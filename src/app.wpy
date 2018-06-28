@@ -1,0 +1,64 @@
+<style lang="less">
+@import "./styles/base";
+@import "./styles/icon";
+@import "./styles/style";
+
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/authorize',
+      'pages/home',
+      'pages/orderList',
+      'pages/personalCenter',
+      'pages/address'
+    ],
+   window: {
+      backgroundTextStyle: 'dark',
+      navigationBarBackgroundColor: '#FFFFFF',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black',
+      enablePullDownRefresh: false,
+      backgroundColor: '#ffffff'
+    },
+    "tabBar": {
+      "color": "#999999",
+      "selectedColor": "#2c2c2c",
+      "borderStyle": "white",
+      "backgroundColor": "#f2f2f2",
+        "list": [{
+        "pagePath": "pages/home",
+        "text": "首页",
+        "iconPath": "images/icon_home.png",
+        "selectedIconPath": "images/icon_home_select.png"
+      },{
+        "pagePath":"pages/orderList",
+        "text":"订单",
+        "iconPath": "images/icon_order.png",
+        "selectedIconPath": "images/icon_order_select.png"        
+      },{
+        "pagePath":"pages/personalCenter",
+        "text":"我的",
+        "iconPath": "images/icon_my.png",
+        "selectedIconPath": "images/icon_my_select.png"        
+      }]
+    }
+  }
+
+  globalData = {
+  }
+
+  constructor () {
+    super()
+    this.use('requestfix')
+    this.use('promisify');
+  }
+
+  async onLaunch(option) {
+  }
+}
+</script>

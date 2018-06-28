@@ -1,0 +1,121 @@
+<template>
+  <view class="{{currentPage==0?'':'hidden'}}">
+    <addressList :list.sync="addressList" @currentPage.user="getCurrentPage"></addressList>
+  </view>
+  <view class="{{currentPage==1?'':'hidden'}}">
+    <addressAdd @currentPage.user="getCurrentPage"></addressAdd>
+  </view>
+  <view class="{{currentPage==2?'':'hidden'}}">
+    <addressEdit @currentPage.user="getCurrentPage" ></addressEdit>
+  </view>
+</template>
+<script>
+	import wepy from 'wepy';
+	import AddressList from "../components/address_list";
+	import AddressAdd from "../components/address_add";
+	import AddressEdit from "../components/address_edit";
+	import api from "../api/api";
+	import tip from "@/utils/tip";
+	import {
+		USER_SPECICAL_INFO,
+		TOKEN
+	} from '@/utils/constant';
+	export default class Address extends wepy.page{
+		config = {
+			navigationBarTitleText: '我的地址',
+		}
+		components = {
+			addressList: AddressList,
+			addressAdd: AddressAdd,
+			addressEdit: AddressEdit
+		}
+		data = {
+			addressList:[],
+			addressInfo:{},
+			//显示当前组件 0：列表、1：新增、2：编辑
+			currentPage:0,
+			type: ""//哪个页面跳转过来的
+		}
+
+		onload(option){
+			this.currentPage =0;
+			this.type =(option.type == undefined?"":option.type);
+			this.$invoke("addressList","setOrgType",this.type);
+		}
+
+		onShow(){
+			let that = this;
+			that.getUserAddress();
+		}
+
+		methods = {
+			//通过子组件的$emit()方法向父组件传递值cur 和 id
+			getCurrentPage(cur,id){
+				this.currentPage = cur;
+				//如果是编辑地址控件，就需要传递数据到编辑控件中
+				if(cur!=1&&cur!=0){
+					this.reachAddressInfo(id);
+				}
+			}
+		}
+
+		events = {
+			refreshAddList(msg){
+				this.getUserAddress();
+			}
+		}
+
+		async getUserAddress(){
+			let that = this;
+			let token = wepy.getStorageSync(TOKEN)||{};
+			const json =await api.getAddressAll({
+				query:{
+					token: token
+				}
+			});
+			if(json.data.code == 0){
+				this.addressList = json.data.data;
+				this.$invoke("addressList","refreshList",this.addressList);
+			}else{
+				tip.error(json.data.msg);
+			}
+			that.showLoading = false;
+		}
+
+		//根据id查询某个收货地址详情
+		async reachAddressInfo(id) {
+    		let that = this;
+    		let token = wepy.getStorageSync(TOKEN) || {};
+    		// const json = await api.reachAddressById({
+     	//  		method:'POST',
+     	//  		query:{
+     	//  			token:token,
+     	//  			id:id
+     	//  		}
+    		// });
+    		const json = await wepy.request({
+    			url:'https://api.it120.cc/manbasji//user/shipping-address/detail',
+    			data:{
+    				token:token,
+    				id:id
+    			},
+    			methods:'POST'
+    		})
+    		console.log(json);
+    	if (json.data.code == 0) {
+      		that.addressInfo=json.data.data;
+      		that.$invoke("addressEdit","refresh", this.addressInfo);
+    	} else {
+      		tip.error("",json.data.msg)
+    	}
+    		that.showLoading = false;
+  		}
+}
+
+</script>
+
+<style lang="less">
+	.hidden{
+		display:none;
+	}
+</style>

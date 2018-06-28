@@ -1,0 +1,189 @@
+<template>
+		<view class="swpier-tab-pd">
+			<tab @currentTab.user="getCurrentTab" :tabList.sync="tabList" :currentTab.sync="currentTab"></tab>
+		</view>
+		<scroll-view scroll-y="true" class="swiper-item-box" style="height:{{winHeight - 31}}px" bindscrolltolower="onReachBottom">
+			<!-- 订单列表item -->
+			<orderItem :orderList.sync="orderList"></orderItem>
+			<!-- 加载更多 -->
+			<bottomLoadMore :show.sync="showLoading" message="正在加载"></bottomLoadMore>
+			<!-- 暂无数据显示 -->
+			<placeholder :show.sync="is_empty" message="暂无发现数据"></placeholder>
+		</scroll-view>		
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api';
+import{
+	SYSTEM_INFO,
+	USER_SPECICAL_INFO
+} from '@/utils/constant';
+import Tab from '@/components/tab' //选项卡组件
+import OrderItem from '@/components/order_item' //订单列表组件
+import BottomLoadMore from '../components/common/bottomLoadMore' //底部加载更多组件
+import PlaceHolder from '../components/common/placeholder' //空列表显示组件
+export default class OrderList extends wepy.page{
+	config = {
+		navigationBarTitleText: '我的订单'
+	}
+	components = {
+		tab: Tab, 
+		orderItem: OrderItem,
+		bottomLoadMore: BottomLoadMore,
+		placeholder: PlaceHolder
+	}
+	data = {
+		winHeight: 0,
+		totalCount:0,//订单条目数
+		tabList:["堂吃","外卖","预约"],
+		orderList:[],//订单列表数据
+		currentPage: 1,//当前加载的页面序号
+		orderStatus: "",//订单状态
+		currentTab: 0,
+		is_empty:true,
+		flag: 0,
+		//是否显示 底部loading
+		showLoading:false,
+		//防止重复加载
+		preventRepeatRequest: false,
+
+		tanchiCount:'',
+		waimaiCount:'',
+		yuyueCount:'',
+		receiveFlg:0,
+
+	}
+
+	async getMyOrder(currentPage,size,refresh){
+		console.log("refresh值"+refresh);
+		let that = this;
+		let userSpecialInfo = wepy.getStorageSync(USER_SPECICAL_INFO) || {};
+		let openId = userSpecialInfo.openId;
+		const json = await api.getMyOrderList({
+			query:{
+				openId: openId,
+				orderStatus: that.orderStatus,
+				receiveFlg: that.receiveFlg,
+				page: currentPage || 1,
+				size: size || 10,
+				type: 1
+			}
+		})
+		console.log("订单列表数据=====");
+		console.log(json);
+		if(json.data.code == 0){
+			if(refresh){
+				that.orderList = json.data.list;
+			}else{
+				that.orderList = [...that.orderList,...json.data.list];
+			}
+			that.page_total = json.data.page_total;
+			that.totalCount = json.data.totalCount;
+			if(json.data.page_total == 0){
+				that.is_empty = true;
+			}else{
+				that.is_empty = false;
+			}
+		}else{
+			tip.error(json.data.msg)
+		}
+		that.showLoading = false;
+		that.$apply();
+	}
+
+	async getMyOrderSize(){
+		console.log("订单数量统计");
+		let that = this;
+		let userSpecialInfo = wepy.getStorageSync(USER_SPECICAL_INFO) || {};
+		let openId = userSpecialInfo.openid;
+		const json = await api.getMyOrderSize({
+			query:{
+				openId:openid
+			}
+		});
+		if(json.data.code == 0){
+			that.tanchiCount = json.data.pendingPayCount;
+			that.waimaiCount = json.data.backrdersCount;
+			that.shippedCount = json.data.shippedCount;
+
+			// var dotList = [{name:"堂吃" dotNum: that.tanchiCount},{name:"外卖",dotNum:that.waimaiCount},{name:"预约",dotNum:that.yuyueCount}];
+			// this.$invoke("tab","changeList",dotList);
+			that.$apply();
+		}
+	}
+
+	onload(opts){
+		let that = this;
+		let title = "";
+		that.orderList=[];
+		that.currentTab = opts.type;
+		that.getMyOrder();
+		// 设置滚动高度
+		let systemInfo = wepy.getStorageSync(SYSTEM_INFO);
+		that.winHeight = systemInfo.windowHeight;
+		that.$apply();
+	}
+	computed = {
+
+	}
+	methods = {
+		getCurrentTab(cur, evt){
+			this.currentPage = 1;
+			this.page_total = 0;
+			this.orderList = [];
+
+			let that = this;
+			that.currentTab = cur;
+			console.log("cur");
+			console.log(cur);
+			if(cur == 0){
+				console.log("堂吃订单");
+				that.orderStatus = 0;
+				that.getMyOrder();
+			} else if (cur == 1){
+				console.log("外卖订单");
+				that.orderStatus = 1;
+				that.getMyOrder();
+			} else if (cur == 2){
+				console.log("预订订单");
+				that.orderStatus = 2;
+				that.getMyOrder();
+			}
+			that.$apply();
+		},
+
+		/**
+		 * 滑动切换tab
+		 */
+		bindChange(e){
+			let that = this;
+			that.currentTab = e.detail.current;
+			console.log("change tab....."+e.detailcurrent)
+			that.$apply();
+		}
+	}
+	events = {
+		//刷新你
+		refreshOrderList(msg){
+			console.log("msg值:"+msg);
+		}
+	}
+	watch = {
+		currentTab(val){
+			console.log("currentTab====="+val)
+		}
+	}
+	//加载更多
+	onReachBottom(){
+
+	}
+}
+</script>
+
+<style lang="less">
+	.swpier-tab-pd{
+		padding: 0 30rpx;
+		background: #fff;
+	}
+</style>

@@ -1,0 +1,216 @@
+<template>
+	<view class="container">
+		<view class="top_box">
+			<image class="logo" src="../images/lamian_logo.jpg"></image>
+			<view class="textsize1 textcolor1">{{shop_name}}</view>
+		</view>
+
+		<view class="middle_box">
+			<view class="btn_subscribebox textsize2">预约</view>
+			<view class="btn_orderbox textsize2">点餐</view>
+			<view class="btn_parcelbox textsize2">外卖</view>
+			<view class="btn_listbox textsize2">排队</view>
+		</view>
+		<view class="bottom_box">
+			<view class="opentime_box textsize2 textcolor2">
+					营业时间：{{open_time}}
+			</view>
+			<view class="contact_box textsize2 textcolor2">
+					联系电话：{{phone}}
+			</view>
+			<view class="address_box textsize2 textcolor2" @tap="showMap">
+				店铺地址：{{address}}
+				<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>
+			</view>
+		</view>	
+
+	</view>
+</template>
+
+<style lang="less">
+	.container{
+
+	}
+	.top_box{
+		width:100%;
+		height:300rpx;
+		text-align:center;
+		background:#f2f2f2;
+	}
+	.logo{
+		width:150rpx;
+		height:150rpx;
+		border-radius:360rpx;
+		margin-top:40rpx;
+	}
+
+	.middle_box{
+		width:100%;
+		height:200rpx;
+	}
+
+	.btn_subscribebox{
+		float:left;
+		height:150rpx;
+		line-height:150rpx;
+		width:20%;
+		background:#999999;
+		text-align:center;
+		margin-left:7%;
+	}
+	.btn_orderbox{
+		float:left;
+		height:150rpx;
+		line-height:150rpx;
+		width:20%;
+		background:#999999;
+		text-align:center;
+		margin-left:2%;
+	}
+	.btn_parcelbox{
+		float:left;
+		height:150rpx;
+		line-height:150rpx;
+		width:20%;
+		background:#999999;
+		text-align:center;
+		margin-left:2%;
+	}
+	.btn_listbox{
+		float:left;
+		height:150rpx;
+		line-height:150rpx;
+		width:20%;
+		background:#999999;
+		text-align:center;
+		margin-left:2%;
+	}
+	.bottom_box{
+		width:100%;
+	}
+	.opentime_box{
+		background:#ffffff;
+		width:86%;
+		height:80rpx;
+		line-height:80rpx;
+		border:0rpx solid #f2f2f2;
+		border-top-width:2rpx;
+		margin-left:7%;
+		margin-right:7%;
+	}
+	.contact_box{
+		background:#ffffff;
+		width:86%;
+		height:80rpx;
+		line-height:80rpx;
+		border:0rpx solid #f2f2f2;
+		border-top-width:2rpx;
+		margin-left:7%;
+		margin-right:7%;
+	}
+	.address_box{
+		background:#ffffff;
+		width:86%;
+		height:80rpx;
+		line-height:80rpx;
+		border:0rpx solid #f2f2f2;
+		border-top-width:2rpx;
+		border-bottom-width:2rpx;
+		margin-left:7%;
+		margin-right:7%;
+	}
+	.icon_arrow{
+		width:64rpx;
+		height:64rpx;
+		float:right;
+		margin-top:8rpx;
+	}
+
+	.textsize1{
+		font-size:36rpx;
+	}
+	.textsize2{
+		font-size:28rpx;
+	}
+	.textcolor1{
+		color:#000000;
+	}
+	.textcolor2{
+		color:#333333;
+	}
+	.textcolor3{
+		color:#666666;
+	}
+	.textcolor4{
+		color:#999999;
+	}
+</style>
+
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api';
+export default class Home extends wepy.page{
+	config = {
+		navigationBarTitleText:'首页'
+	}
+
+	components = {
+
+	}
+	
+	data = {
+		shop_logo:'',
+		shop_name:'',
+		open_time:'',
+		phone:'',
+		address:'',
+		latitude:'',
+		longitude:''
+	}
+
+	async onLoad(){
+		//加载商户信息
+		this.getShopInfo();
+	}
+
+	//获取商家信息
+	async getShopInfo(){
+		let that = this;
+		let json = await api.getShopInfo({
+			query:{
+				id:'1516'
+			}
+		});
+		console.log(json);
+		if(json.data.code == 0){
+			//请求成功
+			let data = (json.data.data)[0];
+			console.log(data.linkPhone);
+			that.open_time = data.dateUpdate;
+			that.phone = data.linkPhone;
+			that.address = data.address;
+			that.shop_name = data.name;
+			that.latitude = data.latitude;
+			that.longitude = data.longitude;
+			console.log(that.open_time);
+		}else{
+
+		}
+		that.$apply();
+	}
+
+	methods = {
+		showMap(){
+			let that = this;
+			wepy.openLocation({
+				latitude:that.latitude,
+				longitude:that.longitude
+			})
+		}
+	}
+
+
+}
+</script>
+
