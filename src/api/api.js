@@ -46,6 +46,15 @@ const deleteAddress = (params) => wxRequest(params,apiHost+'/user/shipping-addre
 //用户收货地址根据id查询
 const reachAddressById = (params) => wxRequest(params, apiHost + '/user/shipping-address/detail');
 
+//获取分类信息
+const getCategory = (params) => wxRequest(params,apiHost +'/shop/goods/category/all');
+
+//获取分类下面的商品信息
+const getFoodMsgList = (params) => wxRequest(params,apiHost + '/shop/goods/list');
+
+//获取商品规格
+const getAttrMsgList = (params) => wxRequest(params,apiHost + '/shop/goods/detail');
+
 export default {
   sendWxCode,
   checkToken,
@@ -55,5 +64,8 @@ export default {
   addAddress,
   updateAddress,
   deleteAddress,
-  reachAddressById
+  reachAddressById,
+  getCategory,
+  getFoodMsgList,
+  getAttrMsgList
 }

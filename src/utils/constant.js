@@ -13,6 +13,8 @@ export const USER_INFO = "userInfo";
 // 用户token
 export const TOKEN = "token";
 
+//分类选择itemcode
+export const ACTIVE_CODE = "activecode";
 /**
  * 系统信息
  * @type {String}
