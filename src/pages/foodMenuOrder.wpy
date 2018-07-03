@@ -1,0 +1,1035 @@
+<template>
+	<view class="top_box">
+		<view class="top_tab textcolor1">菜单</view>
+	</view>
+	<view class="content_box" style="height:{{windowHeight-90}}px">
+		<!-- 左侧菜单 -->
+		<scroll-view class="category_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-90}}px">
+			<view class="name text_overflow {{item.active?'active':''}}" wx:for="{{categoryList}}" wx:key="item" @tap="changeCate" data-code="{{item.id}}">
+				<text>{{item.name}}</text>
+			</view>
+		</scroll-view>
+		<!-- 右侧菜单 -->
+		<scroll-view class="food_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-95}}px">
+			<view class="category_name">{{categoryName}}</view>
+			<view class="food_list">
+				<view class="food_item" wx:for="{{foodMsgList}}" wx:for-item="item" wx:key="index" data-index="{{index}}" @tap="showM">
+					<image class="food_image" src="{{item.pic}}"></image>
+					<view class="food_name">{{item.name}}</view>
+					<view class="food_desc">{{item.characteristic}}</view>
+					<view class="food_msg">月售{{item.numberOrders}}</view>
+					<view class="food_minprice">￥{{item.minPrice}}<text class="food_originalPrice">{{item.originalPrice==0||item.originalPrice==undefined?"":'￥'+item.originalPrice}}</text></view>
+					<view class="chose_attr type_theme_color" data-id="{{item.id}}" data-name="{{item.name}}" wx:if="{{item.beattr && item.num==0}}" @tap.stop="getAttrMsgList">选规格</view>
+					<!-- 商品没有属性规格，直接显示加号 -->
+					<view class="beAttr_addnum_container" wx:if="{{!item.beattr&&item.num==0}}">
+						<image class="beAttr_addnum" src="../images/icon_add_num.png" @tap.stop="addShopCart" data-type="addNum" data-id="{{item.id}}" data-price="{{item.minPrice}}"></image>
+					</view>
+					<!-- 商品并且购物车中商品数量为0（这里会把商品购物车中的数量直接添加到foodMsgList中） -->
+					<view class="op_num_pro_list" wx:if="{{item.num!=0&&item.num!=undefined}}">
+						<image class = "icon_reduce" @tap.stop="reduceProNum" data-id="{{item.id}}" data-price="{{item.minPrice}}" data-type="reduceNum" src="../images/icon_reduce_num.png"></image>
+						<text class="pro_num">{{item.num}}</text>
+						<image class="icon_add" @tap.stop="addProNum" data-type="addNum" data-id="{{item.id}}" data-price="{{item.minPrice}}" src="../images/icon_add_num.png"></image>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+		</view>
+	</view>
+	<view class="bottom_box">
+		<view class="{{allPrice==0||allPrice==undefined?'pic_shopcart_bg_null':'pic_shopcart_bg'}}"><image class="pic_shopcart" src="../images/icon_shop_cart.png"></image></view>
+		<view class="shopcart_num_redpoint" wx:if="{{allPrice==0||allPrice==undefined?false:true}}"></view>
+		<text class="all_price">{{allPrice==0||allPrice==undefined?'':'￥'+allPrice}}</text>
+		<text class="btn_wxpay">微信支付</text>
+		<text class="btn_cashpay">现金支付</text>
+	</view>
+
+
+<!-- 商品图片弹窗 -->
+	<view class="mask" catchtouchmove="preventTouchMove" @tap="touchMask" wx:if="{{showModal}}"></view>
+	<view class="modalDlg" wx:if="{{showModal}}">
+	<image class="modal_img" src="{{modal.src}}" />
+	<text class="modal_name">{{modal.name}}</text>
+	<text class="modal_num">月售 <text class="numorder">{{modal.numberOrders}}</text></text>
+	<view class = "modal_bottom">
+		<text class="modal_minPrice">￥{{modal.minPrice}}</text>
+		<text class="modal_originPrice">{{modal.originalPrice==0||modal.originalPrice==undefined?"":'￥'+modal.originalPrice}}</text>
+		<view class="modal_chose_attr type_theme_color" data-id="{{modal.id}}" @tap="getAttrMsgList">选规格</view>
+	</view>
+	</view>
+<!-- 选取规格弹窗 -->
+	<view class="attrmask" catchouchmove="preventTouchMove" @tap="touchAttrMask" wx:if="{{showAttrModal}}"></view>
+	<view class="modalDlg_attr" wx:if="{{showAttrModal}}">
+		<view class="modal_name_attr">{{attrModal.name}}</view>
+		<view class="rule_box" wx:for="{{attrMsgList}}" wx:for-item="item" wx:key="key" wx:for-index="ex" data-id="{{item.id}}">
+			<view class="title">{{item.name}}</view>
+			<view class="items">
+			<view class="item {{ch.active?'attractive':''}}" wx:for="{{item.childsCurGoods}}" data-pid="{{item.id}}" wx:for-item="ch" wx:key="key" @tap.stop="selAttr" data-id="{{ch.id}}" data-nameid="{{ch.name}}" data-index="{{ex}}">
+				{{ch.name}}
+			</view>
+			</view>
+		</view>
+		<view class="attrmodal_bottom">
+			<text class="attrmodal_minPrice">￥{{curShopCartItem.minPrice}}</text>
+			<text class="attrmodal_originPrice">￥{{curShopCartItem.originPrice}}</text>
+			<view class="add_cart" @tap="addShopCart" wx:if="{{!beNum}}">
+				<image class="add_cart_pic" src="../images/icon_shop_cart.png"></image>
+				<text class="add_cart_text">加入购物车</text>
+			</view>
+			<view class="op_num" wx:if="{{beNum}}">
+				<image class = "icon_reduce" @tap="reduceProNum" src="../images/icon_reduce_num.png"></image>
+				<text class="pro_num">{{curShopCartItem.num}}</text>
+				<image class="icon_add" @tap="addProNum" src="../images/icon_add_num.png"></image>
+			</view>
+		</view>		
+	</view>
+</template>
+
+<style lang="less">
+	page{
+		background:#ffffff
+	}
+	//隐藏滚动条
+	::-webkit-scrollbar{
+ 	 	width: 0;
+  	 	height: 0;
+  	 	color: transparent;
+	}
+	.top_tab{
+		height:80rpx;
+		line-height:80rpx;
+		padding-left:40rpx;
+		font-size:32rpx;
+		border: 2rpx solid #e0e0e0;
+  		border-right-width:0rpx;
+  		border-left-width:0rpx;
+  		border-bottom-color:#f2f2f2;
+	}
+
+	.bottom_box{
+		height:110rpx;
+		background:#413d3c;
+		.pic_shopcart{
+			width:60rpx;
+			height:60rpx;
+			margin-top:15rpx;
+		}
+		.pic_shopcart_bg{
+			float:left;
+			width:90rpx;
+			height:90rpx;
+			border-radius:360rpx;
+			background:#ffeb3b;
+			position:relative;
+			text-align:center;
+			top:-20rpx;
+			left:30rpx;			
+		}
+		.pic_shopcart_bg_null{
+			float:left;
+			width:90rpx;
+			height:90rpx;
+			border-radius:360rpx;
+			background:#cccccc;
+			position:relative;
+			text-align:center;
+			top:-20rpx;
+			left:30rpx;			
+		}
+		.all_price{
+			position:relative;
+			font-size:48rpx;
+			color:#fff;
+			font-weight:normal;
+			left:30rpx;
+			top:15rpx;
+		}
+		.btn_cashpay{
+			float:right;
+			background:#ffc400;
+			font-size:30rpx;
+			height:110rpx;
+			line-height:110rpx;
+			width:170rpx;
+			text-align:center;
+			font-weight:bold;
+			color:#333;
+		}
+		.btn_wxpay{
+			float:right;
+			background:#259b24;
+			font-size:30rpx;
+			height:110rpx;
+			line-height:110rpx;
+			width:170rpx;
+			text-align:center;
+			font-weight:bold;
+			color:#fff;
+		}
+
+		.shopcart_num_redpoint{
+			float:left;
+			width:28rpx;
+			height:28rpx;
+			line-height:28rpx;
+			font-size:20rpx;
+			color:#fff;
+			background:red;
+			z-index:999;
+			position:relative;
+			top:-20rpx;
+			left:15rpx;
+			border-radius:360rpx;
+		}
+	}
+
+	.content_box{
+		display:flex;
+		position: relative;
+	}
+
+	.category_box{
+		width: 160rpx;
+		position:relative;
+	}
+
+	.name{
+	  padding-left:20rpx;
+	  padding-right:20rpx;
+      text-align: center;
+      height: 80rpx;
+      line-height:80rpx;
+      background:#fafafa;
+	  font-size: 28rpx;
+      color: #666;      
+	}
+
+	.active {
+		background:#fff;
+		color: #2c2c2c;
+	}
+
+	.category_name{
+		font-size:28rpx;
+		height:30rpx;
+		margin-top:20rpx;
+		margin-left:20rpx;
+	}
+
+	.food_list{
+		postion: relative;
+		z-index: 100;
+		padding: 20rpx 20rpx 20rpx 20rpx;
+		margin-top:-60rpx;
+	}
+
+	.food_item{
+		margin-top:80rpx;
+	}
+
+	.food_image{
+		float:left;
+		width:160rpx;
+		height:160rpx;
+		margin-right:20rpx;
+	}
+
+	.food_name{
+		position:relative;
+		font-size:32rpx;
+		color:#000000;
+		font-weight:bold;
+	}
+
+	.food_desc{
+		width:100%;
+		height:36rpx;
+		font-size:24rpx;
+		color:#999999
+	}
+	.food_msg{
+		font-size:22rpx;
+		color:#999999;
+		margin-top:8rpx;
+	}
+
+	.food_minprice{
+		font-weight:bold;
+		font-size:34rpx;
+		color:red;
+		margin-top:8rpx;
+	}
+	.food_originalPrice{
+		font-weight:normal;
+		font-size:22rpx;
+		color:#999999;
+		text-decoration:line-through;
+		margin-left:20rpx
+	}
+	//商品列表选择属性
+	.chose_attr{
+		float:right;
+		position:relative;
+		font-size:24rpx;
+		border-radius:25px;
+		width:100rpx;
+		height:40rpx;
+		line-height:40rpx;
+		text-align:center;
+		top:-40rpx;
+		right:5rpx;
+	}
+	//商品列表添加数量
+	.beAttr_addnum_container{
+		float:right;
+		margin-top:-40rpx;
+		margin-right:20rpx;
+		.beAttr_addnum{
+			width:55rpx;
+			height:55rpx;
+		}
+	}
+
+	//弹窗蒙层
+	.mask{
+		width:100%;
+		height:100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		background:#000;
+		z-index:9000;
+		opacity:0.7;
+	}
+	.modalDlg{
+		width:85%;
+		height:635rpx;
+		position:fixed;
+		top:50%;
+		left:0;
+		z-index: 9999;
+    	margin: -370rpx 7.5%;
+		background-color:#fff;
+		border-radius:5rpx;
+		display:flex;
+		flex-direction:column;
+		aligin-items:center;
+	}
+	.modal_img{
+		width:100%;
+		height:440rpx;
+	}
+	.modal_name{
+		font-size:24rpx;
+		font-weight:bold;
+		color:#000;
+		margin-top:15rpx;
+		margin-left:15rpx;
+	}
+
+	.modal_num{
+		font-size:22rpx;
+		color:#999;
+		margin-left:15rpx;
+		margin-top:15rpx;
+		height:40rpx;
+	}
+	.numorder{
+		font-size:24rpx;
+	}
+	.modal_bottom{
+		height:88rpx;
+		width:100%;
+		position:absolute;
+		bottom:0rpx;
+		background:#fafafa;
+	}
+	.modal_minPrice{
+		position:relative;
+		font-size:40rpx;
+		font-weight:bold;
+		color:red;
+		left:15rpx;
+		top:18rpx;
+	}
+	.modal_originPrice{
+		position:relative;
+		top:20rpx;
+		left:20rpx;
+		font-size:24rpx;
+		color:#999999;
+		text-decoration:line-through;
+	}
+	.modal_chose_attr{
+		float:right;
+		position:relative;
+		font-size:24rpx;
+		border-radius:25px;
+		width:120rpx;
+		height:50rpx;
+		line-height:50rpx;
+		text-align:center;
+		top:20rpx;
+		right:20rpx;
+	}
+	// attr弹窗
+	.attrmask{
+		width:100%;
+		height:100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		background:#000;
+		z-index:9000;
+		opacity:0.4;
+	}
+	.modalDlg_attr{
+		width:80%;
+		position:fixed;
+		top:50%;
+		left:0;
+		z-index: 9999;
+    	margin: -370rpx 10%;
+		background-color:#fff;
+		border-radius:5rpx;
+		display:flex;
+		flex-direction:column;
+		aligin-items:center;		
+	}
+	.modal_name_attr{
+		text-align:center;
+		font-size:32rpx;
+		margin-top:15rpx;
+		color:#333333
+	}
+	.rule_box {
+		padding-left:26rpx;
+		padding-right:26rpx;
+		padding-bottom:26rpx;
+		.title {
+			color: #4c4c4c;
+			font-size: 28rpx;
+			margin-top: 10rpx;
+		}
+		.items {
+			display: flex;
+			flex-wrap: wrap;
+			margin-top: 5rpx;
+			margin-left: -20rpx;
+		}
+		.item {
+			padding: 8rpx 20rpx;
+			background: #e6e6e6;
+			color: #000;
+			margin-left: 20rpx;
+			margin-top: 10rpx;
+			border-radius: 10rpx;
+			font-size:28rpx;
+		}
+		.attractive {
+			background: #ed394a;
+			color: #fff;
+		}
+	}
+	.attrmodal_bottom{
+		height:90rpx;
+		width:100%;
+		background:#fafafa;
+	}
+	.attrmodal_minPrice{
+		position:relative;
+		font-size:40rpx;
+		font-weight:bold;
+		color:red;
+		left:15rpx;
+		top:18rpx;
+	}
+	.attrmodal_originPrice{
+		position:relative;
+		top:20rpx;
+		left:20rpx;
+		font-size:24rpx;
+		color:#999999;
+		text-decoration:line-through;
+	}
+	.add_cart{
+		float:right;
+		position:relative;
+		width:220rpx;
+		height:58rpx;
+		line-height:58rpx;
+		top:18rpx;
+		right:15rpx;
+		text-align:center;
+		background:#ffeb3b;
+		border-radius:35rpx;
+		.add_cart_pic{
+			width:40rpx;
+			height:40rpx;
+			float:left;
+			margin-left:20rpx;
+			margin-top:10rpx;
+		}
+		.add_cart_text{
+			font-size:26rpx;
+			color:#333333;
+			margin-bottom:10rpx;
+		}
+	}
+	.op_num_pro_list{
+		float:right;
+		margin-right:20rpx;
+		text-align:center;
+		margin-top:-40rpx;
+	}
+	.op_num{
+		float:right;
+		margin-top:18rpx;
+		margin-right:20rpx;
+		text-align:center;
+	}
+	.icon_add{
+		width:50rpx;
+		height:50rpx;
+		margin-left:20rpx;
+	}
+	.icon_reduce{
+		width:50rpx;
+		height:50rpx;
+		margin-right:20rpx;
+	}
+	.pro_num{
+		font-size:30rpx;
+		color:#333333;
+		position:relative;
+		top:-15rpx;
+	}
+
+</style>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api';
+import{
+	SYSTEM_INFO,
+	ACTIVE_CODE,
+	ATTR_ACTIVE_CODE,
+	SHOP_CART
+} from '@/utils/constant'
+
+import tip from '@/utils/tip'
+
+	export default class FoodMenu extends wepy.page{
+		config = {
+			navigationBarTitleText:'点餐'
+		}
+
+		components = {
+
+		}
+
+		data = {
+			windowHeight:0,
+			categoryList:{},
+			foodMsgList:{},
+			categoryName:'',
+			showModal:false,
+			showAttrModal:false,
+			modal:{
+				src:'',
+				name:'',
+				numberOrders:'',
+				minPrice:'',
+				originalPrice:'',
+				id:''
+			},
+			attrMsgList:{},
+			attrModal:{
+				name:'',
+				price:'',
+				originalPrice:''
+			},
+			attr:{
+				minPrice:'12',
+				originPrice:'22'
+			},
+			//购物车
+			shopCart:[],
+			beNum:false,
+			//判断是否有商品属性数量，根据这个属性可以来判断属性弹窗底部按钮是“加入购物车”还是
+							//加减数量。
+			curShopCartItem:{
+				foodId:'',
+				num:'',
+				minPrice:'',
+				originPrice:'',
+				attr:[
+					{
+						attrId:'',
+						attrItemId:''
+					},
+					{
+						attrId:'',
+						attrItemId:''
+					}
+				]
+			},
+			resetCurShopCartItem:{
+				foodId:'',
+				num:'',
+				minPrice:'',
+				originPrice:'',
+				attr:[
+					{
+						attrId:'',
+						attrItemId:''
+					},
+					{
+						attrId:'',
+						attrItemId:''
+					}
+				]
+			},
+			allPrice:0,
+			beAttr:true,//商品列表中商品是否存在属性规格
+
+		}
+
+		async onLoad(options){
+			console.log("onLoad====",options.tableNum);
+		}
+
+		onShow(){
+			this.shopCart = wepy.getStorageSync(SHOP_CART) || {};
+			let that = this;
+			let systemInfo = wx.getStorageSync(SYSTEM_INFO);			
+			if(systemInfo==null||systemInfo==""||systemInfo==undefined){
+				systemInfo = wepy.getSystemInfoSync();
+        		wepy.setStorageSync(SYSTEM_INFO, systemInfo);						
+			}
+			this.windowHeight = systemInfo.windowHeight;
+			console.log("windowHeight=====");
+			console.log(this.windowHeight);			
+			this.getCategoryList();
+			this.getFoodListMsg();	
+
+			console.log("onshow ====");
+			console.log(this.showModal);	
+		}
+
+		onReady(){
+			console.log("onReady ====");
+			console.log(this.showModal);	
+		}
+
+		preventTouchMove(){
+			console.log("preventTouchMove ====");
+			console.log(this.showModal);	
+		}
+
+		async getCategoryList(){
+			let categoryIndex = 1;
+			let isActiveCodeNull = false;//判断本地缓存是否存在activecode
+			const json = await api.getCategory({
+				query:{}
+			})
+			console.log(json);		
+			if(json.data.code == 0){
+				this.categoryList = json.data.data;
+			}else{
+				tip.error(json.data.msg);
+				return;
+			}
+			//拿取本地activecode缓存，没有则isActiveCodeNull为true
+			let activecode = await wepy.getStorageSync(ACTIVE_CODE);
+			if(activecode.length == 0){
+				isActiveCodeNull = true;
+			}
+			//边遍历边添加active属性，如果isActiveCodeNull为true，则选取第一个item的active为true
+			for(var i = 0 ;i<this.categoryList.length;i++){
+				this.categoryList[i].active = false;
+				if(i == 0 && isActiveCodeNull){
+					categoryIndex = i;
+					this.categoryList[i].active = true;
+					wepy.setStorageSync(ACTIVE_CODE,this.categoryList[i].id);
+				}else{
+					if(this.categoryList[i].id == activecode){
+						categoryIndex = i ;
+						this.categoryList[i].active = true;
+					}
+				}
+			}
+			this.categoryName = this.categoryList[categoryIndex].name
+			this.getFoodListMsg(activecode);
+			this.$apply();
+		}
+
+		async getFoodListMsg(categoryId){
+			const json = await api.getFoodMsgList({
+				query:{
+					categoryId:categoryId
+				}
+			});
+			if(json.data.code == 0){
+				this.foodMsgList = json.data.data;
+			}else{
+				tip.error(json.data.msg);
+				return;
+			}
+			let length = this.shopCart.length;
+			if(length == undefined){
+				this.shopCart = [];
+			}
+			for(let i = 0;i<this.foodMsgList.length;i++){
+		
+				if(this.shopCart.length==0 || this.shopCart.length == undefined){
+					console.log("购物车中没有东西...");
+					//购物车中没有东西
+					this.foodMsgList[i].num = 0;
+					this.foodMsgList[i].beattr = false;		
+				}else{
+					console.log("购物车中有东西...");
+					//购物车中有东西
+					for(let j = 0;j<this.shopCart.length;j++){
+						this.foodMsgList[i].beattr = false;
+						console.log(this.foodMsgList[i].id,this.shopCart[j].foodId);
+						if(this.foodMsgList[i].id == this.shopCart[j].foodId){
+							console.log("foodId 相等");
+							this.foodMsgList[i].num = this.shopCart[j].num;
+							break;
+						}else{
+							console.log("foodId 不相等");
+							this.foodMsgList[i].num = 0;
+						}
+					}
+				}				
+				
+			}
+			console.log("foodMsgList===",this.foodMsgList);
+			this.$apply();
+		}
+
+		//获取选中属性价格
+		async getAttrPrice(){
+			let goodsId = this.curShopCartItem.foodId;
+			let attrString = this.curShopCartItem.attr[0].attrId+':'+this.curShopCartItem.attr[0].attrItemId;
+			for(let i =0;i<this.curShopCartItem.attr.length;i++){
+				if(i==0){
+					attrString = this.curShopCartItem.attr[i].attrId+':'+this.curShopCartItem.attr[i].attrItemId;
+				}else{
+					attrString=attrString+","+this.curShopCartItem.attr[i].attrId+':'+this.curShopCartItem.attr[i].attrItemId;
+				}
+			}
+			const json =  await api.getAttrPrice({
+				query:{
+					goodsId:goodsId,
+					propertyChildIds:attrString
+				},
+			})
+			if(json.data.code == 0){
+				this.curShopCartItem.minPrice = json.data.data.price;
+				this.curShopCartItem.originPrice = json.data.data.originalPrice;
+			}else{
+				tip.error(json.data.msg);
+			}
+			//变换属性，该商品有加入购物车时，将该商品的价格计算入总价格；
+			if(this.beNum){
+				this.allPrice = 0;//先把总价格都初始化为0，在统一进行购物车中商品的计算
+				for(let i = 0;i<this.shopCart.length;i++){
+					console.log("进入循环遍历:",this.shopCart[i].minPrice,this.shopCart[i].num);
+					this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+				}
+			}
+			this.$apply();
+		}
+
+		methods = {
+			changeCate(e){
+				let code = e.currentTarget.dataset.code;
+				this.getFoodListMsg(code);
+				wepy.setStorageSync(ACTIVE_CODE,code);
+				for(var i =0;i<this.categoryList.length;i++){
+					this.categoryList[i].active = false;
+					if(this.categoryList[i].id == code){
+						this.categoryList[i].active = true;
+						this.categoryName = this.categoryList[i].name;
+					}
+				}
+				console.log(this.categoryList);
+				this.$apply();
+			},
+
+			async getAttrMsgList(e){
+				// this.curShopCartItem = {};
+				let name = e.currentTarget.dataset.name;
+				let foodId = e.currentTarget.dataset.id;
+				let foodIndex;//foodId 在 shopCart中的 位置
+				let json = await api.getAttrMsgList({
+					query:{
+						id:foodId
+					}
+				});
+
+				console.log("请求属性信息=====");
+				console.log(json);
+				let beFoodId = false;
+				if(json.data.code == 0){
+					//赋值属性数据
+					this.attrMsgList = json.data.data.properties;
+					if(this.shopCart.length == 0){
+						//购物车没有数据
+					}else{
+						//购物车有数据，遍历是否存在该商品的foodID
+						for(let i = 0;i<this.shopCart.length;i++){
+							if(this.shopCart[i].foodId == foodId){
+								//存在,跳出for循环
+								beFoodId = true;
+								foodIndex = i;
+								break;
+							}
+						}
+					}
+					if(beFoodId){
+							this.beNum = true;//购物车中有商品，肯定就存在数量
+							this.curShopCartItem.num = this.shopCart[foodIndex].num;//获取购物车中的商品数量
+							this.curShopCartItem.foodId = this.shopCart[foodIndex].foodId;//获取购物车中商品id
+							//如果存在foodId，购物车中有商品，遍历attrMsgList，找到与shopCart中相匹配的attr，
+							for(let l =0;l<this.shopCart[foodIndex].attr.length;l++){
+								for(let i = 0;i<this.attrMsgList.length;i++){
+									if(this.attrMsgList[i].id == this.shopCart[foodIndex].attr[l].attrId){
+										//添加当前购物车item 的 attr
+										this.curShopCartItem.attr[l].attrId = this.shopCart[foodIndex].attr[l].attrId;
+										//获取当前购物车的item的attrItemId
+										this.curShopCartItem.attr[l].attrItemId = this.shopCart[foodIndex].attr[l].attrItemId;
+										for(let q = 0; q<this.attrMsgList[i].childsCurGoods.length;q++){
+											if(this.shopCart[foodIndex].attr[l].attrItemId == this.attrMsgList[i].childsCurGoods[q].id ){
+												//相同属性分类下面属性id相同,说明shopCart中存在该属性，则该属性active 值为 true
+												this.attrMsgList[i].childsCurGoods[q].active = true;
+											}else{
+												//不存在则 active 值为false
+												this.attrMsgList[i].childsCurGoods[q].active = false;
+											}										
+										}
+									}
+								}
+							}
+						}else{
+							//为当前购物车Item添加foodId
+							this.curShopCartItem.foodId = foodId;
+							// this.curShopCartItem.attr = [];
+							// this.curShopCartItem.attr.push([attrId:'',attrItemId:'']);
+							console.log(this.curShopCartItem);							
+							//不存在foodId，购物车是空的，默认选择各规格分类下面的第一个规格，设置其属性为active
+							for(let j = 0;j<this.attrMsgList.length;j++){
+								//为当前购物车item 添加attrId
+
+								if(this.curShopCartItem.attr[j].attrId==undefined){
+									this.curShopCartItem.attr[j].attrId = '';
+								}
+								this.curShopCartItem.attr[j].attrId = this.attrMsgList[j].id;
+
+								for(let k=0;k<this.attrMsgList[j].childsCurGoods.length;k++){
+									if(k==0){
+										//为每一个属性分类下面的第一个属性 的 active 赋值 true
+										this.attrMsgList[j].childsCurGoods[k].active=true;
+										//为当前购物车item 添加attrItemId
+										this.curShopCartItem.attr[j].attrItemId = this.attrMsgList[j].childsCurGoods[k].id;
+									}else{
+										//其他设置为 false
+										this.attrMsgList[j].childsCurGoods[k].active=false;	
+									}
+								}
+							}
+						}
+					}else{
+						tip.error(json.data.msg);
+						return;
+					}
+				console.log("处理后的attrMsglist");
+				console.log(this.attrMsgList);
+				this.attrModal.name = name ; 
+				this.showAttrModal = true;
+				this.showModal = false;
+				this.getAttrPrice();
+				this.$apply();
+			},
+
+			selAttr(e){
+				let pid = e.currentTarget.dataset.pid;
+				let id = e.currentTarget.dataset.id;
+				for(let j =0;j<this.attrMsgList.length;j++){
+					if(pid == this.attrMsgList[j].id){
+						for(let i = 0;i<this.attrMsgList[j].childsCurGoods.length;i++){
+							if(this.attrMsgList[j].childsCurGoods[i].id == id){
+								//为当前购物车item赋值 attrId 和 attrItemId
+								if(this.curShopCartItem.attr[j].attrId == pid){
+									this.curShopCartItem.attr[j].attrItemId = id;
+								}
+								this.attrMsgList[j].childsCurGoods[i].active = true;
+							}else{
+								this.attrMsgList[j].childsCurGoods[i].active = false;
+							}
+						}
+					}
+
+				}
+				this.getAttrPrice();//获取所选属性价格
+			},
+			//添加购物车
+			addShopCart(e){
+				let type = e.currentTarget.dataset.type;
+				if(type =='addNum'){
+					this.curShopCartItem = {};
+					console.log("foodId====minPrice",e.currentTarget.dataset.id,e.currentTarget.dataset.price);
+					//点击商品列表的加号
+					this.curShopCartItem.foodId = e.currentTarget.dataset.id;
+					this.curShopCartItem.minPrice = e.currentTarget.dataset.price;
+				}else{
+					//点击属性弹窗的 【加入购物车】
+					console.log("=====加入购物车=====");
+					this.beNum=true;//选择数量
+				}
+					this.curShopCartItem.num = 1;
+					console.log("curShopCartItem====",this.curShopCartItem);
+					//点击加入购物车时，将当前购物车的item添加进入购物车
+					let index = this.shopCart.length;
+					if(index==undefined){
+						this.shopCart=[];
+					}
+					let shopCartItem = this.curShopCartItem;
+					this.shopCart[index==undefined?0:index] = shopCartItem;
+					console.log("shopCart====",this.shopCart);
+					//计算allPrice,先清空allPrice
+					this.allPrice=0;
+					console.log("shopCart的length===",this.shopCart.length);
+					for(let i = 0;i<this.shopCart.length;i++){
+						console.log("进入循环遍历:",this.shopCart[i].minPrice,this.shopCart[i].num);
+						this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+					}				
+				//添加购物车时，要把对应商品的数量添加进入foodMsgList中
+				for(let i = 0;i<this.foodMsgList.length;i++){
+					if(this.foodMsgList[i].id == shopCartItem.foodId){
+						this.foodMsgList[i].num = shopCartItem.num;
+					}
+				}
+				console.log("addShopCart====",this.allPrice);
+			},
+			//添加商品数量
+			addProNum(e){
+				let type = e.currentTarget.dataset.type;
+				if(type == 'addNum'){
+					this.curShopCartItem={};
+					console.log("当前操作的商品是 addNum：",e.currentTarget.dataset.id);
+					this.curShopCartItem.foodId = e.currentTarget.dataset.id;
+					this.curShopCartItem.minPrice = e.currentTarget.dataset.price;
+				}
+				console.log("当前操作的商品是：",this.curShopCartItem.foodId);
+				
+				console.log("当前购物车内容：",this.shopCart);
+
+				for(let i = 0;i<this.shopCart.length;i++){
+					if(this.shopCart[i].foodId == this.curShopCartItem.foodId){
+						//购物车中的foodId与当前操作的商品id相同
+						//将购物车中当前操作商品的数量赋值curShopCartItem上去
+						console.log("当前shopCart【i】.num ==:",this.shopCart[i].num);
+						this.curShopCartItem.num = this.shopCart[i].num;
+					}
+				}
+				console.log("增加前购物车item商品数量：",this.curShopCartItem.num)
+				//增加当前操作商品的数量
+				this.curShopCartItem.num+=1;
+				//添加商品数量时，遍历当前shopCart的foodId，找到匹配到的foodId赋值num
+				for(let i =0;i<this.shopCart.length;i++){
+					if(this.shopCart[i].foodId == this.curShopCartItem.foodId){
+						this.shopCart[i].num = this.curShopCartItem.num;
+					}
+				}
+				//添加商品数量到foodMsgList中；
+				for(let i = 0;i<this.foodMsgList.length;i++){
+					if(this.foodMsgList[i].id == this.curShopCartItem.foodId){
+						this.foodMsgList[i].num = this.curShopCartItem.num;
+					}
+				}
+				console.log("增加后购物车item商品数量：",this.curShopCartItem.num);
+				//计算allPrice,先清空allPrice
+				this.allPrice = 0;
+				console.log("shopCart的length===",this.shopCart.length);
+				for(let i = 0;i<this.shopCart.length;i++){
+					this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+				}
+				console.log("addProNum====",this.allPrice);
+			},
+			//减少商品数量
+			reduceProNum(e){
+				let index  = 0;
+				let type = e.currentTarget.dataset.type;
+				if(type == 'reduceNum'){
+					this.curShopCartItem.foodId = e.currentTarget.dataset.id;
+					this.curShopCartItem.minPrice = e.currentTarget.dataset.price;
+				}
+
+				for(let i = 0;i<this.shopCart.length;i++){
+					if(this.shopCart[i].foodId == this.curShopCartItem.foodId){
+						//购物车中的foodId与当前操作的商品id相同
+						//将购物车中当前操作商品的数量赋值curShopCartItem上去
+						this.curShopCartItem.num = this.shopCart[i].num;
+						index = i;
+					}
+				}
+
+
+				if(this.curShopCartItem.num > 0){
+					this.curShopCartItem.num-=1;
+				}else{
+					this.beNum = false;
+				}
+
+				if(this.curShopCartItem.num==0){
+					//如果操作完后商品数量等于0，就需要将其在购物车中去除
+					this.shopCart.splice(index,1);
+				}else{
+					for(let i =0;i<this.shopCart.length;i++){
+						if(this.shopCart[i].foodId == this.curShopCartItem.foodId){
+							this.shopCart[i].num = this.curShopCartItem.num;
+						}
+					}
+				}
+
+
+
+				console.log("当前购物车item商品数量：",this.curShopCartItem.num);
+				//计算allPrice,先清空allPrice
+				this.allPrice = 0;
+				console.log("shopCart的length===",this.shopCart.length);
+				for(let i = 0;i<this.shopCart.length;i++){
+					this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+				}
+				console.log("reduceProNum====",this.allPrice);
+				//减少商品数量在foodMsgList中；
+				for(let i = 0;i<this.foodMsgList.length;i++){
+					if(this.foodMsgList[i].id == this.curShopCartItem.foodId){
+						this.foodMsgList[i].num = this.curShopCartItem.num;
+					}
+				}
+			},
+
+			showM(e){
+				let index= e.currentTarget.dataset.index;
+				this.showModal=true;
+				this.modal.src = this.foodMsgList[index].pic;
+				this.modal.name = this.foodMsgList[index].name;
+				this.modal.numberOrders = this.foodMsgList[index].numberOrders;
+				this.modal.minPrice = this.foodMsgList[index].minPrice;
+				this.modal.originalPrice = this.foodMsgList[index].originalPrice;
+				this.modal.id = this.foodMsgList[index].id;
+				console.log("showM ====");
+				console.log(this.showModal);					
+			},
+			touchMask(){
+				this.showModal = false;
+			},
+			touchAttrMask(){
+				this.showAttrModal = false;
+			}
+		}
+	}
+</script>
