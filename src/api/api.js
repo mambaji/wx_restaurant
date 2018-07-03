@@ -55,6 +55,9 @@ const getFoodMsgList = (params) => wxRequest(params,apiHost + '/shop/goods/list'
 //获取商品规格
 const getAttrMsgList = (params) => wxRequest(params,apiHost + '/shop/goods/detail');
 
+//获取规格价格
+const getAttrPrice = (params) => wxRequest(params,apiHost+'/shop/goods/price');
+
 export default {
   sendWxCode,
   checkToken,
@@ -67,5 +70,6 @@ export default {
   reachAddressById,
   getCategory,
   getFoodMsgList,
-  getAttrMsgList
+  getAttrMsgList,
+  getAttrPrice
 }

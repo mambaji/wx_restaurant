@@ -2,14 +2,14 @@
 	<view class="container">
 		<view class="top_box">
 			<image class="logo" src="../images/lamian_logo.jpg"></image>
-			<view class="textsize1 textcolor1">{{shop_name}}</view>
+			<view class="shopName textsize1">{{shop_name}}</view>
 		</view>
 
 		<view class="middle_box">
-			<view class="btn_subscribebox textsize2">预约</view>
-			<view class="btn_orderbox textsize2">点餐</view>
-			<view class="btn_parcelbox textsize2">外卖</view>
-			<view class="btn_listbox textsize2">排队</view>
+			<view class="btn_subscribebox textsize2" @tap="onSubscribe">预约</view>
+			<view class="btn_orderbox textsize2" @tap="onOrder">点餐</view>
+			<view class="btn_parcelbox textsize2" @tap="onParce">外卖</view>
+			<view class="btn_listbox textsize2" @tap="onList">排队</view>
 		</view>
 		<view class="bottom_box">
 			<view class="opentime_box textsize2 textcolor2">
@@ -33,15 +33,19 @@
 	}
 	.top_box{
 		width:100%;
-		height:300rpx;
+		height:350rpx;
 		text-align:center;
-		background:#f2f2f2;
+		background:#413d3c;
+		margin-bottom:-50rpx;
 	}
 	.logo{
 		width:150rpx;
 		height:150rpx;
 		border-radius:360rpx;
 		margin-top:40rpx;
+	}
+	.shopName{
+		color:#ffffff;
 	}
 
 	.middle_box{
@@ -57,6 +61,7 @@
 		background:#999999;
 		text-align:center;
 		margin-left:7%;
+
 	}
 	.btn_orderbox{
 		float:left;
@@ -152,7 +157,17 @@ import wepy from 'wepy';
 import api from '@/api/api';
 export default class Home extends wepy.page{
 	config = {
-		navigationBarTitleText:'首页'
+		navigationBarTitleText:'首页',
+		navigationBarBackgroundColor: '#413d3c',
+		navigationBarTextStyle: 'white',
+		// window: {
+  //     		backgroundTextStyle: 'dark',
+  //     		navigationBarBackgroundColor: '#FFFFFF',
+  //     		navigationBarTitleText: 'WeChat',
+  //     		navigationBarTextStyle: 'black',
+  //     		enablePullDownRefresh: false,
+  //     		backgroundColor: '#ffffff'
+  //   	},
 	}
 
 	components = {
@@ -207,6 +222,34 @@ export default class Home extends wepy.page{
 				latitude:that.latitude,
 				longitude:that.longitude
 			})
+		},
+		onSubscribe(e){
+
+		},
+		//店内点单
+		onOrder(e){
+			wx.scanCode({
+  				onlyFromCamera: true,
+  				scanType:'qCode',
+  				success:(res)=>{
+    				console.log("扫描桌面二维码success：",res);
+    				let tableNum = res.result;
+    				wx.navigateTo({
+    					url: 'foodMenuOrder?tableNum='+tableNum
+    				})
+  				},
+  				fail:(res)=>{
+  					console.log("扫描桌面二维码fail:",res);
+  				}
+			})
+		},
+		onParce(e){
+   			wx.navigateTo({
+    			url: 'foodMenuParce'
+    		})
+		},
+		onList(e){
+
 		}
 	}
 

@@ -15,6 +15,12 @@ export const TOKEN = "token";
 
 //分类选择itemcode
 export const ACTIVE_CODE = "activecode";
+
+//属性选择itemcode
+export const ATTR_ACTIVE_CODE = "attractivecode";
+
+//购物车
+export const SHOP_CART = 'shopcart';
 /**
  * 系统信息
  * @type {String}
@@ -25,3 +31,4 @@ export const SYSTEM_INFO = "systemInfo";
 export const ADDRESS_ID = "addressId";
 
 export const SEL_CLASS_CODE = "selClassCode";
+
