@@ -18,6 +18,8 @@ export default class extends wepy.app {
       'pages/address',
       'pages/foodMenuParce',
       'pages/foodMenuOrder',
+      'pages/subscribe',
+
     ],
    window: {
       backgroundTextStyle: 'dark',
