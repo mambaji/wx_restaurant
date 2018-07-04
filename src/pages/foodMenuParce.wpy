@@ -1,6 +1,6 @@
 <template>
 	<view class="top_box">
-		<view class="top_tab textcolor1">菜单</view>
+		<view class="top_tab textcolor1"><text>菜单</text></view>
 	</view>
 	<view class="content_box" style="height:{{windowHeight-90}}px">
 		<!-- 左侧菜单 -->
@@ -19,13 +19,14 @@
 					<view class="food_desc">{{item.characteristic}}</view>
 					<view class="food_msg">月售{{item.numberOrders}}</view>
 					<view class="food_minprice">￥{{item.minPrice}}<text class="food_originalPrice">{{item.originalPrice==0||item.originalPrice==undefined?"":'￥'+item.originalPrice}}</text></view>
-					<view class="chose_attr type_theme_color" data-id="{{item.id}}" data-name="{{item.name}}" wx:if="{{item.beattr && item.num==0}}" @tap.stop="getAttrMsgList">选规格</view>
+					<view class="chose_attr type_theme_color" data-id="{{item.id}}" data-name="{{item.name}}" wx:if="{{item.beattr}}" @tap.stop="getAttrMsgList">选规格</view>
+					<span class="pro_list_redpoint" wx:if="{{item.num>0}}">{{item.num}}</span>
 					<!-- 商品没有属性规格，直接显示加号 -->
 					<view class="beAttr_addnum_container" wx:if="{{!item.beattr&&item.num==0}}">
 						<image class="beAttr_addnum" src="../images/icon_add_num.png" @tap.stop="addShopCart" data-type="addNum" data-id="{{item.id}}" data-price="{{item.minPrice}}"></image>
 					</view>
 					<!-- 商品并且购物车中商品数量为0（这里会把商品购物车中的数量直接添加到foodMsgList中） -->
-					<view class="op_num_pro_list" wx:if="{{item.num!=0&&item.num!=undefined}}">
+					<view class="op_num_pro_list" wx:if="{{!item.beattr&&item.num!=0&&item.num!=undefined}}">
 						<image class = "icon_reduce" @tap.stop="reduceProNum" data-id="{{item.id}}" data-price="{{item.minPrice}}" data-type="reduceNum" src="../images/icon_reduce_num.png"></image>
 						<text class="pro_num">{{item.num}}</text>
 						<image class="icon_add" @tap.stop="addProNum" data-type="addNum" data-id="{{item.id}}" data-price="{{item.minPrice}}" src="../images/icon_add_num.png"></image>
@@ -37,9 +38,9 @@
 	</view>
 	<view class="bottom_box">
 		<view class="{{allPrice==0||allPrice==undefined?'pic_shopcart_bg_null':'pic_shopcart_bg'}}"><image class="pic_shopcart" src="../images/icon_shop_cart.png"></image></view>
-		<view class="shopcart_num_redpoint" wx:if="{{allPrice==0||allPrice==undefined?false:true}}"></view>
+		<view class="shopcart_num_redpoint" wx:if="{{allPrice==0||allPrice==undefined?false:true}}">{{allProNum}}</view>
 		<text class="all_price">{{allPrice==0||allPrice==undefined?'':'￥'+allPrice}}</text>
-		<text class="btn_balance">结算</text>
+		<text class="btn_balance" @tap="onBalance">结算</text>
 	</view>
 
 
@@ -102,6 +103,15 @@
   		border-right-width:0rpx;
   		border-left-width:0rpx;
   		border-bottom-color:#f2f2f2;
+  		font-weight:600;
+  		color:#666;
+  		text{
+  			text-align:center;
+  			display:block;
+  			height:80rpx;
+  			width:80rpx;
+  			border-bottom:4rpx solid #ffc400;
+  		}
 	}
 
 	.bottom_box{
@@ -150,14 +160,16 @@
 			line-height:110rpx;
 			width:170rpx;
 			text-align:center;
-			font-weight:bold;
+			font-weight:600;
 			color:#333;
 		}
+
 		.shopcart_num_redpoint{
 			float:left;
 			width:28rpx;
 			height:28rpx;
 			line-height:28rpx;
+			text-align:center;
 			font-size:20rpx;
 			color:#fff;
 			background:red;
@@ -264,6 +276,21 @@
 		text-align:center;
 		top:-40rpx;
 		right:5rpx;
+	}
+	 .pro_list_redpoint{
+	 	float:right;
+	 	width:28rpx;
+	 	height:28rpx;
+	 	line-height:28rpx;
+	 	text-align:center;
+	 	font-size:20rpx;
+	 	color:#fff;
+	 	background:red;
+	 	z-index:999;
+	 	position:relative;
+	 	top:-56rpx;
+	 	left:100rpx;
+	 	border-radius:360rpx;
 	}
 	//商品列表添加数量
 	.beAttr_addnum_container{
@@ -505,9 +532,9 @@ import{
 
 import tip from '@/utils/tip'
 
-	export default class FoodMenu extends wepy.page{
+	export default class FoodMenuParce extends wepy.page{
 		config = {
-			navigationBarTitleText:'外卖'
+			navigationBarTitleText:'点餐'
 		}
 
 		components = {
@@ -578,6 +605,7 @@ import tip from '@/utils/tip'
 			},
 			allPrice:0,
 			beAttr:true,//商品列表中商品是否存在属性规格
+			allProNum:0,//购物车中所有商品的数量
 
 		}
 
@@ -672,12 +700,12 @@ import tip from '@/utils/tip'
 					console.log("购物车中没有东西...");
 					//购物车中没有东西
 					this.foodMsgList[i].num = 0;
-					this.foodMsgList[i].beattr = false;		
+					this.foodMsgList[i].beattr = true;		
 				}else{
 					console.log("购物车中有东西...");
 					//购物车中有东西
 					for(let j = 0;j<this.shopCart.length;j++){
-						this.foodMsgList[i].beattr = false;
+						this.foodMsgList[i].beattr = true;
 						console.log(this.foodMsgList[i].id,this.shopCart[j].foodId);
 						if(this.foodMsgList[i].id == this.shopCart[j].foodId){
 							console.log("foodId 相等");
@@ -721,9 +749,11 @@ import tip from '@/utils/tip'
 			//变换属性，该商品有加入购物车时，将该商品的价格计算入总价格；
 			if(this.beNum){
 				this.allPrice = 0;//先把总价格都初始化为0，在统一进行购物车中商品的计算
+				this.allProNum = 0;// 购物车中数量初始化为0
 				for(let i = 0;i<this.shopCart.length;i++){
 					console.log("进入循环遍历:",this.shopCart[i].minPrice,this.shopCart[i].num);
 					this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+					this.allProNum+=this.shopCart[i].num;
 				}
 			}
 			this.$apply();
@@ -887,10 +917,12 @@ import tip from '@/utils/tip'
 					console.log("shopCart====",this.shopCart);
 					//计算allPrice,先清空allPrice
 					this.allPrice=0;
+					this.allProNum = 0;
 					console.log("shopCart的length===",this.shopCart.length);
 					for(let i = 0;i<this.shopCart.length;i++){
 						console.log("进入循环遍历:",this.shopCart[i].minPrice,this.shopCart[i].num);
 						this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+						this.allProNum+=this.shopCart[i].num;
 					}				
 				//添加购物车时，要把对应商品的数量添加进入foodMsgList中
 				for(let i = 0;i<this.foodMsgList.length;i++){
@@ -939,9 +971,11 @@ import tip from '@/utils/tip'
 				console.log("增加后购物车item商品数量：",this.curShopCartItem.num);
 				//计算allPrice,先清空allPrice
 				this.allPrice = 0;
+				this.allProNum = 0;
 				console.log("shopCart的length===",this.shopCart.length);
 				for(let i = 0;i<this.shopCart.length;i++){
 					this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+					this.allProNum+=this.shopCart[i].num;
 				}
 				console.log("addProNum====",this.allPrice);
 			},
@@ -986,9 +1020,11 @@ import tip from '@/utils/tip'
 				console.log("当前购物车item商品数量：",this.curShopCartItem.num);
 				//计算allPrice,先清空allPrice
 				this.allPrice = 0;
+				this.allProNum = 0;
 				console.log("shopCart的length===",this.shopCart.length);
 				for(let i = 0;i<this.shopCart.length;i++){
 					this.allPrice+=this.shopCart[i].minPrice*this.shopCart[i].num;
+					this.allProNum+=this.shopCart[i].num;
 				}
 				console.log("reduceProNum====",this.allPrice);
 				//减少商品数量在foodMsgList中；
@@ -1016,6 +1052,11 @@ import tip from '@/utils/tip'
 			},
 			touchAttrMask(){
 				this.showAttrModal = false;
+			},
+			onBalance(){
+				if(this.shopCart.length==0||this.shopCart.length==undefined){
+					tip.toast("您还没有选择商品！不能进行结算");
+				}
 			}
 		}
 	}
