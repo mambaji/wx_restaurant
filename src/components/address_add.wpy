@@ -63,7 +63,7 @@
       </view>
     </view>
     <view class="btn_box">
-      <button class="button type_thome_color" formType="submit">完成</button>
+      <button class="button type_theme_color" formType="submit">完成</button>
     </view>
   </form>
 </template>

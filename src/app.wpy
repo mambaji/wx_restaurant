@@ -19,7 +19,6 @@ export default class extends wepy.app {
       'pages/foodMenuOrder',
       'pages/foodMenuParce',
       'pages/subscribe',
-
     ],
    window: {
       backgroundTextStyle: 'dark',

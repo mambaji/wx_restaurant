@@ -32,7 +32,8 @@
 			position: relative;
 			bottom:80rpx;
 			left:30rpx;
-			color:#ffffff;
+			font-weight:600;
+			color:#333;
 		}
 	}
 	.icon_arrow{

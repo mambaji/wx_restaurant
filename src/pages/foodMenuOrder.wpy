@@ -10,7 +10,7 @@
 			</view>
 		</scroll-view>
 		<!-- 右侧菜单 -->
-		<scroll-view class="food_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-95}}px">
+		<scroll-view class="food_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-90}}px">
 			<view class="category_name">{{categoryName}}</view>
 			<view class="food_list">
 				<view class="food_item" wx:for="{{foodMsgList}}" wx:for-item="item" wx:key="index" data-index="{{index}}" @tap="showM">
