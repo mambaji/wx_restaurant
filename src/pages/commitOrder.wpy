@@ -1,0 +1,357 @@
+<style lang="less">
+	page{
+		background:#f2f2f2;
+
+	}
+	//隐藏滚动条
+	::-webkit-scrollbar{
+ 	 	width: 0;
+  	 	height: 0;
+  	 	color: transparent;
+	}
+
+	.address{
+		background:#fff;
+		width:94%;
+		height:145rpx;
+		box-shadow:2px 2px 0px 0px #ccc;
+		.icon_address{
+			width:40rpx;
+			height:40rpx;
+			margin-left:30rpx;
+			margin-top:50rpx;
+			float:left;
+		}
+		.address_detail{
+			font-size:28rpx;
+			color:#333;
+			position:relative;
+			top:30rpx;
+			left:20rpx;
+		}
+		.user_msg{
+			position:relative;
+			font-size:26rpx;
+			top:40rpx;
+			left:20rpx;
+		}
+		.icon_arrow_right{
+			float:right;
+			width:45rpx;
+			height:45rpx;
+			margin-right:20rpx;
+			margin-top:-20rpx;
+		}
+	}
+	.pro_list{
+		background:#fff;
+		margin-top:20rpx;
+		width:94%;
+		.pro_list_top{
+			margin-left:20rpx;
+			font-size:28rpx;
+			color:#333;	
+			height:60rpx;
+			line-height:60rpx;
+		}
+		.pro_list_content{
+
+		}
+		.pro_list_item{
+			background:#f2f3f2;
+			padding:20rpx;
+			margin-top:5rpx;
+			height:120rpx;
+			box-shadow:1px 0px 0px 0px #f2f3f2;
+			.image{
+				float:left;
+				width:120rpx;
+				height:120rpx;
+			}
+			.name{
+				float:left;
+				font-size:28rpx;
+				color:#333;
+				margin-left:15rpx;
+			}
+			.price{
+				display:block;
+				text-align:right;
+				font-size:28rpx;
+				color:#333;
+				width:100%;
+			}
+			.originPrice{
+				display:block;
+				text-align:right;
+				width:100%;
+				font-size:28rpx;
+				color:#999;
+				margin-top:8rpx;
+				text-decoration:line-through;
+			}
+			.attr{
+				float:left;
+				font-size:24rpx;
+				color:#999;
+				margin-left:15rpx;
+				margin-top:8rpx;
+			}
+			.num{
+				margin-left:15rpx;
+				font-size:28rpx;
+				color:#999;
+			}
+		}
+	}
+	.order_price{
+		width:94%;
+		height:120rpx;
+		background:#fff;
+		padding-top:20rpx;
+		.package_text{
+			float:left;
+			font-size:28rpx;
+			color:#333;
+			margin-left:20rpx;
+		}
+		.package_price{
+			display:block;
+			width:100%;
+			text-align:right;
+			position:relative;
+			right:20rpx;
+			font-size:28rpx;
+		}
+		.distribution_text{
+			float:left;
+			margin-top:20rpx;
+			font-size:28rpx;
+			color:#333;
+			margin-left:20rpx;
+		}
+		.distribution_price{
+			display:block;
+			width:100%;
+			text-align:right;
+			margin-top:20rpx;
+			position:relative;
+			right:20rpx;
+			font-size:28rpx;
+		}
+	}
+	.all_price{
+		background:#fff;
+		border-top:1rpx dashed #ccc;
+		height:70rpx;
+		width:94%;
+		line-height:70rpx;
+		text-align:right;
+		.all_price_text{
+			font-size:30rpx;
+			color:red;
+			margin-right:20rpx;
+		}
+	}
+	.order_content{
+		width:94%;
+		background:#fff;
+		margin-top:20rpx;
+		height:80rpx;
+		line-height:80rpx;
+		margin-bottom:45rpx;
+		.remark_text{
+			width:10%;
+			font-size:28rpx;
+			color:#333;
+			float:left;
+			margin-left:20rpx;
+		}
+		.remark_input{
+			float:left;
+			width:80%;
+			height:40rpx;
+			margin-top:15rpx;
+			margin-left:15rpx;
+			border-bottom:1rpx solid #f2f2f2;
+		}
+	}
+
+	.btn_pay{
+		position:relative;
+		bottom:0rpx;
+		background:#259b24;
+		height:90rpx;
+		line-height:90rpx;
+		color:#fff;
+		text-align:center;
+		.wx_pay{
+			font-size:34rpx;
+		}
+		.pay_price{
+			font-size:40rpx;
+		}
+	}
+
+
+
+</style>
+
+<template>
+	<view style="height:{{wheight-45}}px;;">
+	<scroll-view class="scroll_content" scroll-y style="padding:3%;height:{{wheight-45}}px">
+		<!-- 我的地址 -->
+		<view class="address">
+			<image class="icon_address" src="../images/icon_address.png"></image>
+			<view class="address_detail">
+				嘉顿小镇东区14栋704
+			</view>
+			<view class="user_msg">
+				<text class="name">纪先生</text>
+				<text class="phone">1598881632</text>
+			</view>
+			<image class="icon_arrow_right" src="../images/icon_arrow_right.png"></image>
+		</view>
+		<!-- 商品列表 -->
+		<view class="pro_list">
+			<view class="pro_list_top">选购商品</view>
+			<view class="pro_list_content">
+				<view class="pro_list_item" wx:for="{{shopCart}}" wx:for-item="item" wx:key="index">
+					<image class="image" src="{{item.image}}"></image>
+					<text class="name">{{item.foodName}}</text>
+					<text class="price">￥{{item.minPrice}}</text>
+					<text class="attr">大份</text>
+					<text class="originPrice">￥{{item.originPrice}}</text>
+					<text class="num">x {{item.num}}</text>
+				</view>
+			</view>
+		</view>
+		<!-- 其他费用 -->
+		<view class="order_price">
+			<text class="package_text">包装费</text>
+			<text class="package_price">￥{{shop.packagePrice}}</text>
+			<text class="distribution_text">配送费</text>
+			<text class="distribution_price">￥{{shop.distributionPrice}}</text>
+		</view>
+		<view class="all_price">
+			小计
+			<text class="all_price_text">￥{{allPrice}}</text>
+		</view>
+		<!-- 其他 -->
+		<view class="order_content">
+			<text class="remark_text">备注</text>
+			<input class="remark_input" name=""></input>
+		</view>
+	</scroll-view>
+	</view>
+	<view class="btn_pay">
+		<text class="wx_pay">微信支付</text>
+		<text class="pay_price">￥{{allPrice}}</text>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api';
+import{
+	SYSTEM_INFO
+} from '@/utils/constant'
+export default class CommitOrder extends wepy.page{
+	config = {
+		navigationBarTitleText:'提交订单',
+	}
+
+	data = {
+		wheight:0,
+		allPrice:'32',
+		shop:{
+			packagePrice:'1',
+			distributionPrice:'3'
+		},
+		shopCart:[
+			{
+				foodId:'001',
+				num:'2',
+				minPrice:'15',
+				originPrice:'20',
+				foodName:'招牌鹅肉',
+				image:'../images/zhaopaierou.jpg',
+				attr:[
+					{
+						attrId:'123',
+						attrItemId:'12301',
+						attrItemName:'大份'
+					},{
+						attrId:'124',
+						attrItemId:'12301',
+						attrItemName:'排骨汤'						
+					}
+				]
+			},{
+				foodId:'001',
+				num:'1',
+				minPrice:'15',
+				originPrice:'20',
+				foodName:'招牌鹅肉',
+				image:'../images/zhaopaierou.jpg',
+				attr:[
+					{
+						attrId:'123',
+						attrItemId:'12301',
+						attrItemName:'大份'
+					},{
+						attrId:'124',
+						attrItemId:'12302',
+						attrItemName:'玉米汤'						
+					}
+				]
+			},
+			{
+				foodId:'002',
+				num:'1',
+				minPrice:'20',
+				originPrice:'25',
+				foodName:'酸甜粉',
+				image:'../images/suantianfen.jpg',
+				attr:[
+					{
+						attrId:'125',
+						attrItemId:'12501',
+						attrItemName:'微辣'
+					},{
+						attrId:'126',
+						attrItemId:'12601',
+						attrItemName:'不加糖'						
+					}
+				]
+			},{
+				foodId:'003',
+				num:'1',
+				minPrice:'8',
+				originPrice:'10',
+				foodName:'凉拌黄瓜',
+				image:'../images/liangbanhuanggua.jpg',
+				attr:[
+				]
+			}
+		]
+	}
+
+	onLoad(){
+			let systemInfo = wx.getStorageSync(SYSTEM_INFO);	
+			if(systemInfo==null||systemInfo==""||systemInfo==undefined){
+				systemInfo = wepy.getSystemInfoSync();
+        		wepy.setStorageSync(SYSTEM_INFO, systemInfo);	
+			}
+			this.wheight = systemInfo.windowHeight;
+			console.log("windowheight===",this.wheight);
+	}
+
+
+
+	methods = {
+
+	}
+}	
+</script>
+
