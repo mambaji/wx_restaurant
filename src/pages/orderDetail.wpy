@@ -1,0 +1,269 @@
+<style lang="less">
+	page{
+		background:#f2f2f2;
+	}
+	.top_container{
+		margin:15rpx 20rpx;
+		background:#fff;
+		text-align:center;
+		height:100rpx;
+		line-height:100rpx;
+		text{
+			font-weight:600;
+			font-size:32rpx;
+			color:#333;
+		}
+	}
+	.content_container{
+		margin:0rpx 20rpx 15rpx 20rpx;
+	}
+	.list{
+		height:130rpx;
+		background:#f2f2f2;
+		padding:10rpx 20rpx;
+		image{
+			width:120rpx;
+			height:110rpx;
+			float:left;
+			margin-right:20rpx;
+		}
+		.name{
+			font-size:28rpx;
+			color:#333;
+			float:left;
+		}
+		.amount{
+			width:100%;
+			text-align:right;
+		}
+		.attr{
+			font-size:26rpx;
+			color:#999;
+		}
+		.num{
+			font-size:26rpx;
+			color:#999;
+		}
+	}
+	.order_price_content{
+		padding:10rpx 15rpx;
+		background:#fff;
+		height:100rpx;
+		border-bottom: 1px dashed #cdcdcd;
+		border-radius:0rpx 0rpx 20rpx 20rpx;
+		.pack_price{
+			.text1{
+				float:left;
+				font-size:28rpx;
+			}
+			.text2{
+				font-size:28rpx;
+				width:100%;
+				text-align:right;
+			}
+		}
+		.distribute_price{
+			margin-top:20rpx;
+			.text1{
+				float:left;
+				font-size:28rpx;
+			}
+			.text2{
+				font-size:28rpx;
+				width:100%;
+				text-align:right;
+			}
+		}
+	}
+	.discount_content{
+		background:#fff;
+		padding:10rpx 15rpx;
+		height:100rpx;
+		border-radius: 20rpx 20rpx 20rpx 20rpx;
+		border-bottom: 1px dashed #cdcdcd;
+		.discount_price{
+			.text1{
+				float:left;
+				font-size:28rpx;
+			}
+			.text2{
+				font-size:28rpx;
+				width:100%;
+				text-align:right;
+			}
+		}
+		.counpon_price{
+			margin-top:20rpx;
+			.text1{
+				float:left;
+				font-size:28rpx;
+			}
+			.text2{
+				font-size:28rpx;
+				width:100%;
+				text-align:right;
+			}
+		}
+	}
+		.all_price{
+			height:80rpx;
+			line-height:80rpx;
+			padding:0rpx 15rpx;
+			font-size:30rpx;
+			background:#fff;
+			border-radius: 20rpx 20rpx 0rpx 0rpx;
+			text-align:right;
+			font-weight:600;
+			text{
+				color:red;
+				font-size:30rpx;
+				font-weight:600;
+			}
+		}
+		.option{
+			border-top: 1px dashed #cdcdcd;
+			height:80rpx;
+			line-height:80rpx;
+			background:#fff;
+			text-align:center;
+			color:#333;
+		}	
+
+		.other_msg{
+			height:80rpx;
+			background:#fff;
+			padding:10rpx 15rpx;
+			margin:0rpx 20rpx; 
+			margin-top:20rpx;
+			font-size:28rpx;
+		}	
+		.order_msg{
+			background:#fff;
+			padding:0rpx 15rpx;
+			padding-top:1rpx;
+			padding-bottom:20rpx;
+			margin:20rpx 20rpx;
+			font-size:26rpx;
+		}
+		.title_value{
+			font-size:26rpx;
+			color:#999;
+			margin-top:25rpx;
+			text{
+				margin-left:30rpx;
+				color:#666;
+			}
+		}
+</style>
+
+<template>
+	<view class="top_container">
+		<text wx:if="{{orderMsg.status==0}}">待支付</text>
+		<text wx:if="{{orderMsg.status==1}}">已支付，待确认</text>
+		<text wx:if="{{orderMsg.status==2}}">待配送</text>
+		<text wx:if="{{orderMsg.status==3}}">订单配送中...</text>
+		<text wx:if="{{orderMsg.status==6}}">已确认，待上菜</text>
+		<text wx:if="{{orderMsg.status==4}}">已完成</text>
+		<text wx:if="{{orderMsg.status==5}}">已取消</text>
+	</view>
+	<view class="content_container">
+		<repeat for="{{orderMsg.goodsData}}" key="index" index="index" item="item">
+			<view class="list">
+				<image src="../images/manbasji_logo.jpg"></image>
+				<view class="name">{{item.goodsName}}</view>
+				<view class="amount">￥{{item.baseAmount}}</view>
+				<view class="attr">{{item.attrName1+item.attrName2+item.attrName3+item.attrName4}}</view>
+				<view class="num">x{{item.num}}</view>
+			</view>
+		</repeat>
+		<view class="order_price_content">
+			<view class="pack_price">
+				<view class="text1">餐盒费</view>
+				<view class="text2">￥{{orderMsg.packPrice}}</view>
+			</view>
+			<view class="distribute_price">
+				<view class="text1">配送费</view>
+				<view class="text2">￥{{orderMsg.distributePrice}}</view>
+			</view>
+		</view>
+		<view class="discount_content">
+			<view class="discount_price">
+				<view class="text1">折扣</view>
+				<view class="text2">￥{{orderMsg.discountPrice}}</view>
+			</view>
+			<view class="counpon_price">
+				<view class="text1">优惠</view>
+				<view class="text2">￥{{orderMsg.reductionPrice}}</view>
+			</view>
+		</view>
+		<view class="all_price">
+			实付<text>￥{{orderMsg.allAmount}}</text>
+		</view>
+		<view class="option" id="btn_option">
+			<i class="iconfont icon-phone"></i>
+			联系商家
+		</view>
+	</view>
+	<view class="footer_container">
+		<view class="other_msg">
+			<view class="title_value" wx:if="{{orderMsg.type==0}}">配送地址<text>{{address}}</text></view>
+			<view class="title_value" wx:if="{{orderMsg.type==1}}">餐桌号<text>{{table}}</text></view>
+		</view>
+		<view class="order_msg">
+			<view class="title_value">订单号码<text>{{orderMsg.orderNo}}</text></view>
+			<view class="title_value">订单时间<text>{{orderMsg.date}}</text></view>
+			<view class="title_value">支付方式<text>{{orderMsg.payType==0?'现金支付':'微信支付'}}</text></view>
+			<view class="title_value">订单备注<text>{{orderMsg.remark}}</text></view>			
+		</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api';
+
+export default class OrderDetail extends wepy.page{
+	config = {
+		navigationBarTitleText :'订单详情',
+		navigationBarBackgroundColor: '#f2f2f2',
+		navigationBarTextStyle: 'black',
+	}
+
+	data = {
+		orderMsg:'',
+		address:'',
+	}
+
+	onLoad(opts){
+		
+		this.onGetOrderDetail();
+	}
+
+	async onGetOrderDetail(){
+			var orderListItem ={};
+			orderListItem.orderNo = "TC201807070004";
+			orderListItem.orderId = "01";
+			orderListItem.type = 0;
+			orderListItem.status = 1;
+			orderListItem.date = "2018-07-08";
+			orderListItem.allAmount = 24.00;
+			orderListItem.payType = 0;
+			orderListItem.totalNum = 2;
+			orderListItem.goodsData = [];
+			for(let j = 0;j<orderListItem.totalNum;j++){
+				var goodsDataItem = {};
+				goodsDataItem.goodsId = "001";
+				goodsDataItem.goodsName = "小龙虾";
+				goodsDataItem.attrName1 = "小份";
+				goodsDataItem.attrName2 = "麻辣";
+				goodsDataItem.attrName3 = "";
+				goodsDataItem.attrName4 = "";
+				goodsDataItem.num = 2;
+				goodsDataItem.baseAmount = "13";
+				orderListItem.goodsData.push(goodsDataItem);
+			}	
+			this.orderMsg = orderListItem;
+			console.log("订单详情",this.orderMsg);
+	}
+}
+</script>

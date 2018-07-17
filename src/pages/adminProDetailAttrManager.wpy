@@ -1,0 +1,192 @@
+<template>
+	<view class="content_container">
+		<!-- 一级规格 -->
+		<repeat for="{{attrList}}" key="index" index="index" item="item">
+		<view class="attr_box">
+			<form bindsubmit="formSubmitOne">
+			<view class="attr_top">
+				<text>{{item.typeName}}
+				</text>
+				<input type="text" name="attr_type1" />
+			</view>
+			<view class="attr_content">
+				<text>{{item.attrName}}
+				</text>
+				<input type="text" name="attr_name1" />
+				<text>{{item.attrPrice}}
+				</text>
+				<input type="text" name="attr_price1" />
+				<button class="btn_submit" formType="submit" data-index="{{index}}">添加</button>
+			</view>
+			<view class="attr_footer">
+				<repeat for="{{item.attrNameList}}" key="index" index="index" item="item">
+					<view class="attrname">{{item.name}}</view>
+				</repeat>
+			</view>
+			</form>
+		</view>
+		</repeat>
+	</view>
+	<view class="footer_container">
+		<view class="markNum" @tap="markNum">数量</view>
+		<repeat for="{{attrList}}" key="index" for="index" item="item">
+			<repeat for="{{item.attrListName}}" key="index" for="index" item="item">
+			
+		</repeat>			
+		</repeat>
+	</view>
+</template>
+
+<style lang="less">
+	.attr_box{
+		padding:15rpx 20rpx;
+		background:#fff;
+		margin-top:20rpx;
+		.attr_top{
+			height:80rpx;
+			line-height:80rpx;
+			border-bottom:1rpx solid #cdcdcd;
+			text{
+				font-szie:28rpx;
+				color:#666;
+				float:left;
+				margin-right:20rpx;
+			}
+			input{
+				float:left;
+				width:50%;
+				height:50rpx;
+				margin-top:15rpx;
+			}
+		}
+		.attr_content{
+			height:130rpx;
+			border-bottom:1rpx solid #cdcdcd;
+			text{
+				color:#666;
+				float:left;
+				margin-top:10rpx;
+				margin-right:20rpx;
+			}
+			input{
+				float:left;
+				width:50%;
+				margin-top:10rpx;
+				height:50rpx;
+			}
+			button{
+				font-size:24rpx;
+				background:#fff;
+				border:1rpx solid #fff;
+				width:120rpx;
+				height:60rpx;
+				float:right;
+				margin-top:-20rpx;
+			}
+
+		}
+		.attr_footer{
+			padding-bottom:10rpx;
+			padding-left:20rpx;
+			height:140rpx;
+			.attrname{
+				padding:8rpx 15rpx;
+				border-radius:10rpx;
+				border:1rpx solid #999;
+				float:left;
+				margin-right:20rpx;
+				margin-top:20rpx;
+				font-size:26rpx;
+			}
+		}
+			i{
+				float:right;
+				width:80rpx;
+				height:80rpx;				
+				z-index:9999;
+				margin-top:-20rpx;
+			}
+	}
+	.markNum{
+		color:#03a9f4;
+		font-size:30rpx;
+		margin:20rpx;
+	}
+
+</style>
+
+<script>
+import wepy from 'wepy'
+import api from '@/api/api'
+import tip from '@/utils/tip'
+export default class AdminProDetailAttrManager extends wepy.page{
+	config = {
+		navigationBarTitleText:'商品规格'
+	}
+
+	data = {
+		attrNameList:[],
+		attrNameList2:[],
+		attrNameList3:[],
+		attrNameList4:[],
+		attrList:[],
+		attrListIndex:''
+	}
+
+	onLoad(){
+			let attrMsgList = {};
+			attrMsgList.typeName="一级规格类型：";
+			attrMsgList.attrName="一级规格名称：";
+			attrMsgList.attrPrice="一级规格价格：";
+			attrMsgList.attrNameList=[];
+			this.attrList.push(attrMsgList);
+			attrMsgList={};
+			attrMsgList.typeName="二级规格类型：";
+			attrMsgList.attrName="二级规格名称：";
+			attrMsgList.attrPrice="二级规格价格：";
+			attrMsgList.attrNameList=[];
+			this.attrList.push(attrMsgList);
+			attrMsgList={};
+			attrMsgList.typeName="三级规格类型：";
+			attrMsgList.attrName="三级规格名称：";
+			attrMsgList.attrPrice="三级规格价格：";
+			attrMsgList.attrNameList=[];
+			this.attrList.push(attrMsgList);
+			attrMsgList={};
+			attrMsgList.typeName="四级规格类型：";
+			attrMsgList.attrName="四级规格名称：";
+			attrMsgList.attrPrice="四级规格价格：";
+			attrMsgList.attrNameList=[];
+			this.attrList.push(attrMsgList);
+			console.log(this.attrList);
+	}
+
+	formSubmitOne(e){
+		let that=this;
+		let index=e.detail.target.dataset.index;
+		let attrType = e.detail.value.attr_type1;
+		let attrName = e.detail.value.attr_name1;
+		let attrPrice = e.detail.value.attr_price1;
+		if(attrName==''||attrName==undefined){
+			tip.toast("规格名称不能为空");
+			return;
+		}
+		if(attrPrice==''||attrPrice==undefined){
+			tip.toast("规格价格不能为空");
+			return;
+		}
+		let attr = {};
+		attr.name = attrName;
+		attr.price = attrPrice;
+		that.attrList[index].attrNameList.push(attr);
+		that.attrListIndex = index;
+		this.$apply();
+	}
+
+	methods = {
+		markNum(e){
+			console.log(this.attrList);
+		}
+	}
+}
+</script>

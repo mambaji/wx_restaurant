@@ -105,20 +105,22 @@ export default class AddressList extends wepy.component {
     },
 
     tapSelAddress(e) {
+      console.log("地址列表选中跳转");
       if (this.type!="order") {
+        console.log("类型不等于'order'");
         return;
       }
       var id = e.currentTarget.dataset.id;
       console.log("id=="+id);
       wepy.setStorageSync(ADDRESS_ID,id);
       wepy.redirectTo({
-        url: "/pages/comfire_order?from=selAdd"
+        url: "/pages/commitOrder?from=selAdd"
       })
     }
   }
 
   onLoad() {
-
+    console.log("===address_list====",this.addressList)
   }
 }
 

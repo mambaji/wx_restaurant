@@ -2,14 +2,19 @@
 		<view class="swpier-tab-pd">
 			<tab @currentTab.user="getCurrentTab" :tabList.sync="tabList" :currentTab.sync="currentTab"></tab>
 		</view>
+		<view style="height:{{winHeight - 31}}px">
 		<scroll-view scroll-y="true" class="swiper-item-box" style="height:{{winHeight - 31}}px" bindscrolltolower="onReachBottom">
 			<!-- 订单列表item -->
-			<orderItem :orderList.sync="orderList"></orderItem>
+			<!-- <orderItem :orderList.sync="orderList"></orderItem> -->
+			<dineinOrderItem :orderList.sync="orderList" wx:if="{{currentTab==0}}"></dineinOrderItem>
+			<parceOrderItem :orderList.sync="orderList" wx:if="{{currentTab==1}}">
+			</parceOrderItem>
 			<!-- 加载更多 -->
 			<bottomLoadMore :show.sync="showLoading" message="正在加载"></bottomLoadMore>
 			<!-- 暂无数据显示 -->
 			<placeholder :show.sync="is_empty" message="暂无发现数据"></placeholder>
-		</scroll-view>		
+		</scroll-view>	
+		</view>	
 </template>
 
 <script>
@@ -20,7 +25,9 @@ import{
 	USER_SPECICAL_INFO
 } from '@/utils/constant';
 import Tab from '@/components/tab' //选项卡组件
-import OrderItem from '@/components/order_item' //订单列表组件
+import DineinOrderItem from '@/components/dinein_order_item'//堂吃订单列表组件
+import ParceOrderItem from '@/components/parce_order_item'
+// import OrderItem from '@/components/order_item' //订单列表组件
 import BottomLoadMore from '../components/common/bottomLoadMore' //底部加载更多组件
 import PlaceHolder from '../components/common/placeholder' //空列表显示组件
 export default class OrderList extends wepy.page{
@@ -29,9 +36,11 @@ export default class OrderList extends wepy.page{
 	}
 	components = {
 		tab: Tab, 
-		orderItem: OrderItem,
+		// orderItem: OrderItem,s
 		bottomLoadMore: BottomLoadMore,
-		placeholder: PlaceHolder
+		placeholder: PlaceHolder,
+		dineinOrderItem:DineinOrderItem,
+		parceOrderItem:ParceOrderItem
 	}
 	data = {
 		winHeight: 0,
@@ -52,44 +61,67 @@ export default class OrderList extends wepy.page{
 		waimaiCount:'',
 		yuyueCount:'',
 		receiveFlg:0,
-
 	}
 
-	async getMyOrder(currentPage,size,refresh){
-		console.log("refresh值"+refresh);
-		let that = this;
-		let userSpecialInfo = wepy.getStorageSync(USER_SPECICAL_INFO) || {};
-		let openId = userSpecialInfo.openId;
-		const json = await api.getMyOrderList({
-			query:{
-				openId: openId,
-				orderStatus: that.orderStatus,
-				receiveFlg: that.receiveFlg,
-				page: currentPage || 1,
-				size: size || 10,
-				type: 1
-			}
-		})
-		console.log("订单列表数据=====");
-		console.log(json);
-		if(json.data.code == 0){
-			if(refresh){
-				that.orderList = json.data.list;
-			}else{
-				that.orderList = [...that.orderList,...json.data.list];
-			}
-			that.page_total = json.data.page_total;
-			that.totalCount = json.data.totalCount;
-			if(json.data.page_total == 0){
-				that.is_empty = true;
-			}else{
-				that.is_empty = false;
-			}
-		}else{
-			tip.error(json.data.msg)
-		}
-		that.showLoading = false;
-		that.$apply();
+    getMyOrder(currentPage,size,refresh){
+    	if(this.orderStatus==0){
+    		this.orderList = [];
+    		for(let i = 0 ;i<5;i++){
+			var orderListItem ={};
+			orderListItem.orderNo = "TC201807070004";
+			orderListItem.orderId = "01";
+			orderListItem.type = 0;
+			orderListItem.status = 1;
+			orderListItem.data = "2018-07-08";
+			orderListItem.allAmount = 24.00;
+			orderListItem.payType = 0;
+			orderListItem.totalNum = 2;
+			orderListItem.goodsData = [];
+			for(let j = 0;j<orderListItem.totalNum;j++){
+				var goodsDataItem = {};
+				goodsDataItem.goodsId = "001";
+				goodsDataItem.goodsName = "小龙虾";
+				goodsDataItem.attrName1 = "小份";
+				goodsDataItem.attrName2 = "麻辣";
+				goodsDataItem.attrName3 = "";
+				goodsDataItem.attrName4 = "";
+				goodsDataItem.num = 2;
+				orderListItem.goodsData.push(goodsDataItem);
+			}	
+			this.orderList.push(orderListItem);		
+		}		
+
+    	}else{
+    		this.orderList = [];
+    		for(let i = 0 ;i<5;i++){
+			var orderListItem ={};
+			orderListItem.orderNo = "TC201807070004";
+			orderListItem.orderId = "01";
+			orderListItem.type = 1;
+			orderListItem.status = 1;
+			orderListItem.data = "2018-07-08";
+			orderListItem.allAmount = 24.00;
+			orderListItem.payType = 0;
+			orderListItem.totalNum = 2;
+			orderListItem.goodsData = [];
+			for(let j = 0;j<orderListItem.totalNum;j++){
+				var goodsDataItem = {};
+				goodsDataItem.goodsId = "001";
+				goodsDataItem.goodsName = "红烧排骨饭";
+				goodsDataItem.attrName1 = "小份";
+				goodsDataItem.attrName2 = "麻辣";
+				goodsDataItem.attrName3 = "";
+				goodsDataItem.attrName4 = "";
+				goodsDataItem.num = 2;
+				orderListItem.goodsData.push(goodsDataItem);
+			}	
+			this.orderList.push(orderListItem);		
+		}		
+
+    	}
+
+		console.log("orderList====",this.orderList);
+		this.is_empty = false;
 	}
 
 	async getMyOrderSize(){
@@ -113,17 +145,23 @@ export default class OrderList extends wepy.page{
 		}
 	}
 
-	onload(opts){
-		let that = this;
-		let title = "";
-		that.orderList=[];
-		that.currentTab = opts.type;
-		that.getMyOrder();
-		// 设置滚动高度
-		let systemInfo = wepy.getStorageSync(SYSTEM_INFO);
-		that.winHeight = systemInfo.windowHeight;
-		that.$apply();
+	onLoad(){
 	}
+
+	onShow(){
+		this.getMyOrder();
+	}
+	// onLoad(opts){
+	// 	let that = this;
+	// 	let title = "";
+	// 	that.orderList=[];
+	// 	that.currentTab = opts.type;
+	// 	that.getMyOrder();
+	// 	// 设置滚动高度
+	// 	let systemInfo = wepy.getStorageSync(SYSTEM_INFO);
+	// 	that.winHeight = systemInfo.windowHeight;
+	// 	that.$apply();
+	// }
 	computed = {
 
 	}
@@ -185,5 +223,8 @@ export default class OrderList extends wepy.page{
 	.swpier-tab-pd{
 		padding: 0 30rpx;
 		background: #fff;
+	}
+	.swiper-item-box{
+		margin-top:20rpx;
 	}
 </style>

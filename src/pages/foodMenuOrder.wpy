@@ -560,6 +560,7 @@ import tip from '@/utils/tip'
 			categoryName:'',
 			showModal:false,
 			showAttrModal:false,
+			goalFoodId:'',
 			modal:{
 				src:'',
 				name:'',
@@ -599,22 +600,7 @@ import tip from '@/utils/tip'
 					}
 				]
 			},
-			resetCurShopCartItem:{
-				foodId:'',
-				num:'',
-				minPrice:'',
-				originPrice:'',
-				attr:[
-					{
-						attrId:'',
-						attrItemId:''
-					},
-					{
-						attrId:'',
-						attrItemId:''
-					}
-				]
-			},
+
 			allPrice:0,
 			beAttr:true,//商品列表中商品是否存在属性规格
 			allProNum:0,//购物车中所有商品的数量
@@ -758,6 +744,19 @@ import tip from '@/utils/tip'
 			}else{
 				tip.error(json.data.msg);
 			}
+			//判断变换属性时，购物车是否存在该商品的这种属性
+			console.log("变换属性===",this.shopCart);
+			for(let i=0;i<this.shopCart.length;i++){
+				if(this.shopCart[i].foodId == goodsId){
+					for(let j = 0;j<this.shopCart[i].attr.length;j++){
+						if(this.shopCart[i].attr[j].attrId == this.curShopCartItem.attr[i].attrId&& this.shopCart[i].attr[j].attrItemId == this.curShopCartItem.attr[i].attrItemId){
+
+						}else{
+							this.beNum = false;
+						}
+					}
+				}
+			}
 			//变换属性，该商品有加入购物车时，将该商品的价格计算入总价格；
 			if(this.beNum){
 				this.allPrice = 0;//先把总价格都初始化为0，在统一进行购物车中商品的计算
@@ -769,6 +768,22 @@ import tip from '@/utils/tip'
 				}
 			}
 			this.$apply();
+		}
+
+		resetCurShopCartItem(){
+			this.curShopCartItem = {};
+			this.curShopCartItem.foodId = '';
+			this.curShopCartItem.num = '';
+			this.curShopCartItem.minPrice = '';
+			this.curShopCartItem.originPrice = '';
+			this.curShopCartItem.attr = [];
+			let attr = {};
+			for(let i =0;i<3;i++){
+				attr.attrId= '';
+				attr.attrItemId ='';
+				this.curShopCartItem.attr.push(attr);
+			}	
+			console.log("初始化后的curShopCartItem：",this.curShopCartItem);	
 		}
 
 		methods = {
@@ -791,6 +806,7 @@ import tip from '@/utils/tip'
 				// this.curShopCartItem = {};
 				let name = e.currentTarget.dataset.name;
 				let foodId = e.currentTarget.dataset.id;
+				this.goalFoodId = foodId;
 				let foodIndex;//foodId 在 shopCart中的 位置
 				let json = await api.getAttrMsgList({
 					query:{
@@ -883,6 +899,8 @@ import tip from '@/utils/tip'
 			},
 
 			selAttr(e){
+				this.resetCurShopCartItem();
+				this.curShopCartItem.foodId = this.goalFoodId;
 				let pid = e.currentTarget.dataset.pid;
 				let id = e.currentTarget.dataset.id;
 				for(let j =0;j<this.attrMsgList.length;j++){
@@ -901,6 +919,7 @@ import tip from '@/utils/tip'
 					}
 
 				}
+				console.log("setAttr curShopCartItem===",this.curShopCartItem);
 				this.getAttrPrice();//获取所选属性价格
 			},
 			//添加购物车

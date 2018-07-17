@@ -164,7 +164,7 @@ export default class orderItem extends wepy.component {
   }
 
   onLoad() {
-    console.log("===========lzz返回数据lzz=========")
+    console.log("===========返回数据lzz=========")
     console.log(this.orderList);
   }
 }

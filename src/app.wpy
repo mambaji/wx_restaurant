@@ -11,15 +11,21 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/commitOrder',
+      'pages/adminProDetailAttrManager',
+      'pages/adminProDetailManager',
+      'pages/adminProManager',
       'pages/authorize',
-      'pages/home',
+      'pages/adminHome',
       'pages/orderList',
+      'pages/home',
       'pages/personalCenter',
       'pages/address',
       'pages/subscribe',
       'pages/foodMenuParce',
       'pages/foodMenuOrder',
+      'pages/commitOrder',
+      'pages/orderDetail',
+      'pages/list',
     ],
    window: {
       backgroundTextStyle: 'dark',
@@ -43,12 +49,12 @@ export default class extends wepy.app {
         "pagePath":"pages/orderList",
         "text":"订单",
         "iconPath": "images/icon_order.png",
-        "selectedIconPath": "images/icon_order_select.png"        
+        "selectedIconPath":"images/icon_order_select.png"
       },{
         "pagePath":"pages/personalCenter",
         "text":"我的",
         "iconPath": "images/icon_my.png",
-        "selectedIconPath": "images/icon_my_select.png"        
+        "selectedIconPath": "images/icon_my_select.png"       
       }]
     }
   }

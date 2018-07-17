@@ -1,0 +1,143 @@
+<style lang="less">
+	page{
+		background:#fff;
+	}
+	.content_container{
+		padding:40rpx;
+		line-height:100rpx;
+		height:400rpx;
+		text-align:center;
+	}
+
+	.btn_cancel{
+		width:100%;
+		text-align:right;
+		font-size:32rpx;
+		color:#333;
+		margin-top:-20rpx;
+	}
+	.text1{
+		font-size:55rpx;
+		color:#333;
+		font-weight:600;
+		text{
+			font-size:28rpx;
+			font-weight:500;
+			color:#666;
+		}
+	}
+	.btn_option{
+		height:80rpx;
+		width:80%;
+		background:#ffc400;
+		color:#333;
+		text-align:center;
+		line-height:80rpx;
+		margin:10rpx auto;
+		border-radius:10rpx;
+	}
+</style>
+
+<template>
+	<view class="content_container">
+		<view class="btn_cancel" wx:if="{{status==1}}" @tap="cancelList">取消</view>
+		<view class="text1" wx:if="{{status==1}}"><text>您当前的号码：</text>{{listNum}}</view>
+		<view class="text2">{{statusMsg}}</view>
+		<view class="text2" wx:if="{{status==1 && num==0}}" style="color:red" >请留意服务员叫号！</view>
+	</view>
+	<view class="btn_option" wx:if="{{status==0}}" @tap="startList">开始排队</view>
+	<view class="btn_option" wx:if="{{status==1}}" @tap="startFood">开始用餐</view>
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api';
+import tip from '@/utils/tip'
+
+export default class List extends wepy.page{
+	config = {
+		navigationBarTitleText :'排队点餐',
+	}
+
+	data = {
+		status:0,//0:没有排队；1:开始排队
+		option_text:'',
+		listNum:'',
+		statusMsg:'',
+		num:'',
+	}
+
+	onLoad(){
+		this.getCurListPeople();
+	}
+
+	onHide(){
+	}
+
+	//获取排队号码
+	async getListNum(){
+		this.listNum = Math.ceil(Math.random()*1000);  
+		this.$apply();
+	}
+
+	//获取当前排队人数，轮询监控
+	async getCurListPeople(){
+		let that = this;
+		let num = Math.ceil(Math.random()*10); 
+		that.num = num;
+		that.statusMsg = "排在您前面的人数有"+num+"人";
+		that.$apply();		
+		setTimeout(function(){
+			that.getCurListPeople();
+		},30000);
+	}
+
+	methods = {
+		//
+		startList(){
+			this.status = 1;
+			this.getListNum();
+		},
+
+		//开始用餐
+		startFood(){
+			wx.scanCode({
+  				onlyFromCamera: true,
+  				scanType:'qCode',
+  				success:(res)=>{
+    				console.log("扫描桌面二维码success：",res);
+    				let tableNum = res.result;
+    				wx.navigateTo({
+    					url: 'foodMenuOrder?tableNum='+tableNum
+    				})
+  				},
+  				fail:(res)=>{
+  					console.log("扫描桌面二维码fail:",res);
+  				}
+			})			
+		},
+
+		//取消排队
+		cancelList(){
+			let that  = this;
+			wx.showModal({
+        	title: '',
+        	content: '您是否要取消排队',
+        	showCancel: true,
+        	success: res => {
+          	if (res.confirm) {
+          		that.status = 0;
+          		wx.navigateBack({
+  					delta: 1
+				})
+          	} else if (res.cancel) {
+
+          	}
+        	},
+        	fail: res => {
+        	}
+     	});
+		}
+	}
+}
+</script>

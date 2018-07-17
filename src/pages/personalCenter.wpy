@@ -59,6 +59,13 @@
 		border-top-width:0rpx;
 		padding-left:30rpx;
 	}
+	.admin_box{
+		height:80rpx;
+		line-height:80rpx;
+		border:2rpx solid #f2f2f2;
+		border-top-width:0rpx;
+		padding-left:30rpx;
+	}	
 </style>
 <template>
 	<view class="container">
@@ -71,10 +78,14 @@
 					<view style="float:left">我的地址</view>
 					<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>
 			</view>
-			<view class="counpon_box textsize2 textcolor2" @tap="">
+			<view class="admin_box textsize22 textcolor2" @tap="">
+					<view style="float:left">管理员后台</view>
+					<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>				
+			</view>
+<!-- 			<view class="counpon_box textsize2 textcolor2" @tap="">
 					<view style="float:left">优惠券</view>
 					<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>
-			</view>			
+			</view>	 -->
 		</view>
 	</view>
 </template>
@@ -118,5 +129,3 @@ export default class PersonalCenter extends wepy.page{
 	}
 }
 </script>
-
-<style lang="less"></style>

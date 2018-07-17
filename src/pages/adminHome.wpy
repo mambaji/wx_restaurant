@@ -1,0 +1,59 @@
+<style lang="less">
+	page{
+		background:#fff;
+	}
+	.content_container{
+		text-align:center;
+		.pro_manager{
+			width:180rpx;
+			height:180rpx;
+			line-height:180rpx;
+			text-align:center;
+			background:#ffc400;
+			border-radius:360rpx;
+			margin:80rpx auto;
+			color:#fff;
+			box-shadow: 5px 5px 5px #f2f2f2;
+		}
+		.order_manager{
+			width:180rpx;
+			height:180rpx;
+			line-height:180rpx;
+			text-align:center;
+			background:#ffc400;
+			border-radius:360rpx;
+			margin:50rpx auto;
+			color:#fff;
+			box-shadow: 5px 5px 5px #f2f2f2;
+		}
+	}
+</style>
+
+<template>
+	<view class="content_container">
+		<view class="pro_manager" @tap="shopManager">商品管理</view>
+		<view class="order_manager" @tap="orderManager">订单管理</view>
+	</view>	
+</template>
+
+<script>
+
+import wepy from 'wepy';
+export default class AdminHome extends wepy.page{
+	config = {
+		navigationBarTitleText:'管理员后台',
+	}
+
+	data = {
+
+	}
+
+	onLoad(){
+
+	}
+
+	methods = {
+
+	}
+}
+</script>

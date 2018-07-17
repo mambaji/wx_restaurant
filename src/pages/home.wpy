@@ -251,7 +251,20 @@ export default class Home extends wepy.page{
     		})
 		},
 		onList(e){
-
+			wx.scanCode({
+  				onlyFromCamera: true,
+  				scanType:'qCode',
+  				success:(res)=>{
+    				console.log("扫描店外小程序二维码success：",res);
+    				let tableNum = res.result;
+    				wx.navigateTo({
+    					url: 'foodMenuOrder?tableNum='+tableNum
+    				})	
+  				},
+  				fail:(res)=>{
+  					console.log("扫描店外小程序二维码fail:",res);
+  				}
+			})
 		}
 	}
 

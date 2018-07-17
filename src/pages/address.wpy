@@ -37,8 +37,9 @@
 			type: ""//哪个页面跳转过来的
 		}
 
-		onload(option){
+		onLoad(option){
 			this.currentPage =0;
+			console.log("接受的类型是",option.type);
 			this.type =(option.type == undefined?"":option.type);
 			this.$invoke("addressList","setOrgType",this.type);
 		}

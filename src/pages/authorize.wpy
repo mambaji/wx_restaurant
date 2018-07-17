@@ -62,6 +62,7 @@ export default class Authrorize extends wepy.page{
 					//用户有注册
 					wepy.switchTab({
 						url:'/pages/home'
+						// url: '/pages/adminProManager'
 					})
 				}else{
 					//重新调用登录功能
@@ -72,6 +73,7 @@ export default class Authrorize extends wepy.page{
 					if(res.confirm){
 						wepy.switchTab({
 							url: '/pages/home'
+							// url: '/pages/adminProManager'
 						})
 					}
 				}	

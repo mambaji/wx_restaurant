@@ -1148,7 +1148,11 @@ import tip from '@/utils/tip'
 			onBalance(){
 				if(this.shopCart.length==0||this.shopCart.length==undefined){
 					tip.toast("您还没有选择商品！不能进行结算");
+					return;
 				}
+				wx.navigateTo({
+					url: 'commitOrder'
+				})
 			}
 		}
 	}

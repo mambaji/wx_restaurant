@@ -1,0 +1,241 @@
+<style lang="less">
+	page{
+		background:#f2f2f2;
+	}
+	.top_container{
+		background:#fff;
+		width:100%;
+		height:100rpx;
+		line-height:100rpx;
+		border-top:1rpx solid #cdcdcd;
+		padding:0rpx 20rpx;  
+		.category_picker{
+			font-size:28rpx;
+			color:#666;
+			float:left;
+		}
+		.iconfont{
+			float:left;
+			margin-left:10rpx;
+			margin-right:20rpx;
+		}
+		.search_inpput{
+			width:70%;
+			height:60rpx;
+			font-size:28rpx;
+			color:#666;
+			padding:0rpx 10rpx;
+			margin-top:20rpx;
+			margin-left:20rpx;
+			border:1rpx solid #cdcdcd;
+			border-radius:5rpx;
+		}
+	}
+	.middle_container{
+		margin-top:20rpx;
+	}
+	.pro_list{
+		background:#fff;
+		margin-top:20rpx;
+		padding:25rpx 25rpx;
+		height:170rpx;
+		.list_top{
+			height:130rpx;
+		}
+		.goodsPic{
+			width:120rpx;
+			height:120rpx;
+			float:left;
+			margin-right:20rpx;
+			border-radius:10rpx;
+		}
+		.goodsName{
+			font-size:28rpx;
+			color:#333;
+		}
+		.list_footer{
+
+		}
+		.btn_status{
+			float:right;
+			width:80rpx;
+			height:40rpx;
+			line-height:40rpx;
+			text-align:center;
+			border:1rpx solid #cdcdcd;
+			font-size:24rpx;
+			color:#999;
+		}
+		.btn_delete{
+			float:right;
+			width:80rpx;
+			height:40rpx;
+			line-height:40rpx;
+			text-align:center;
+			border:1rpx solid #cdcdcd;
+			font-size:24rpx;
+			color:#999;
+			margin-left:20rpx;
+		}
+	}
+	.addPro{
+		position:fixed;
+		width:80rpx;
+		height:80rpx;
+		line-height:80rpx;
+		background:#ffc400;
+		border-radius:360rpx;
+		text-align:center;
+		font-size:24rpx;
+		z-index:9999;
+		bottom:40rpx;
+		right:40rpx;
+		color:#000;
+		font-weight:600;
+	}
+</style>
+
+<template>
+	<view class="top_container">
+			<picker bindchange="bindPickerChange" value="{{index}}" range="{{category}}">
+				<view class="category_picker">
+					{{category[index]}}
+				</view>
+		
+			</picker>
+			<i class="iconfont icon-arrowdown"></i>
+			<input class="search_inpput" type="text" name="search_text" confirm-type="search" placeholder="搜索商品名称">
+	</view>
+	<view class="middle_container" > 
+		<repeat for="{{goodsData}}" key="index" index="index" item="item">
+			<view class="pro_list">
+				<view class="list_top">
+					<image class="goodsPic" src="{{item.pic}}"></image>
+					<view class="goodsName">{{item.name}}</view>
+				</view>
+				<view class="list_footer">
+					<view class="btn_delete" @tap="optionDelGoods">删除</view>
+					<view class="btn_status" @tap="optionStatus">{{item.status==0?'下架':'上架'}}</view>
+				</view>
+			</view>
+		</repeat>
+	</view>
+	<view class="addPro">添加</view>
+
+
+</template>
+
+<script>
+import wepy from 'wepy';
+import api from '@/api/api';
+import{
+	SYSTEM_INFO,
+	ACTIVE_CODE,
+	ATTR_ACTIVE_CODE,
+	SHOP_CART
+} from '@/utils/constant'
+
+import tip from '@/utils/tip'
+export default class AdminProManager extends wepy.page{
+
+	config = {
+		navigationBarTitleText:'商品管理'
+	}
+
+	data = {
+		index:0,
+		category:[],
+		categoryList:[],
+		goodsData:[],
+		categoryId:0,
+	}
+
+	methods = {
+		optionDelGoods(e){
+			console.log("optionDelGoods===");
+			wx.showModal({
+        	title: '',
+        	content: '您是否要删除该商品',
+        	showCancel: true,
+        	success: res => {
+          	if (res.confirm) {
+  
+          	} else if (res.cancel) {
+
+          	}
+        	},
+        	fail: res => {
+        	}
+     		});			
+		},
+		optionStatus(e){
+			console.log("optionStatus===");
+		}
+	}
+
+	onLoad(){
+		this.getCategoryList();
+	}
+
+	async getCategoryList(){
+			let that = this;
+			const json = await api.getCategory({
+				query:{}
+			})
+			console.log(json);		
+			if(json.data.code == 0){
+				this.categoryList = json.data.data;
+			}else{
+				tip.error(json.data.msg);
+				return;
+			}
+			for(let i =0;i<that.categoryList.length;i++){
+				if(i==0)that.category.push('全部');
+				that.category.push(that.categoryList[i].name);
+			}
+			this.getFoodListMsg('');
+			console.log("category===",that.category);
+			this.$apply();
+		}
+
+	async getFoodListMsg(categoryId){
+			const json = await api.getFoodMsgList({
+				query:{
+					categoryId:categoryId
+				}
+			});
+			
+			if(json.data.code == 0){
+				this.goodsData = json.data.data;
+			}else{
+				tip.error(json.data.msg);
+				return;
+			}
+			console.log("goodsData===",this.goodsData);
+			this.$apply();
+		}
+
+	async getAttrListMsg(foodId){
+			let json = await api.getAttrMsgList({
+				query:{
+					id:foodId
+				}
+			});
+			console.log("请求属性信息=====");
+			console.log(json);		
+	}
+
+		bindPickerChange(e){
+			this.index = e.detail.value;
+			if(this.index == 0){
+				//分类选择‘全部’
+				this.categoryId = '';
+			}else{
+				this.categoryId = this.categoryList[this.index-1].id;	
+			}
+			//获取商品列表
+			this.getFoodListMsg(this.categoryId);
+			this.$apply();
+		}
+}
+</script>
