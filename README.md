@@ -16,6 +16,7 @@
 |提交订单||
 |支付|微信支付,店内点餐支持现金支付|
 ## 产品截图
+### 小程序用户端
 ![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/首页.PNG)
 ![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/我的.PNG)
 <br />
@@ -29,3 +30,18 @@
 ![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/外卖_选择规格.PNG)
 <br />
 ![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/提交订单.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/我的订单.PNG)
+<br />
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/预约订单.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/订单详情.PNG)
+
+### 小程序商户后台
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品列表.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品添加.PNG)
+<br />
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品规格.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——订单.PNG)
+<br />
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——订单详情.PNG)
+<br />
+
