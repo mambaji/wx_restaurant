@@ -30,18 +30,18 @@
 ![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/外卖_选择规格.PNG)
 <br />
 ![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/提交订单.PNG)
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/我的订单.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/我的订单.png)
 <br />
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/预约订单.PNG)
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/订单详情.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/预约订单.png)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/订单详情.png)
 
 ### 小程序商户后台
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品列表.PNG)
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品添加.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品列表.png)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品添加.png)
 <br />
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品规格.PNG)
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——订单.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——商品规格.png)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——订单.png)
 <br />
-![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——订单详情.PNG)
+![image](https://github.com/ManbasJi/pro_images/blob/master/wx_images/商户后台——订单详情.png)
 <br />
 
