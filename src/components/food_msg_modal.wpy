@@ -1,0 +1,130 @@
+<style lang="less">
+	//弹窗蒙层
+	.mask{
+		width:100%;
+		height:100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		background:#000;
+		z-index:9000;
+		opacity:0.7;
+	}
+	.modalDlg{
+		width:85%;
+		height:635rpx;
+		position:fixed;
+		top:50%;
+		left:0;
+		z-index: 9999;
+    	margin: -370rpx 7.5%;
+		background-color:#fff;
+		border-radius:5rpx;
+		display:flex;
+		flex-direction:column;
+		aligin-items:center;
+	}
+	.modal_img{
+		width:100%;
+		height:440rpx;
+	}
+	.modal_name{
+		font-size:24rpx;
+		font-weight:bold;
+		color:#000;
+		margin-top:15rpx;
+		margin-left:15rpx;
+	}
+
+	.modal_num{
+		font-size:22rpx;
+		color:#999;
+		margin-left:15rpx;
+		margin-top:15rpx;
+		height:40rpx;
+	}
+	.numorder{
+		font-size:24rpx;
+	}
+	.modal_bottom{
+		height:88rpx;
+		width:100%;
+		position:absolute;
+		bottom:0rpx;
+		background:#fafafa;
+	}
+	.modal_minPrice{
+		position:relative;
+		font-size:40rpx;
+		font-weight:bold;
+		color:red;
+		left:15rpx;
+		top:18rpx;
+	}
+	.modal_originPrice{
+		position:relative;
+		top:20rpx;
+		left:20rpx;
+		font-size:24rpx;
+		color:#999999;
+		text-decoration:line-through;
+	}
+	.modal_chose_attr{
+		float:right;
+		position:relative;
+		font-size:24rpx;
+		border-radius:25px;
+		width:120rpx;
+		height:50rpx;
+		line-height:50rpx;
+		text-align:center;
+		top:20rpx;
+		right:20rpx;
+	}
+</style>
+
+<template>
+	<view class="mask" catchtouchmove="preventTouchMove" @tap="touchMask" wx:if="{{showMsgModal}}" ></view>
+	<view class="modalDlg" wx:if="{{showMsgModal}}">
+	<image class="modal_img" src="{{modal.fGoodsImg}}" />
+	<text class="modal_name">{{modal.fName}}</text>
+	<text class="modal_num">月售 <text class="numorder">{{modal.fSellNum}}</text></text>
+	<view class = "modal_bottom">
+		<text class="modal_minPrice">￥{{modal.fBaseAmount}}</text>
+		<text class="modal_originPrice">{{modal.fOldPrice==0||modal.fOldPrice==undefined?"":'￥'+modal.fOldPrice}}</text>
+		<view class="modal_chose_attr type_theme_color" data-id="{{modal.fGoodsId}}" @tap="getAttrMsgList">选规格</view>
+	</view>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class foodMsgModal extends wepy.component{
+	props = {
+		modal:{
+
+		}
+	}
+
+	data = {
+		modal:{},
+		showMsgModal:false
+	}
+
+	reventTouchMove(){
+		console.log("preventTouchMove ====");
+	}	
+
+	methods = {
+		setModalItem(modalItem,showMsgModal){
+			this.moda = modalItem;
+			this.showMsgModal = showMsgModal;
+		},
+		touchMask(){
+			this.showMsgModal = false;
+			this.$emit('msgModal', this.showMsgModal);
+			this.$apply();
+		}
+	}
+}
+</script>

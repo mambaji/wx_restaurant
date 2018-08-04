@@ -1,0 +1,190 @@
+<style lang="less">
+	
+
+</style>
+
+<template>
+<view class="attrmask" catchouchmove="preventTouchMove" @tap="touchAttrMask" wx:if="{{showAttrModal}}"></view>
+	<view class="modalDlg_attr" wx:if="{{showAttrModal}}">
+		<view class="modal_name_attr">{{goodsMsg.fGoodsName}}</view>
+		<view class="rule_box" wx:for="{{attrMsgList}}" wx:for-item="item" wx:key="key" wx:for-index="ex" data-id="{{item.fTypeId}}">
+			<view class="title">{{item.fTypeName}}</view>
+			<view class="items">
+			<view wx:for="{{item.fUnionName}}" wx:for-index="index" data-pid="{{item.fTypeId}}" wx:for-item="ch" wx:key="key" class="{{ch.active?'attractive':''}} item" @tap.stop="selAttr" data-addPrice="{{ch.fAddPrice}}" data-id="{{ch.fItemId}}" data-name="{{ch.fName}}" data-pindex="{{ex}}" data-index="{{index}}">
+				{{ch.fName}}
+			</view>
+			</view>
+		</view>
+		<view class="attrmodal_bottom">
+			<text class="attrmodal_minPrice">￥{{attrListItem.fAllAmount}}</text>
+<!-- 			<text class="attrmodal_originPrice">￥{{curShopCartItem.originPrice}}</text> -->
+			<view class="add_cart" @tap="addShopCart" wx:if="{{attrListItem.fNum==0}}">
+				<image class="add_cart_pic" src="../images/icon_shop_cart.png"></image>
+				<text class="add_cart_text">加入购物车</text>
+			</view>
+			<view class="op_num" wx:if="{{attrListItem.fNum>0}}">
+				<image class = "icon_reduce" @tap="reduceProNum" src="../images/icon_reduce_num.png"></image>
+				<text class="pro_num">{{attrListItem.fNum}}</text>
+				<image class="icon_add" @tap="addProNum" src="../images/icon_add_num.png"></image>
+			</view>
+		</view>		 	
+	</view>	
+</template>
+
+<script>
+import wepy from 'wepy'
+export default class foodAttrModal extends wepy.component{
+	props={
+		attrMsgList:{
+
+		},
+		shopCart:{
+
+		},
+		goodsMsg:{
+
+		}
+	}
+
+	data = {
+		showAttrModal:false,
+		beNum:false,
+		attrMsgList:[],
+		attrListItem:{},
+	}
+
+	reventTouchMove(){
+		console.log("preventTouchMove ====");
+	}	
+
+	methods = {
+		touchAttrMask(){
+			this.showAttrModal = false;
+			this.$emit('attrModal', this.showAttrModal);
+		},
+		setAttrItem(showAttrModal,attrListItem){
+			this.showAttrModal = showAttrModal;
+			this.attrListItem = attrListItem;
+			console.log("开启attr窗口googsMsg===",this.goodsMsg);
+			console.log("开启attr窗口attrListItem===",this.attrListItem);
+			this.$apply();
+		},
+		selAttr(e){
+			console.log("shopCart===",this.shopCart);
+			console.log("goodsMsg===",this.goodsMsg);
+			let pindex = e.currentTarget.dataset.pindex;
+			let index = e.currentTarget.dataset.index;
+			let pid = e.currentTarget.dataset.pid;
+			let id = e.currentTarget.dataset.id;
+
+			console.log("对比对比对比对比===",this.attrListItem,this.shopCart);
+			//1.初始化
+			this.attrListItem={};
+			//2.将属性是选中状态的添加到attrListItem中来
+			//3.把修改的属性类别下面的所有属性的active设置成false
+			//4.把修改的属性item设置为true
+			for(let i = 0;i<this.attrMsgList.length;i++){
+				for(let j = 0;j<this.attrMsgList[i].fUnionName.length;j++){
+					if(pindex == i){
+						if(this.attrMsgList[i].fUnionName[j].fItemId==id){
+							this.attrMsgList[i].fUnionName[j].active =true;
+						}else{
+							this.attrMsgList[i].fUnionName[j].active =false;
+						}	
+					}
+					if(this.attrMsgList[i].fUnionName[j].active){
+						//遍历，如果属性是选中状态，则添加进来
+						if(i==0){
+							this.attrListItem.fAttrType1 = this.attrMsgList[i].fUnionName[j].fItemId;
+							this.attrListItem.fAttrPrice1 = this.attrMsgList[i].fUnionName[j].fAddPrice;
+							this.attrListItem.fAttrName1 = this.attrMsgList[i].fUnionName[j].fName;
+
+						}else if(i==1){
+							this.attrListItem.fAttrType2 = this.attrMsgList[i].fUnionName[j].fItemId;
+							this.attrListItem.fAttrPrice2 = this.attrMsgList[i].fUnionName[j].fAddPrice;
+							this.attrListItem.fAttrName2 = this.attrMsgList[i].fUnionName[j].fName;
+						}else if(i==2){
+							this.attrListItem.fAttrType3 = this.attrMsgList[i].fUnionName[j].fItemId;
+							this.attrListItem.fAttrPrice3 = this.attrMsgList[i].fUnionName[j].fAddPrice;
+							this.attrListItem.fAttrName3 = this.attrMsgList[i].fUnionName[j].fName;
+						}else if(i==3){
+							this.attrListItem.fAttrType4 = this.attrMsgList[i].fUnionName[j].fItemId;
+							this.attrListItem.fAttrPrice4 = this.attrMsgList[i].fUnionName[j].fAddPrice;
+							this.attrListItem.fAttrName4 = this.attrMsgList[i].fUnionName[j].fName;
+						}
+						// console.log("遍历进来attrListItem===",this.attrListItem,this.attrMsgList[i].fUnionName);					
+					}	
+
+				}
+			}
+
+			//1.首先把这一分类下面的属性全部设置为false
+			//2.再把选中的属性item active设置为true
+			//3.再修改当前的attrListItem内容
+			//4.最后要把attrListItem跟shopCart对比，看购物车中是否有该属性内容
+			this.attrListItem.fBasePrice = this.goodsMsg.fBasePrice;
+			// for(let i = 0;i<this.attrMsgList[pindex].fUnionName.length;i++ ){
+			// 	this.attrMsgList[pindex].fUnionName[i].active = false;
+			// 	if(this.attrMsgList[pindex].fUnionName[i].fItemId==id){
+			// 		this.attrMsgList[pindex].fUnionName[i].active = true;
+			// 		//先计算总价格
+			// 		// this.attrListItem.fBaseAmount+=this.attrMsgList[pindex].fUnionName[i].fAddPrice;
+			// 		console.log("计算总价格:",this.attrMsgList[pindex].fUnionName[i].fAddPrice,this.attrListItem.fBaseAmount);
+			// 		if(pindex==0){
+			// 			this.attrListItem.fAttrType1 = id;
+			// 			this.attrListItem.fAttrPrice1 = this.attrMsgList[pindex].fUnionName[i].fAddPrice;
+			// 		}else if(pindex==1){
+			// 			this.attrListItem.fAttrType2 = id;
+			// 			this.attrListItem.fAttrPrice2 = this.attrMsgList[pindex].fUnionName[i].fAddPrice;
+			// 		}else if(pindex==2){
+			// 			this.attrListItem.fAttrType3 = id;
+			// 		}else if(pindex==3){
+			// 			this.attrListItem.fAttrType4 = id;
+			// 			this.attrListItem.fAttrPrice4 = this.attrMsgList[pindex].fUnionName[i].fAddPrice;
+			// 		}
+			// 	}
+			// }
+			//计算改变属性规格后的总价格
+			this.attrListItem.fBaseAmount = this.attrListItem.fBasePrice+(this.attrListItem.fAttrPrice1==undefined?0:this.attrListItem.fAttrPrice1)+(this.attrListItem.fAttrPrice2==undefined?0:this.attrListItem.fAttrPrice2)+(this.attrListItem.fAttrPrice3==undefined?0:this.attrListItem.fAttrPrice3)+(this.attrListItem.fAttrPrice4==undefined?0:this.attrListItem.fAttrPrice4)
+			this.attrListItem.fAllAmount = this.attrListItem.fBaseAmount;
+			this.attrListItem.fNum = 0;
+			this.attrListItem.fGoodsId = this.goodsMsg.fGoodsId;
+			this.attrListItem.fGoodsName = this.goodsMsg.fGoodsName;
+			//查询购物车中是否有该商品规格属性存在，如果有，则数量和总价跟购物车的一致。
+			for(let i=0;i<this.shopCart.length;i++){
+			//有商品存在并且属性相同
+			if(this.shopCart[i].fGoodsId == this.attrListItem.fGoodsId &&
+				this.shopCart[i].fAttrType1 == this.attrListItem.fAttrType1 &&
+				this.shopCart[i].fAttrType2 == this.attrListItem.fAttrType2 &&
+				this.shopCart[i].fAttrType3 == this.attrListItem.fAttrType3 &&
+				this.shopCart[i].fAttrType4 == this.attrListItem.fAttrType4){
+					console.log("有商品存在并且属性相同");
+					this.attrListItem.fNum = this.shopCart[i].fNum;
+					this.attrListItem.fAllAmount = this.shopCart[i].fAllAmount;
+					break;
+				}else{
+					this.attrListItem.fNum = 0;
+				}
+			}		
+		},
+		addShopCart(e){
+			let isGoodsAdd = true;//购物车中是否有该商品id,true则没有，直接push到shopCart中；
+			for(let i = 0;i<this.shopCart.length;i++){
+				if(this.shopCart[i].fGoodsId==this.attrListItem.fGoodsId){
+					isGoodsAdd = false;
+				}
+			}
+			this.attrListItem.fNum = 1;
+			console.log("addShopCart.AttrMsg==",this.attrListItem);
+			//调用父级的addShopCart方法
+			this.$emit('addShopCart',this.attrListItem,isGoodsAdd,true);
+		},
+		addProNum(e){
+			this.$emit('attrAddProNum',this.attrListItem,true);
+		},
+		reduceProNum(e){
+			this.$emit('attrReduceProNum',this.attrListItem,false);
+		}
+	}
+}
+</script>
