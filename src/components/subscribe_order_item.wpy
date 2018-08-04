@@ -1,0 +1,94 @@
+<style lang="less">
+	.subscribe_item{
+
+		.list_item{
+			background:#fff;
+			padding:30rpx;
+			margin-top:15rpx;
+			.name{
+				font-size:28rpx;
+				color:#666;
+				margin-top:10rpx;
+			}
+			.phone{
+				font-size:28rpx;
+				color:#666;
+				margin-top:10rpx;
+			}
+			.date{
+				font-size:28rpx;
+				color:#666;
+				margin-top:10rpx;
+			}
+			.time{
+				font-size:28rpx;
+				color:#666;
+				margin-top:10rpx;
+			}
+			.num{
+				font-size:28rpx;
+				color:#666;
+				margin-top:10rpx;
+			}
+			.remark{
+				font-size:28rpx;
+				color:#666;
+				margin-top:10rpx;
+				padding-bottom:10rpx;
+				border-bottom:1rpx solid #cdcdcd; 
+			}
+			.option{
+				float:right;
+				padding:8rpx 6rpx;
+				border:1rpx solid #cdcdcd;
+				border-radius:10rpx;
+				margin-top:10rpx;
+				font-size:28rpx;
+			}
+		}
+	}
+</style>
+
+<template>
+	<view class="subscribe_item">
+		<repeat for="{{subscribeList}}" key="index" index="index" item="item">
+			<view class="list_item">
+				<view class="name">姓名：{{item.fCustName}}</view>
+				<view class="phone">手机号码：{{item.fPhone}}</view>
+				<view class="date">申请日期：{{item.fDate}}</view>
+				<view class="time">预约时间：{{item.fDateTime}}</view>
+				<view class="num">人数：{{item.fPeopleNum}}</view>
+				<!-- <text class="option">取消预约</text> -->
+			</view>
+		</repeat>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '@/api/api'
+export default class subscribeOrderItem extends wepy.component{
+	props = {
+		subscribeList:{
+
+		},
+		type:{
+
+		}
+
+	}
+
+	data = {
+		subscribeList:[]
+	}
+
+	methods = {
+
+	}
+
+	onLoad(){
+		console.log("subscirbe==",this.subscribeList);
+	}
+
+}
+</script>

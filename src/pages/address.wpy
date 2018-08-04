@@ -18,7 +18,9 @@
 	import tip from "@/utils/tip";
 	import {
 		USER_SPECICAL_INFO,
-		TOKEN
+		TOKEN,
+		CUSTID,
+		SHOPID,
 	} from '@/utils/constant';
 	export default class Address extends wepy.page{
 		config = {
@@ -30,6 +32,7 @@
 			addressEdit: AddressEdit
 		}
 		data = {
+			shopId:'',
 			addressList:[],
 			addressInfo:{},
 			//显示当前组件 0：列表、1：新增、2：编辑
@@ -38,6 +41,7 @@
 		}
 
 		onLoad(option){
+			this.shopId = wepy.getStorageSync(SHOPID)||{};
 			this.currentPage =0;
 			console.log("接受的类型是",option.type);
 			this.type =(option.type == undefined?"":option.type);
@@ -51,11 +55,11 @@
 
 		methods = {
 			//通过子组件的$emit()方法向父组件传递值cur 和 id
-			getCurrentPage(cur,id){
+			getCurrentPage(cur,id,index){
 				this.currentPage = cur;
 				//如果是编辑地址控件，就需要传递数据到编辑控件中
 				if(cur!=1&&cur!=0){
-					this.reachAddressInfo(id);
+					this.reachAddressInfo(index);
 				}
 			}
 		}
@@ -68,12 +72,15 @@
 
 		async getUserAddress(){
 			let that = this;
-			let token = wepy.getStorageSync(TOKEN)||{};
+			let custId = wepy.getStorageSync(CUSTID)||{};
 			const json =await api.getAddressAll({
 				query:{
-					token: token
+					fShopId:that.shopId,
+					fCustId:custId,
+					fId:'',
 				}
 			});
+			console.log("发送getUserAddress请求===",json);
 			if(json.data.code == 0){
 				this.addressList = json.data.data;
 				this.$invoke("addressList","refreshList",this.addressList);
@@ -84,33 +91,12 @@
 		}
 
 		//根据id查询某个收货地址详情
-		async reachAddressInfo(id) {
-    		let that = this;
-    		let token = wepy.getStorageSync(TOKEN) || {};
-    		// const json = await api.reachAddressById({
-     	//  		method:'POST',
-     	//  		query:{
-     	//  			token:token,
-     	//  			id:id
-     	//  		}
-    		// });
-    		const json = await wepy.request({
-    			url:'https://api.it120.cc/manbasji//user/shipping-address/detail',
-    			data:{
-    				token:token,
-    				id:id
-    			},
-    			methods:'POST'
-    		})
-    		console.log(json);
-    	if (json.data.code == 0) {
-      		that.addressInfo=json.data.data;
-      		that.$invoke("addressEdit","refresh", this.addressInfo);
-    	} else {
-      		tip.error("",json.data.msg)
-    	}
-    		that.showLoading = false;
-  		}
+		async reachAddressInfo(index) {
+			console.log("index====",index);
+      		this.addressInfo=this.addressList[index];
+      		this.$invoke("addressEdit","refresh", this.addressInfo);
+    		this.showLoading = false;
+	  	}
 }
 
 </script>

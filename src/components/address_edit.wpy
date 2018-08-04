@@ -31,13 +31,13 @@
       <view class="list_item">
         <view class="title">收货人姓名:</view>
         <view class="input">
-          <input type="text" name="receiverName" value="{{editInfo.linkMan}}" />
+          <input type="text" name="receiverName" value="{{editInfo.fName}}" />
         </view>
       </view>
       <view class="list_item">
         <view class="title">联系电话:</view>
         <view class="input">
-          <input type="text" name="mobile" value="{{editInfo.mobile}}"/>
+          <input type="text" name="mobile" value="{{editInfo.fPhone}}"/>
         </view>
       </view>
       <view class="list_item">
@@ -50,7 +50,7 @@
       <view class="list_item">
         <view class="title">详细地址:</view>
         <view class="input">
-          <input type="text" name="addressDetail" value="{{editInfo.address}}" />
+          <input type="text" name="addressDetail" value="{{editInfo.fAddress}}" />
         </view>
       </view>
       <view class="list_item">
@@ -87,16 +87,16 @@ export default class AddressEdit extends wepy.component {
     province: '',
     city: '',
     area: '',
-    provinceCode: '',
-    cityCode: '',
-    areaCode: ''
+    provinceName: '',
+    cityName: '',
+    areaName: ''
   }
 
   components = {
     areaPicker: AreaPicker
   }
   async editAddress(address) {
-    console.log("保存");
+    console.log("保存===",address);
     let that = this;
     let token = wepy.getStorageSync(TOKEN) || {};
     let isDefult = 0;
@@ -106,23 +106,27 @@ export default class AddressEdit extends wepy.component {
     const json = await api.updateAddress({
       query: {
         token: token,
-        id: this.id,
-        address: address.addressDetail,
-        isDefult: isDefult,
-        provinceId:that.provinceCode,
-        cityId:that.cityCode,
-        districtId:that.areaCode,
-        linkMan:address.receiverName,
-        mobile:address.mobile,
-      }
+        fId: this.id,
+        fAddress: address.addressDetail,
+        fAddressX:'0',
+        fAddressY:'0',
+        fProvinceId:that.provinceName,
+        fCityId:that.cityName,
+        fAreaId:that.areaName,
+        fName:address.receiverName,
+        fPhone:address.mobile,
+        fCustId:that.editInfo.fCustId,
+        fIsDefault:isDefult
+      },
+      method:'POST'
     });
+    console.log("updateAddress===",json);
     if (json.data.code == 0) {
       //0 列表 1新增 2编辑 (显示列表)
       this.$emit('currentPage', 0);
       this.$emit('refreshAddList', 'hehe');
-
     } else {
-      tip.error(json.data.msg)
+      tip.toast(json.data.msg)
     }
     that.showLoading = false;
   }
@@ -159,15 +163,15 @@ export default class AddressEdit extends wepy.component {
       console.log("val.....", val);
       this.editInfo = val;
       console.log(this.editInfo);
-      this.id = this.editInfo.id;
-      if(this.editInfo.isDefault==true){
+      this.id = this.editInfo.fId;
+      if(this.editInfo.fIsDefault=='1'){
         this.isDefult=true
       }
       console.log("==========ee=========");
       console.log(this.isDefult);
-      this.province = { code: this.editInfo.provinceId, name: this.editInfo.provinceStr };
-      this.city = { code: this.editInfo.cityId, name:this.editInfo.cityStr };
-      this.area = { code: this.editInfo.districtId, name: this.editInfo.areaStr };
+      this.province = { code: this.editInfo.fProvinceId, name: this.editInfo.provinceStr };
+      this.city = { code: this.editInfo.fCityId, name:this.editInfo.cityStr };
+      this.area = { code: this.editInfo.fAreaId, name: this.editInfo.areaStr };
 
       this.$apply();
     },
@@ -179,9 +183,9 @@ export default class AddressEdit extends wepy.component {
       this.city = city;
       this.area = area;
 
-      this.provinceCode = province.code;
-      this.cityCode = city.code;
-      this.areaCode = area.code;
+      this.provinceName = province.name;
+      this.cityName = city.name;
+      this.areaName = area.name;
       this.$apply();
     }
   }

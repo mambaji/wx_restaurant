@@ -1,15 +1,7 @@
 <style lang="less">
 	page{
 		background:#f2f2f2;
-
 	}
-	//隐藏滚动条
-	::-webkit-scrollbar{
- 	 	width: 0;
-  	 	height: 0;
-  	 	color: transparent;
-	}
-
 	.empty_address{
 		background:#fff;
 		width:94%;
@@ -27,7 +19,7 @@
 			height:45rpx;
 			margin-top:23rpx;
 			margin-right:20rpx;
-		}		
+		}
 	}
 
 	.address{
@@ -212,6 +204,22 @@
 		}
 	}
 
+	.btn_pay_cash{
+		position:relative;
+		bottom:0rpx;
+		background:#ffc400;
+		height:90rpx;
+		line-height:90rpx;
+		color:#fff;
+		text-align:center;
+		.wx_pay{
+			font-size:34rpx;
+		}
+		.pay_price{
+			font-size:40rpx;
+		}
+	}	
+
 	.mask{
 		width:100%;
 		height:100%;
@@ -222,28 +230,23 @@
 		z-index:9000;
 		opacity:0.7;
 	}
-	}
-
-
-
 </style>
-
 <template>
-	<view style="height:{{wheight-45}}px;;">
+	<view style="height:{{wheight-45}}px;">
 	<scroll-view class="scroll_content" scroll-y style="padding:3%;height:{{wheight-45}}px">
 		<!-- 我的地址 -->
-			<view class="empty_address" wx:if="{{!isExit}}" @tap="setAddress">
+			<view class="empty_address" wx:if="{{!isExit&&type==1}}" @tap="setAddress">
 		        <text class="title">设置收货地址</text>
         		<image class="icon_arrow_right" src="../images/icon_arrow_right.png"></image>
       		</view>
-      		<view class="address" wx:if="{{isExit}}"  @tap="setAddress">
+      		<view class="address" wx:if="{{isExit&&type==1}}"  @tap="setAddress">
 			<image class="icon_address" src="../images/icon_address.png"></image>
 			<view class="address_detail">
-				{{addressInfo.address}}
+				{{addressInfo.fProvinceId}}{{addressInfo.fCityId}}{{addressInfo.fAreaId}}{{addressInfo.fAddress}}
 			</view>
 			<view class="user_msg">
-				<text class="name">{{addressInfo.linkMan}}</text>
-				<text class="phone">{{addressInfo.mobile}}</text>
+				<text class="name">{{addressInfo.fName}}</text>
+				<text class="phone">{{addressInfo.fPhone}}</text>
 			</view>
 			<image class="icon_arrow_right" src="../images/icon_arrow_right.png"></image>
 			</view>
@@ -253,20 +256,20 @@
 			<view class="pro_list_content">
 				<view class="pro_list_item" wx:for="{{shopCart}}" wx:for-item="item" wx:key="index">
 					<image class="image" src="{{item.image}}"></image>
-					<text class="name">{{item.foodName}}</text>
-					<text class="price">￥{{item.minPrice}}</text>
-					<text class="attr">大份</text>
-					<text class="originPrice">￥{{item.originPrice}}</text>
-					<text class="num">x {{item.num}}</text>
+					<text class="name">{{item.fGoodsName}}</text>
+					<text class="price">￥{{item.fBaseAmount}}</text>
+					<text class="attr">{{item.fAttrName1}}{{item.fAttrName2}}{{item.fAttrName3}}{{item.fAttrName4}}</text>
+					<!-- <text class="originPrice">￥{{item.originPrice}}</text> -->
+					<text class="num">x {{item.fNum}}</text>
 				</view>
 			</view>
 		</view>
 		<!-- 其他费用 -->
-		<view class="order_price">
+		<view class="order_price" wx:if="{{type==1}}">
 			<text class="package_text">包装费</text>
-			<text class="package_price">￥{{shop.packagePrice}}</text>
+			<text class="package_price">￥{{shop.fPackagePrice}}</text>
 			<text class="distribution_text">配送费</text>
-			<text class="distribution_price">￥{{shop.distributionPrice}}</text>
+			<text class="distribution_price">￥{{shopInfo.fDistributionPrice}}</text>
 		</view>
 		<view class="all_price">
 			小计
@@ -275,12 +278,16 @@
 		<!-- 其他 -->
 		<view class="order_content">
 			<text class="remark_text">备注</text>
-			<input class="remark_input" name=""></input>
+			<input class="remark_input" name="remark_input" bindinput="getRemarkInput"></input>
 		</view>
 	</scroll-view>
 	</view>
-	<view class="btn_pay">
+	<view class="btn_pay" @tap="onPay" wx:if="{{payType==1}}">
 		<text class="wx_pay">微信支付</text>
+		<text class="pay_price">￥{{allPrice}}</text>
+	</view>
+	<view class="btn_pay_cash" wx:if="{{type==0&&payType==0}}" @tap="onPay">
+		<text class="wx_pay">提交订单</text>
 		<text class="pay_price">￥{{allPrice}}</text>
 	</view>
 
@@ -296,16 +303,19 @@
 		<view class="modal_bottom">新增收货地址</view>
 	</view> -->
 </template>
-
 <script>
 import wepy from 'wepy';
 import api from '@/api/api';
 import{
 	SYSTEM_INFO,
 	TOKEN,
-	ADDRESS_ID
+	ADDRESS_ID,
+	SHOPID,
+	CUSTID,
+	SHOP_CART
 } from '@/utils/constant'
 import tip from "../utils/tip"
+import util from "../utils/util"
 export default class CommitOrder extends wepy.page{
 	config = {
 		navigationBarTitleText:'提交订单',
@@ -315,140 +325,103 @@ export default class CommitOrder extends wepy.page{
 
 	data = {
 		wheight:0,
-		addressInfo:'',
+		addressInfo:null,
 		isExit:false,
-		allPrice:'32',
-		shop:{
-			packagePrice:'1',
-			distributionPrice:'3'
-		},
-		shopCart:[
-			{
-				foodId:'001',
-				num:'2',
-				minPrice:'15',
-				originPrice:'20',
-				foodName:'招牌鹅肉',
-				image:'../images/zhaopaierou.jpg',
-				attr:[
-					{
-						attrId:'123',
-						attrItemId:'12301',
-						attrItemName:'大份'
-					},{
-						attrId:'124',
-						attrItemId:'12301',
-						attrItemName:'排骨汤'						
-					}
-				]
-			},{
-				foodId:'001',
-				num:'1',
-				minPrice:'15',
-				originPrice:'20',
-				foodName:'招牌鹅肉',
-				image:'../images/zhaopaierou.jpg',
-				attr:[
-					{
-						attrId:'123',
-						attrItemId:'12301',
-						attrItemName:'大份'
-					},{
-						attrId:'124',
-						attrItemId:'12302',
-						attrItemName:'玉米汤'						
-					}
-				]
-			},
-			{
-				foodId:'002',
-				num:'1',
-				minPrice:'20',
-				originPrice:'25',
-				foodName:'酸甜粉',
-				image:'../images/suantianfen.jpg',
-				attr:[
-					{
-						attrId:'125',
-						attrItemId:'12501',
-						attrItemName:'微辣'
-					},{
-						attrId:'126',
-						attrItemId:'12601',
-						attrItemName:'不加糖'						
-					}
-				]
-			},{
-				foodId:'003',
-				num:'1',
-				minPrice:'8',
-				originPrice:'10',
-				foodName:'凉拌黄瓜',
-				image:'../images/liangbanhuanggua.jpg',
-				attr:[
-				]
-			}
-		]
+		allPrice:0,//订单总价格
+		allProNum:0,
+		baseAmount:0,//商品总价格
+		type:'',//1:外卖、0:堂食
+		payType:'',//1：微信支付 、0：现金支付
+		shopId:'',
+		custId:'',
+		token:'',
+		remark:'',
+		tableNo:'',
+		shopInfo:{},
+
+		shopCart:[],
 	}
 
 	onLoad(option){
-			if(option!='' && option!=undefined){
-				this.shopCart = option.shopCartMsg;
-			}
+		console.log("onLoad");
+			this.shopId = wepy.getStorageSync(SHOPID)||{};
+			this.custId = wepy.getStorageSync(CUSTID)||{};
+			this.token = wepy.getStorageSync(TOKEN)||{};
+			this.getShopMsg();//获取店铺信息
 			let systemInfo = wx.getStorageSync(SYSTEM_INFO);	
 			if(systemInfo==null||systemInfo==""||systemInfo==undefined){
 				systemInfo = wepy.getSystemInfoSync();
         		wepy.setStorageSync(SYSTEM_INFO, systemInfo);	
 			}
 			this.wheight = systemInfo.windowHeight;
-			let from = option.from==undefined?'':option.from;
-			if(from == "selAdd"){
-				this.reachAddressInfo(wepy.getStorageSync(ADDRESS_ID));
-			}else{
-				this.onGetAddress();
+			
+			this.type = option.type;
+			this.payType = option.payType;
+			this.tableNo = option.tableNo;
+			if(this.tableNo==undefined){
+				this.tableNo = null;
 			}
+			this.shopCart = wepy.getStorageSync(SHOP_CART)||{};
+			console.log("tableNo===",this.tableNo);
 	}
-		//根据id查询某个收货地址详情
-		async reachAddressInfo(id) {
-    		let that = this;
-    		let token = wepy.getStorageSync(TOKEN) || {};
-    		const json = await wepy.request({
-    			url:'https://api.it120.cc/manbasji//user/shipping-address/detail',
-    			data:{
-    				token:token,
-    				id:id
-    			},
-    			methods:'POST'
-    		})
-    		console.log(json);
-    	if (json.data.code == 0) {
-      		that.addressInfo=json.data.data;
-      		that.isExit = true;
-    	} else {
-      		tip.error("",json.data.msg)
-    	}
-    		that.showLoading = false;
-    		this.$apply();
-  		}
+
+	onShow(){
+		//地址列表回调的时候调用onShow方法
+		console.log("onShow");
+		let addressId = wepy.getStorageSync(ADDRESS_ID)||'';
+		console.log("addressId===",addressId);
+		this.onGetAddress(addressId);
+	}
+
+
+	onHide(){
+		console.log("onHide");
+		wepy.setStorageSync(ADDRESS_ID,'');//当页面隐藏时初始化 addressId
+	}
+
+	onUnload(){
+		console.log("onUnload");
+		wepy.setStorageSync(ADDRESS_ID,'');//当页面隐藏时初始化 addressId	
+
+	}
+
+	getRemarkInput(e){
+		this.remark = e.detail.value;
+		console.log("订单备注:",this.remark);
+	}
 
 	//获取收货地址列表
-		async onGetAddress(){
+		async onGetAddress(id){
 			let that = this;
-			let token = wepy.getStorageSync(TOKEN)||{};
 			const json =await api.getAddressAll({
 				query:{
-					token: token
+					fShopId:this.shopId,
+					fCustId:this.custId,
+					fId:id,
 				}
 			});
+			console.log("onGetAddress",json);
 			if(json.data.code == 0){
 				console.log(json.data.data);
-				for(let i=0;i<json.data.data.length;i++){
-					if(json.data.data[i].isDefault){
-						this.addressInfo  = json.data.data[i];
-						this.isExit = true;
-						break;
+				if(id==''){
+					//id为空，则查询列表，选择默认地址作为显示信息
+					for(let i=0;i<json.data.data.length;i++){
+						if(json.data.data[i].fIsDefault==1){
+							this.addressInfo  = json.data.data[i];
+							this.isExit = true;
+							break;
+						}
 					}
+				}else{
+					//id有值，则查询该id的地址信息
+					this.addressInfo = json.data.data[0];
+					this.isExit = true;
 				}
+				console.log("addressInfo.length==",this.addressInfo.length);
+				if (this.addressInfo==null) {
+					this.isExit = false;
+				}
+
 			}else{
 				tip.error(json.data.msg);
 			}
@@ -457,6 +430,41 @@ export default class CommitOrder extends wepy.page{
 			that.showLoading = false;
 			this.$apply();
 		}
+
+		async getShopMsg(){
+			const json = await api.getShopInfo({
+				query:{
+					fShopId:this.shopId
+				}
+			});
+			console.log("getShopMsg===",json);
+			if(json.data.code == 0){
+				this.shopInfo = json.data.data;
+			}else{
+				tip.error("网络连接失败!");
+			}
+			this.onGetAllPrice();//计算总价格
+		}
+
+		onGetAllPrice(){
+			let allPrice = 0;
+			let num = 0;
+			for(let i = 0;i<this.shopCart.length;i++){
+				num+=this.shopCart[i].fNum;//购物车中的所有商品数量相加
+				allPrice+=this.shopCart[i].fAllAmount;//购物车中的所有商品金额相加
+			}
+			this.baseAmount = allPrice;
+			//如果是订单是外卖类型的，则需要加上包装费和运送费
+			
+			if(this.type==1){
+				this.allPrice = allPrice+this.shopInfo.fPackPrice+this.shopInfo.fDistributionPrice;			
+			}else{
+				this.allPrice = allPrice;
+			}
+			this.allProNum = num;
+			console.log("countShopCart===",this.allPrice,this.allProNum,this.shopCart);	
+			this.$apply();		
+		}
 	
 	methods = {
 		setAddress(){
@@ -464,7 +472,61 @@ export default class CommitOrder extends wepy.page{
         		url: "/pages/address?type=order"
       		});			
 		},
-	}
-}	
-</script>
 
+		async onPay(){
+			let token = wepy.getStorageSync(TOKEN)||{};
+			let shopId = wepy.getStorageSync(SHOPID)||{};
+			let custId = wepy.getStorageSync(CUSTID)||{};
+			let goodsData = [];
+
+			let orderNo;
+			if(this.type==0){
+				orderNo = 'TC'+util.getTimeStamp();
+			}else{
+				orderNo = 'WM'+util.getTimeStamp();
+			}
+
+			for(let i = 0 ;i<this.shopCart.length;i++){
+				this.shopCart[i].fEntryId = i+1;
+			}
+			let status = 1;//0:待支付；1:已支付,待确认；2:待配送；3：配送中；4：已完成；5：已取消；6：已确认，待上菜
+			if(this.remark==''){
+				this.remark = null;
+			}
+
+			const json = await api.submitOrder({
+				query:{
+					token:token,
+					fShopId:shopId,
+					fCustId:custId,
+					fType:this.type,
+					fStatus:status,
+					fBasePrice:this.baseAmount,
+					fDisCount:0,
+					fNote:this.remark,
+					fDistributionPrice:this.shopInfo.fDistributionPrice,
+					fPackPrice:this.shopInfo.fPackPrice,
+					fDiscountPrice:0,
+					fReductionPrice:0,
+					fCouponId:null,
+					fAllAmount:this.allPrice,
+					fPayType:0,
+					fGoodsData:this.shopCart,
+					fAddressId:this.addressInfo.fId,
+					fCouponPrice:0,
+					fOrderNo:orderNo,
+					fTable:0
+				},
+				method:'POST'
+			});
+			console.log("提交订单===",json);
+			if(json.data.code == 0){
+				tip.toast("下单成功，请等待商家确认！");
+				wx.navigateBack({
+        			delta: 1
+      			})
+			}
+		}
+	}
+}
+</script>

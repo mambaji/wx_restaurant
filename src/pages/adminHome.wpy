@@ -53,7 +53,16 @@ export default class AdminHome extends wepy.page{
 	}
 
 	methods = {
-
+		shopManager(){
+			wx.navigateTo({
+				url:'adminProManager'
+			})
+		},
+		orderManager(){
+			wx.navigateTo({
+				url:'adminOrderManager'
+			})
+		}
 	}
 }
 </script>

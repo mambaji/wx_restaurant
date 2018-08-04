@@ -3,7 +3,7 @@
 		font-size:30rpx;
 		color:#333;
 		font-weight:600;
-		width:100%
+		width:100%;
 		height:80rpx;
 		line-height:80rpx;
 		padding-left:20rpx;
@@ -19,11 +19,10 @@
 			color:#999;
 			font-size:28rpx;
 			float:left;
-			margin-right:40rpx;
 		}
 		.category_picker{
 			float:left;
-			width:70%;
+			width:50%;
 		}
 		i{
 			float:right;
@@ -39,7 +38,6 @@
 			float:left;
 			color:#999;
 			font-size:28rpx;
-			margin-right:40rpx;
 		}
 		input{
 			float:left;
@@ -99,7 +97,12 @@
 			font-size:28rpx;
 			float:left;
 			margin-top:30rpx;
+		}
+		span{
+			color:red;
+			float:left;
 			margin-right:40rpx;
+			margin-top:30rpx;
 		}
 		view{
 			height:120rpx;
@@ -126,15 +129,32 @@
 		}
 	}
 
+	.footer_container{
+		width:100%;
+	}
+
+	.btn_save_goods{
+		background:#ffc400;
+		width:80%;
+		margin-top:40rpx;
+		color:#fff;
+	}
+	span{
+		color:red;
+		float:left;
+		margin-right:40rpx;
+	}
+
 </style>
 
 <template>
 	<view class="top_container">
 		{{type}}
 	</view>
+	<form bindsubmit="onSaveGoods">
 	<view class="middle_container">
 		<view class="category_input">
-			<text>商品类别</text>
+			<text>商品类别</text><span>*</span>
 			<picker bindchange="bindCategoryPickerChange" value="{{index}}" range="{{category}}">
 				<view class="category_picker">
 					{{category[index]}}
@@ -142,14 +162,23 @@
 				<i class="iconfont icon-arrowdown"></i>	
 			</picker>
 		</view>
-		<view class="goodsName_input">
-			<text>商品名称</text>
-			<input type="text" name="goodsName">
-		</view>
-		<view class="goodsDesc_input">
-			<text>商品描述</text>
-			<textarea></textarea>
-		</view>
+			<view class="goodsName_input">
+				<text>商品名称</text><span>*</span>
+				<input type="text" name="goodsName" value="{{goodsName}}" />
+			</view>
+			<view class="goodsDesc_input">
+				<text>商品描述</text>
+				<textarea name="goodsDesc" value="{{goodsDesc}}"></textarea>
+			</view>
+			<view class="goodsName_input">
+				<text>商品现价</text><span>*</span>
+				<input type="text" name="goodsPrice" value="{{goodsPrice}}">
+			</view>
+			<view class="goodsName_input">
+				<text>商品原价</text>
+				<input type="text" name="oldPrice" value="{{oldPrice}}">
+			</view>
+		
 		<view class="goodsType_input">
 			<text>商品标签</text>
 			<picker bindchange="bindTypePickerChange" value="{{type_index}}" range="{{typelist}}">
@@ -160,23 +189,32 @@
 			</picker>			
 		</view>
 		<view class="goodsPic_upload">
-			<text>商品图片</text>
+			<text>商品图片</text><span>*</span>
 			<view wx:if="{{!isImage}}" @tap = "onUploadImage">
 				<i class="iconfont icon-add"></i>
 			</view>
 			<image class="goodsPic" wx:if="{{isImage}}"></image>
 		</view>
-		<view class="goodsAttr">
+		<view class="goodsAttr" @tap="goAttr" wx:if="{{isGoodsSave}}">
 			<text>商品规格</text>
 			<i class="iconfont icon-arrowright"></i>	
 		</view>		
 	</view>
-	<view class="footer_container"></view>
+	<view class="footer_container">
+		<button formType="submit" class="button btn_save_goods">保存</button>
+	</view>
+	</form>
 </template>
 
 <script>
 import wepy from 'wepy'
 import api from '@/api/api'
+import tip from '@/utils/tip'
+import upload from '@/utils/qiniuUploader'
+import {
+	SHOPID,
+	TOKEN
+} from '@/utils/constant'
 export default class AdminProDetailManager extends wepy.page{
 	config = {
 		navigationBarTitleText:"商品详情管理"
@@ -187,19 +225,85 @@ export default class AdminProDetailManager extends wepy.page{
 		isImage:false,//判断是否有上传商品图片
 		categoryList:[],
 		category:[],
+		categoryId:'',
 		index:0,
-		typelist:['推荐','热销','折扣'],
+		typelist:['无','推荐','热销','折扣'],
 		type_index:0,
+		type_id:'',
+		shopId:'',
+		imageURL:'',
+		isGoodsSave:false,
+		token:'',
+
+
+		goodsName:'',
+		goodsDesc:'',
+		goodsPrice:'',
+		oldPrice:'',
 	}
 
-	onLoad(){
+	onLoad(option){
+		this.token = wepy.getStorageSync(TOKEN)||{};
+		this.shopId = wepy.getStorageSync(SHOPID)||{};
+		console.log("type=======",option.type)
+		if(option.type==0){
+			this.type="商品添加";
+		}else if(option.type==1){
+			this.type="商品编辑";
+		}
 		this.getCategoryList();
+	}
+
+	onSaveGoods(e){
+		console.log("form===",e.detail.value);
+		let goodsName = e.detail.value.goodsName;
+		let goodsPirce = e.detail.value.goodsPrice;
+		let oldPrice = e.detail.value.oldPrice;
+		let goodsDesc = e.detail.value.goodsDesc;
+		let categoryId = this.categoryId;
+		let type_id = this.type_id;
+		let pic = this.imageURL;
+
+		if(categoryId==''||goodsName == '' || goodsPrice == ''||pic == ''){
+			tip.toast("信息填写不完整！");
+			return;
+		}
+
+		const json = api.addGoods({
+			query:{
+				token:that.token,
+				fShopId:that.shopId,
+				fGoodsListId:categoryId,
+				fName:goodsName,
+				fGoodsImg:pic,
+				fGoodsNote:goodsDesc,
+				fBaseAmount:goodsPrice,
+				fOldPrice:oldPrice,
+				fLable:type_id,
+				fStatus:1,
+			}
+		});
+		console.log("saveGoods==",json);
+		if(json.data.code==0){
+			tip.toast("保存信息成功,请设置商品规格");
+			this.isGoodsSave = true;
+
+			this.goodsName=''
+			this.goodsDesc=''
+			this.goodsPrice=''
+			this.oldPrice=''
+		}else{
+			tip.toast("网络连接失败!");
+		}
+
 	}
 
 	async getCategoryList(){
 			let that = this;
 			const json = await api.getCategory({
-				query:{}
+				query:{
+					fShopId:this.shopId
+				}
 			})
 			console.log(json);		
 			if(json.data.code == 0){
@@ -209,7 +313,7 @@ export default class AdminProDetailManager extends wepy.page{
 				return;
 			}
 			for(let i =0;i<that.categoryList.length;i++){
-				that.category.push(that.categoryList[i].name);
+				that.category.push(that.categoryList[i].fListName);
 			}
 			console.log("category===",that.category);
 			this.$apply();
@@ -217,24 +321,37 @@ export default class AdminProDetailManager extends wepy.page{
 
 		bindCategoryPickerChange(e){
 			this.index = e.detail.value;
+			this.categoryId = this.categoryList[index].fListId;
+			console.log("bindCategoryPickerChange==",this.index);
 		}
 
 		bindTypePickerChange(e){
 			this.type_index = e.detail.value;
+			if(this.type_index==0){
+				this.type_id = null
+			}
+			this.type_id = this.type_index;
+			console.log("bindTypePickerChange==",this.type_index);
 		}
 
 	methods = {
+
 		//选择照片并上传照片
 		onUploadImage(){
-			count:1,
+			let that = this;
 			wx.chooseImage({
+				count:1,
 				success:function(res){
-					var tempFilePaths = res.tempFilePaths
-					wx.uploadFile({
+					var tempFilePath = res.tempFilePaths[0];
+					upload.upload(tempFilePath,(res)=>{
+						that.imageURL = res.imageURL
+					},(error)=>{
+						console.log('error:'+error);
+					},{
 
 					})
 				}
-			})
+			});
 		},
 
 	}

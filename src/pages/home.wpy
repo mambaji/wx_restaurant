@@ -1,17 +1,75 @@
 <template>
 	<view class="container">
 		<view class="top_box">
+	<!-- 		<image class="backg" mode="scaleToFill" src="../images/food_pic1.png"></image> -->
+	    <view wx:if="{{isAddressCover}}" class="address_cover">
+	    	<text class="address">{{address}}</text>
+    	</view>
+			<i class="iconfont icon-home-address" @tap="onAddresscover"></i>
+	    <view wx:if="{{isTimeCover}}" class="time_cover">
+	    	<text class="time">{{open_time}}</text>
+    	</view>
+			<i class="iconfont icon-home-time"  @tap="onTimecover"></i>
+	    <view wx:if="{{isNoticeCover}}" class="notice_cover">
+	    	<text class="notice">{{notice}}</text>
+    	</view>
+			<i class="iconfont icon-home-notice" @tap="onNoticecover"></i>			
 			<image class="logo" src="../images/lamian_logo.jpg"></image>
 			<view class="shopName textsize1">{{shop_name}}</view>
 		</view>
 
 		<view class="middle_box">
-			<view class="btn_subscribebox textsize2" @tap="onSubscribe">预约</view>
-			<view class="btn_orderbox textsize2" @tap="onOrder">点餐</view>
-			<view class="btn_parcelbox textsize2" @tap="onParce">外卖</view>
-			<view class="btn_listbox textsize2" @tap="onList">排队</view>
+<!-- 			<view class="btn_subscribebox" @tap="onSubscribe">
+				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
+			</image>
+			<i class="iconfont icon-subscribe" style="color:#259b24"></i>
+			</view>
+			<view class="btn_orderbox textsize2" @tap="onOrder">
+				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
+			</image>
+			<i class="iconfont icon-diner" style="color:#ff3d00"></i>
+			</view>
+			<view class="btn_parcelbox textsize2" @tap="onParce">
+				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
+			</image>
+			<i class="iconfont icon-parce" style="color:#ffc400"></i>
+			</view>
+			<view class="btn_listbox textsize2" @tap="onList">
+				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
+			</image>
+			<i class="iconfont icon-list" style="color:#795548"></i>
+			</view> -->
+			
+<!-- 			<image class="btn_orderbox" mode="scaleToFill" src="../images/icon_dish.png">
+			</image>
+			<i class="iconfont icon-diner"></i>
+			<image class="btn_parcelbox" mode="scaleToFill" src="../images/icon_dish.png">
+				<i class="iconfont icon-parce"></i>
+			</image>
+			<image class="btn_listbox" mode="scaleToFill" src="../images/icon_dish.png">
+				<i class="iconfont icon-list"></i>
+			</image>	 -->	
+			<view class="dish_container">
+	<!-- 			<image class="" mode="scaleToFill" src="../images/icon_dish.png">
+			</image> -->
+			<view class="s">
+			<i class="iconfont icon-subscribe" style="color:#259b24" @tap="onSubscribe"></i>
+			<view>预约</view>
+			</view>
+			<view class="d">
+			<i class="iconfont icon-diner" style="color:#ff3d00" @tap="onOrder"></i>
+			<view>点餐</view>
+			</view>
+			<view class="p">
+			<i class="iconfont icon-parce" style="color:#ffc400" @tap="onParce"></i>
+			<view>外卖</view>
+			</view>
+			<view class="l">
+			<i class="iconfont icon-list" style="color:#795548" @tap="onList"></i>
+			<view>排队</view>	
+			</view>						
 		</view>
-		<view class="bottom_box">
+<!-- 		<view class="bottom_box">
 			<view class="opentime_box textsize2 textcolor2">
 					营业时间：{{open_time}}
 			</view>
@@ -22,73 +80,229 @@
 				店铺地址：{{address}}
 				<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>
 			</view>
-		</view>	
+		</view>	 -->
 
+			<!-- <i class="iconfont icon-diner" style="color:#ff3d00"></i> -->
+			</view>
 	</view>
 </template>
 
 <style lang="less">
+	.address_cover{
+		background:#fff;
+		padding:8rpx 20rpx;
+		border-radius:30rpx;
+		font-size:28rpx;
+		color:#999;
+		position:absolute;
+		top:1vw;
+		left:16vw;
+		z-index:999;
+		opacity:0.9;
+	}
+	.time_cover{
+		background:#fff;
+		padding:8rpx 20rpx;
+		border-radius:30rpx;
+		font-size:28rpx;
+		color:#999;
+		position:absolute;
+		top:13vw;
+		left:16vw;
+		z-index:999;
+		opacity:0.9;
+	}
+	.notice_cover{
+		background:#fff;
+		padding:8rpx 20rpx;
+		border-radius:30rpx;
+		font-size:28rpx;
+		color:#999;
+		position:absolute;
+		top:25vw;
+		left:16vw;
+		z-index:999;
+		opacity:0.9;
+	}
+	.dish_container{
+		position:relative;
+		width:80%;
+		height:80vw;
+		background:#fff;
+		border-radius:360rpx;
+		margin-left:10%;
+		box-shadow: 5px 5px 1px #cdcdcd;
+		i{
+			font-size:80rpx;
+		}
+		.s{
+			position:absolute;
+			top:25%;
+			left:25%;
+			text-align:center;
+			view{
+				font-size:25rpx;
+				color:#999;
+			}
+		}
+		.d{
+			position:absolute;
+			top:25%;
+			right:25%;
+			text-align:center;
+			view{
+				font-size:25rpx;
+				color:#999;
+			}
+		}
+		.p{
+			position:absolute;
+			bottom:25%;
+			left:25%;
+			text-align:center;
+			view{
+				font-size:25rpx;
+				color:#999;
+			}
+		}
+		.l{
+			position:absolute;
+			bottom:25%;
+			right:25%;
+			text-align:center;
+			view{
+				font-size:25rpx;
+				color:#999;
+			}
+		}
+	}
 	.container{
 
 	}
 	.top_box{
+		position:relative;
 		width:100%;
-		height:350rpx;
+		height:500rpx;
 		text-align:center;
 		background:#413d3c;
-		margin-bottom:-50rpx;
+		margin-bottom:-200rpx;
+		.backg{
+			position:fixed;
+			left:0rpx;
+			top:0rpx;
+			bottom:0rpx;
+			height:500rpx;
+			width:100%;
+		}
+		.icon-home-address{
+			position:absolute;
+			font-size:60rpx;
+			color:#999;
+			left:3vw;
+		}
+		.icon-home-time{
+			position:absolute;
+			font-size:55rpx;
+			color:#999;
+			left:3vw;
+			top:12vw;
+		}
+		.icon-home-notice{
+			position:absolute;
+			font-size:55rpx;
+			color:#999;
+			left:3vw;
+			top:24vw;
+		}
 	}
 	.logo{
-		width:150rpx;
-		height:150rpx;
+		position:absolute;
+		width:20vw;
+		height:20vw;
 		border-radius:360rpx;
-		margin-top:40rpx;
+		top:5vw;
+		left:40vw;
 	}
 	.shopName{
-		color:#ffffff;
+		position:absolute;
+		color:#fff;
+		font-weight:500;
+		top:26vw;
+		left:40vw;
 	}
 
 	.middle_box{
 		width:100%;
 		height:200rpx;
+		i{
+			position:relative;
+			z-index:9999;
+		}
 	}
 
 	.btn_subscribebox{
 		float:left;
 		height:150rpx;
-		line-height:150rpx;
 		width:20%;
-		background:#999999;
 		text-align:center;
 		margin-left:7%;
-
+		image{
+			width:150rpx;
+			height:150rpx;
+		}
+		i{
+			position:relative;
+			bottom:110rpx;
+			font-size:50rpx;
+		}
 	}
 	.btn_orderbox{
 		float:left;
 		height:150rpx;
-		line-height:150rpx;
 		width:20%;
-		background:#999999;
 		text-align:center;
 		margin-left:2%;
+		image{
+			width:150rpx;
+			height:150rpx;
+		}
+		i{
+			position:relative;
+			bottom:110rpx;
+			font-size:50rpx;
+		}
 	}
 	.btn_parcelbox{
 		float:left;
 		height:150rpx;
-		line-height:150rpx;
 		width:20%;
-		background:#999999;
 		text-align:center;
 		margin-left:2%;
+		image{
+			width:150rpx;
+			height:150rpx;
+		}
+		i{
+			position:relative;
+			bottom:110rpx;
+			font-size:50rpx;
+		}
 	}
 	.btn_listbox{
 		float:left;
 		height:150rpx;
-		line-height:150rpx;
 		width:20%;
-		background:#999999;
 		text-align:center;
 		margin-left:2%;
+		image{
+			width:150rpx;
+			height:150rpx;
+		}
+		i{
+			position:relative;
+			bottom:110rpx;
+			font-size:50rpx;
+		}
 	}
 	.bottom_box{
 		width:100%;
@@ -155,6 +369,9 @@
 <script>
 import wepy from 'wepy';
 import api from '@/api/api';
+import {
+	SHOPID
+} from '@/utils/constant';
 export default class Home extends wepy.page{
 	config = {
 		navigationBarTitleText:'首页',
@@ -175,16 +392,22 @@ export default class Home extends wepy.page{
 	}
 	
 	data = {
+		shopId:'',
 		shop_logo:'',
 		shop_name:'',
 		open_time:'',
 		phone:'',
 		address:'',
+		notice:'',
 		latitude:'',
-		longitude:''
+		longitude:'',
+		isAddressCover:false,
+		isTimeCover:false,
+		isNoticeCover:false,
 	}
 
 	async onLoad(){
+		this.shopId = wepy.getStorageSync(SHOPID)||{};
 		//加载商户信息
 		this.getShopInfo();
 	}
@@ -194,21 +417,20 @@ export default class Home extends wepy.page{
 		let that = this;
 		let json = await api.getShopInfo({
 			query:{
-				id:'1516'
+				fShopId:that.shopId
 			}
 		});
 		console.log(json);
 		if(json.data.code == 0){
 			//请求成功
-			let data = (json.data.data)[0];
-			console.log(data.linkPhone);
-			that.open_time = data.dateUpdate;
-			that.phone = data.linkPhone;
-			that.address = data.address;
-			that.shop_name = data.name;
-			that.latitude = data.latitude;
-			that.longitude = data.longitude;
-			console.log(that.open_time);
+			let data = json.data.data;
+			that.open_time = data.fOpenTime;
+			that.phone = data.fPhone;
+			that.address = data.fAddress;
+			that.shop_name = data.fName;
+			that.latitude = data.fAddressX;
+			that.longitude = data.fAddressY;
+			this.notice = data.fNotice;
 		}else{
 
 		}
@@ -256,15 +478,42 @@ export default class Home extends wepy.page{
   				scanType:'qCode',
   				success:(res)=>{
     				console.log("扫描店外小程序二维码success：",res);
-    				let tableNum = res.result;
+    				let tableNo = res.result;
     				wx.navigateTo({
-    					url: 'foodMenuOrder?tableNum='+tableNum
+    					url: 'foodMenuOrder?tableNo='+tableNo
     				})	
   				},
   				fail:(res)=>{
   					console.log("扫描店外小程序二维码fail:",res);
   				}
 			})
+		},
+		onAddresscover(){
+			let that = this;
+			this.isAddressCover=true;
+			setTimeout(function(){
+				that.isAddressCover = false;
+				that.$apply();
+			},3000);
+			this.$apply();
+		},
+		onTimecover(){
+			let that = this;
+			this.isTimeCover=true;
+			setTimeout(function(){
+				that.isTimeCover = false;
+				that.$apply();
+			},3000);
+			this.$apply();
+		},
+		onNoticecover(){
+			let that = this;
+			this.isNoticeCover=true;
+			setTimeout(function(){
+				that.isNoticeCover = false;
+				that.$apply();
+			},3000);
+			this.$apply();
 		}
 	}
 

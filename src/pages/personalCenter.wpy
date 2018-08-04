@@ -78,7 +78,7 @@
 					<view style="float:left">我的地址</view>
 					<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>
 			</view>
-			<view class="admin_box textsize22 textcolor2" @tap="">
+			<view class="admin_box textsize22 textcolor2" @tap="goAdmin">
 					<view style="float:left">管理员后台</view>
 					<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>				
 			</view>
@@ -125,6 +125,11 @@ export default class PersonalCenter extends wepy.page{
 			wepy.navigateTo({
 				url:'/pages/address'
 			})
+		},
+		goAdmin(){
+			wepy.navigateTo({
+				url:'/pages/adminHome'
+			})			
 		}
 	}
 }

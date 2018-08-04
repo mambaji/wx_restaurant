@@ -16,7 +16,10 @@ import {
 	SYSTEM_INFO,
 	USER_SPECICAL_INFO,
 	USER_INFO,
-	TOKEN
+	TOKEN,
+	CUSTID,
+	OPENID,
+	SHOPID
 } from '@/utils/constant';
 export default class Authrorize extends wepy.page{
 	config = {
@@ -50,15 +53,18 @@ export default class Authrorize extends wepy.page{
 		if(reslogin.errMsg == "login:ok"){
 			const json = await api.sendWxCode({
 				query:{
-					code:reslogin.code,
-					type:2
-				}
+					code:reslogin.code
+				},
+				method:'POST'
 			})
 			console.log("发送wxcode请求......");
 			console.log(json);
 			if(json.data.code == 0){
 					//保存token到本地
-					wepy.setStorageSync(TOKEN,json.data.data.token);//
+					wepy.setStorageSync(TOKEN,json.data.token);//
+					wepy.setStorageSync(CUSTID,json.data.data.fId);
+					wepy.setStorageSync(OPENID,json.data.data.openId);
+					wepy.setStorageSync(SHOPID,'1');
 					//用户有注册
 					wepy.switchTab({
 						url:'/pages/home'
@@ -91,7 +97,7 @@ export default class Authrorize extends wepy.page{
 			let json = await api.checkToken({
 				query:{
 					token:token
-				}
+				},
 			})
 			console.log("执行token接口");
 			console.log(json);			
@@ -99,6 +105,9 @@ export default class Authrorize extends wepy.page{
 				wepy.switchTab({
 					url:'/pages/home'
 				})
+				// wx.navigateTo({
+   	// 				url: '/pages/home	'
+   	// 			})	
 			}else{
 				//token过期，重新请求token
 				that.wxlogin();

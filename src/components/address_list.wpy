@@ -3,18 +3,18 @@
     <repeat for="{{addressList}}" key="index" index="index" item="item">
       <view class="list_box">
         <swipeDelete :swipeData="item" @delItem.user="handleDelItem">
-          <view class="address_list" @tap="tapSelAddress" data-id="{{item.id}}">
+          <view class="address_list" @tap="tapSelAddress" data-id="{{item.fId}}">
             <view class="title">
               <view class="user_info textsize2">
-                <text class="name">{{item.linkMan}}</text>
-                <text class="phone">{{item.mobile}}</text>
+                <text class="name">{{item.fName}}</text>
+                <text class="phone">{{item.fPhone}}</text>
               </view>
               <view class="active_address text_overflow textsize2">
                 <text class="defult" wx:if="{{item.isDefault==1}}"> [默认]</text>
-                {{item.provinceStr}} {{item.cityStr}} {{item.areaStr}} {{item.address}}
+                {{item.fProvinceId}} {{item.fCityId}} {{item.fAreaId}} {{item.fAddress}}
               </view>
             </view>
-            <view class="arrow"  @tap.stop="edit" data-id="{{item.id}}"><i class="iconfont icon-edit" ></i></view>
+            <view class="arrow"  @tap.stop="edit" data-id="{{item.id}}" data-index="{{index}}"><i class="iconfont icon-edit" ></i></view>
           </view>
         </swipeDelete>
       </view>
@@ -59,10 +59,12 @@ export default class AddressList extends wepy.component {
     let token = wepy.getStorageSync(TOKEN) || {};
     const json = await api.deleteAddress({
       query: {
-        id: id,
+        fId: id,
         token:token
-      }
+      },
+      method:'POST'
     });
+    console.log("delUser===",json);
 
     if (json.data.code == 0) {
       console.log("删除成功");
@@ -80,17 +82,17 @@ export default class AddressList extends wepy.component {
     },
     edit(e) {
       var id = e.currentTarget.dataset.id;
+      let index = e.currentTarget.dataset.index;
       console.log("id=====");
       console.log(id);
       //0 列表 1新增 2编辑
-      this.$emit('currentPage', 2,id);
+      this.$emit('currentPage', 2,id,index);
     },
     //左滑删除
     handleDelItem(itemData) {
-      this.delUserAddress(itemData.id);
+      this.delUserAddress(itemData.fId);
       console.log("左滑删除")
-      console.log(itemData.id)
-
+      console.log(itemData)
     },
 
     refreshList(val){
@@ -113,8 +115,11 @@ export default class AddressList extends wepy.component {
       var id = e.currentTarget.dataset.id;
       console.log("id=="+id);
       wepy.setStorageSync(ADDRESS_ID,id);
-      wepy.redirectTo({
-        url: "/pages/commitOrder?from=selAdd"
+      // wepy.redirectTo({
+      //   url: "/pages/commitOrder?from=selAdd"
+      // })
+      wx.navigateBack({
+        delta: 1
       })
     }
   }

@@ -11,21 +11,23 @@ import 'wepy-async-function'
 export default class extends wepy.app {
   config = {
     pages: [
-      'pages/adminProDetailAttrManager',
-      'pages/adminProDetailManager',
-      'pages/adminProManager',
       'pages/authorize',
-      'pages/adminHome',
-      'pages/orderList',
       'pages/home',
+      'pages/orderList',
+      'pages/adminHome',
       'pages/personalCenter',
       'pages/address',
       'pages/subscribe',
+      'pages/list',
       'pages/foodMenuParce',
       'pages/foodMenuOrder',
       'pages/commitOrder',
       'pages/orderDetail',
-      'pages/list',
+      'pages/adminProManager',
+      'pages/adminProDetailManager',
+      'pages/adminProDetailAttrManager',       
+      'pages/adminOrderManager',
+      'pages/adminOrderDetail'
     ],
    window: {
       backgroundTextStyle: 'dark',

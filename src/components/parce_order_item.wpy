@@ -1,3 +1,4 @@
+
 <style lang="less">
   .order_list_top {
     display: flex;
@@ -69,45 +70,58 @@
 		<!-- <view wx:for="{{orderList}}" wx:for-item="item" wx:key="index"> -->
 		<repeat for="{{orderList}}" key="index" index="index" item="item">
 			<view class="list">
-				<navigator class="item_content" url="/pages/orderDetail?orderNo={{item.orderNo}}">
+				<view class="item_content" @tap="navigatorOrderDetail">
 					<view class="order_list_top">
-						<text class="type">{{item.type==0?'堂吃':'外卖'}}</text>
-						<text class="status" wx:if="{{item.status==0}}">待支付</text>
-						<text class="status" wx:if="{{item.status==1}}">已付款，待确认</text>
-						<text class="status" wx:if="{{item.status==2}}">待配送</text>	
-						<text class="status" wx:if="{{item.status==3}}">配送中...</text>	
-						<text class="status" wx:if="{{item.status==4}}">已完成</text>
-						<text class="status" wx:if="{{item.status==5}}">已取消</text>					
+						<text class="type">{{item.ftype==0?'堂吃':'外卖'}}</text>
+						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
+						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
+						<text class="status" wx:if="{{item.fStatus==2}}">待配送</text>	
+						<text class="status" wx:if="{{item.fStatus==3}}">配送中...</text>	
+						<text class="status" wx:if="{{item.fStatus==4}}">已完成</text>
+						<text class="status" wx:if="{{item.fStatus==5}}">已取消</text>					
 					</view>
 					<view class="order_list_content">
 						<repeat for="{{item.goodsData}}">
 							<view class="goods_list" wx:key="index">
-								<text class="goods_name">{{item.goodsName}}</text>
+								<text class="goods_name">{{item.name}}</text>
 								<text class="goods_num">x{{item.num}}</text>
 							</view>
 						</repeat>
 						<view class="pro_total">
-							共{{item.totalNum}}件商品
-							合计:￥{{item.allAmount}}
-							<text wx:if="{{item.payType==1}}">(微信支付)</text>
-							<text wx:if="{{item.payType==0}}">(现金支付)</text>
+							共{{item.fUnionNum}}件商品
+							合计:￥{{item.fAllAmount}}
+							<text wx:if="{{item.fPayType==1}}">(微信支付)</text>
+							<text wx:if="{{item.fPayType==0}}">(现金支付)</text>
 						</view>
 				<!-- 		<view class="data">
 							{{item.data}}
 						</view>	 -->					
 					</view>
-					<view class="order_list_footer">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.status==0}}">
+					<!-- 用户端 type==1 -->
+					<view class="order_list_footer" wx:if="{{type==1}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}">
 							立即支付
 						</view>
-						<view class="option_btn" id="btn_cancel" wx:if="{{item.status==0||item.status==1||item.status==2}}">
+						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==0||item.fStatus==1||item.fStatus==2}}">
 							取消订单
 						</view>						
-						<view class="option_btn" id="btn_comfirm" wx:if="{{item.status==3}}">
+						<view class="option_btn" id="btn_comfirm" wx:if="{{item.fStatus==3}}">
 							确认收货
 						</view>						
 					</view>
-				</navigator>
+					<!-- 商户端 type==0 -->
+					<view class="order_list_footer" wx:if="{{type==0}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}">
+							确认订单
+						</view>
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}">
+							拒绝订单
+						</view>						
+						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==0||item.fStatus==1||item.fStatus==2}}">
+							配送
+						</view>							
+					</view>					
+				</view>
 			</view>			
 		</repeat>
 		<!-- </view> -->
@@ -127,7 +141,14 @@ export default class parceOrderItem extends wepy.component{
 				style:0
 			}],
 			type:Object
-		}	
+		},
+		type:{
+
+		}
+	}
+
+	data = {
+		url:'',
 	}
 
 	async updateOrderStatus(orderNo,flag){
@@ -146,12 +167,27 @@ export default class parceOrderItem extends wepy.component{
 			this.orderList = val;
 			console.log("val....",this.orderList);
 			this.$apply();
+		},
+
+		navigatorOrderDetail(e){
+			let index = e.currentTarget.dataset.index;
+			let that = this;
+			wepy.setStorageSync(ORDER_DETAIL,that.orderList[index]);
+			if(this.type==1){
+    			wx.navigateTo({
+    				url: '/pages/orderDetail?orderListItem='+ that.orderList[index]
+    			});	
+			}else{
+    			wx.navigateTo({
+    				url: '/pages/adminOrderDetail?orderListItem='+ that.orderList[index]
+    			});	
+			}			
 		}
 	}
 
+
+
 	onLoad(){
-		let that = this;
-		console.log("返回的数据orderList===",this.orderList,this.orderList.length);
 	}
 }
 </script>

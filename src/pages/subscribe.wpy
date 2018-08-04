@@ -10,9 +10,21 @@
 				<input name="phone"></input>
 			</view>
 			<view class="border_bottom">
-				<text>时间</text><span>*</span>
-				<input name="time"></input>
-			</view>
+			<text>日期</text><span>*</span>
+  			<picker mode="date" value="{{date}}" start="2018-01-01" end="2028-12-31" bindchange="bindDateChange">
+    		<view class="picker">
+      			{{date}}
+    		</view>
+  			</picker>
+  			</view>
+			<view class="border_bottom">
+			<text>时间</text><span>*</span>  						
+  			<picker mode="time" value="{{time}}" start="09:01" end="23:01" bindchange="bindTimeChange">
+    		<view class="picker">
+      			{{time}}
+    		</view>
+  			</picker>
+  			</view>
 			<view class="border_bottom">
 				<text>人数</text><span>*</span>
 				<input name="num"></input>
@@ -64,6 +76,14 @@
 			width:100%;
 			text-align:center;
 		}
+		.picker{
+			position:relative;
+			width:60%;
+			height:60rpx;
+			top:20rpx;
+			left:20rpx;
+			line-height:60rpx;			
+		}
 	}
 	.btn_submit{
 		width:80%;
@@ -74,7 +94,13 @@
 <script>
 import wepy from 'wepy';
 import api from '@/api/api';
-import tip from '@/utils/tip'
+import tip from '@/utils/tip';
+import util from '@/utils/util';
+import{
+	TOKEN,
+	SHOPID,
+	CUSTID
+} from '@/utils/constant'
 export default class Subscribe extends wepy.page{
 	config = {
 		navigationBarTitleText:'预约',
@@ -85,14 +111,25 @@ export default class Subscribe extends wepy.page{
 	}
 
 	data = {
-
+		date:'',
+		time:'',
 	}
 
-	onload(){
-
+	onLoad(){
+		var datetime = util.getCurrentTime().split(",");
+		this.date = datetime[0];
+		this.time = datetime[1];
 	}
 
-	formSubmit(e){
+	bindDateChange(e){
+		this.date = e.detail.value;
+	}
+
+	bindTimeChange(e){
+		this.time = e.detail.value;
+	}
+
+    async formSubmit(e){
 		console.log("formSubmit",e.detail.value);
 		if(e.detail.value.name == ''){
 			tip.toast("姓名不能为空");
@@ -102,20 +139,62 @@ export default class Subscribe extends wepy.page{
 			tip.toast("手机号不能为空");
 			return;
 		}
-		if(e.detail.value.time == ''){
-			tip.toast("到店时间不能为空");
+		if(this.date == ''){
+			tip.toast("到店日期不能为空");
 			return;
 		}
+		if(this.time == ''){
+			tip.toast("到店时间不能为空");
+			return;
+		}		
 		if(e.detail.value.num == ''){
 			tip.toast("到店人数不能为空");
 			return;
 		}
 
+
+		let supplyDate = util.getCurrentTime().replace(',',' ');
+		let date = this.date+' '+this.time;
 		let name = e.detail.value.name;
 		let phone = e.detail.value.phone;
-		let time = e.detail.value.time;
+		let time = this.time;
 		let num = e.detail.value.num;
 		let remark = e.detail.value.remark;
+
+		let token = wepy.getStorageSync(TOKEN)||{};
+		let shopId = wepy.getStorageSync(SHOPID)||{};
+		let custId = wepy.getStorageSync(CUSTID)||{};
+		if(token == {}){
+			return;
+		}
+		const json  = await api.submitRecord({
+			query:{
+				token:token,
+				fShopId:shopId,
+				fDate:supplyDate,
+				fDateTime:date,
+				fPhone:phone,
+				fCustName:name,
+				fPeopleNum:num,
+				fTableNum:'',
+				fCustId:custId
+			},
+			method:'POST'
+		});
+		console.log("用户提交预约表单===",json);
+		if(json.data.code==0){
+			tip.toast("提交预约成功!");
+		}
+
+		const getjson = await api.getRecord({
+			query:{
+				fCustId:custId,
+				fShopId:shopId,
+				fStatus:''
+			}
+		});
+		console.log("getjson===",getjson);
+
 	}
 
 	methods={

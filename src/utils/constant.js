@@ -13,6 +13,15 @@ export const USER_INFO = "userInfo";
 // 用户token
 export const TOKEN = "token";
 
+// custId
+export const CUSTID = "custId";
+
+//openId
+export const OPENID = "openId";
+
+//SHOPID
+export const SHOPID = "shopId";
+
 //分类选择itemcode
 export const ACTIVE_CODE = "activecode";
 
@@ -21,6 +30,11 @@ export const ATTR_ACTIVE_CODE = "attractivecode";
 
 //购物车
 export const SHOP_CART = 'shopcart';
+
+//订单详情
+export const ORDER_DETAIL = "orderDetail";
+
+
 /**
  * 系统信息
  * @type {String}

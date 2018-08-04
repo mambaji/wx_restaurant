@@ -9,8 +9,15 @@ function getCurrentTime() {
   var f = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
   var s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
   var rand = Math.round(Math.random() * 899 + 100);
-  keep = y + '' + m + '' + d + '' + h + '' + f + '' + s;
+  keep = y + '-' + m + '-' + d + ',' + h + ':' + f;
   return keep; //20160614134947
+}
+
+//获取时间戳
+function getTimeStamp(){
+  var timeStamp = Date.parse(new Date());
+  timeStamp = timeStamp/1000;
+  return timeStamp;
 }
 
 function objLength(input) {
@@ -138,5 +145,6 @@ module.exports = {
   div: div,
   mul: mul,
   accAdd: accAdd,
-  convertStarArray: convertStarArray
+  convertStarArray: convertStarArray,
+  getTimeStamp:getTimeStamp
 }

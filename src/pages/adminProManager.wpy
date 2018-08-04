@@ -20,7 +20,7 @@
 			margin-right:20rpx;
 		}
 		.search_inpput{
-			width:70%;
+			width:60%;
 			height:60rpx;
 			font-size:28rpx;
 			color:#666;
@@ -66,6 +66,17 @@
 			font-size:24rpx;
 			color:#999;
 		}
+		.btn_attr{
+			float:right;
+			width:110rpx;
+			height:40rpx;
+			line-height:40rpx;
+			text-align:center;
+			border:1rpx solid #cdcdcd;
+			font-size:24rpx;
+			color:#999;
+			margin-right:20rpx;
+		}
 		.btn_delete{
 			float:right;
 			width:80rpx;
@@ -97,30 +108,31 @@
 
 <template>
 	<view class="top_container">
-			<picker bindchange="bindPickerChange" value="{{index}}" range="{{category}}">
+			<picker bindchange="bindCategoryChangePicker" value="{{index}}" range="{{category}}">
 				<view class="category_picker">
 					{{category[index]}}
 				</view>
-		
 			</picker>
 			<i class="iconfont icon-arrowdown"></i>
-			<input class="search_inpput" type="text" name="search_text" confirm-type="search" placeholder="搜索商品名称">
+			<input class="search_inpput" type="text" name="search_text" confirm-type="search" placeholder="搜索商品名称" bindinput="getSearchContent" bindblur="searchLoseFocus">
 	</view>
 	<view class="middle_container" > 
 		<repeat for="{{goodsData}}" key="index" index="index" item="item">
-			<view class="pro_list">
+			<view class="pro_list" @tap="goProDetail">
 				<view class="list_top">
-					<image class="goodsPic" src="{{item.pic}}"></image>
-					<view class="goodsName">{{item.name}}</view>
+					<image class="goodsPic" src="{{item.fGoodsImg}}"></image>
+					<view class="goodsName">{{item.fName}}</view>
 				</view>
 				<view class="list_footer">
-					<view class="btn_delete" @tap="optionDelGoods">删除</view>
-					<view class="btn_status" @tap="optionStatus">{{item.status==0?'下架':'上架'}}</view>
+					<view class="btn_delete" data-id="{{item.fGoodsId}}" @tap.stop="optionDelGoods">删除</view>
+					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="1" wx:if="{{item.fStatus==0}}">上架</view>
+					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="0" wx:if="{{item.fStatus==1}}">下架</view>
+					<view class="btn_attr" @tap.stop="goAttr" data-id="{{item.fGoodsId}}">规格管理</view>		
 				</view>
 			</view>
 		</repeat>
 	</view>
-	<view class="addPro">添加</view>
+	<view class="addPro" @tap="addPro">添加</view>
 
 
 </template>
@@ -132,7 +144,9 @@ import{
 	SYSTEM_INFO,
 	ACTIVE_CODE,
 	ATTR_ACTIVE_CODE,
-	SHOP_CART
+	SHOP_CART,
+	SHOPID,
+	TOKEN
 } from '@/utils/constant'
 
 import tip from '@/utils/tip'
@@ -143,15 +157,77 @@ export default class AdminProManager extends wepy.page{
 	}
 
 	data = {
+		shopId:'',
+		token:'',
 		index:0,
 		category:[],
 		categoryList:[],
+		categoryId:'',
 		goodsData:[],
 		categoryId:0,
+		searchContent:'',
+	}
+
+	async onUpdateStatus(goodsId,status){
+		const json  = await api.updateGoodsStatus({
+			query:{
+				token:this.token,
+				fGoodsId:goodsId,
+				fStatus:status,
+			},
+			method:'POST'
+		})
+		console.log("onUpdateStatus===",json);
+		if(json.data.code==0){
+			tip.toast("更新商品状态成功!");
+		}
+		this.$apply();
+	}
+
+
+	async onDelGoods(goodsId){
+		const json = await api.delGoods({
+			query:{
+				token:this.token,
+				fGoodsId:goodsId
+			},
+			method:'POST'
+		})
+		console.log("onDelGoods===",json);
+		if(json.data.code==0){
+			tip.toast("删除成功!");
+		}
+		this.$apply();
+	}
+
+	bindCategoryChangePicker(e){
+		console.log("bindPickerChange");
+		let index = e.detail.value;
+		this.index = index;
+		if(index == 0){
+			index = ''
+		}else{
+			index = this.categoryList[index].fListId;
+		}
+		this.categoryId = index;
+		this.getFoodListMsg();
+	}
+
+	getSearchContent(e){
+		console.log("getSearchContent");
+		this.searchContent = e.detail.value;
+	}
+
+	searchLoseFocus(e){
+		console.log("searchLoseFocus");
+		this.searchContent = e.detail.value;
+		this.getFoodListMsg();
 	}
 
 	methods = {
 		optionDelGoods(e){
+			let that = this;
+			let id = e.currentTarget.dataset.id;
 			console.log("optionDelGoods===");
 			wx.showModal({
         	title: '',
@@ -159,29 +235,53 @@ export default class AdminProManager extends wepy.page{
         	showCancel: true,
         	success: res => {
           	if (res.confirm) {
-  
+  				that.onDelGoods(id);
           	} else if (res.cancel) {
 
           	}
         	},
         	fail: res => {
+
         	}
      		});			
 		},
 		optionStatus(e){
-			console.log("optionStatus===");
+			let status = e.currentTarget.dataset.status;
+			let id = e.currentTarget.dataset.id;
+			this.onUpdateStatus(id,status);
+			
+		},
+		goProDetail(e){
+			wx.navigateTo({
+				url:'adminProDetailManager?type=1'
+			})
+		},
+		addPro(e){
+			wx.navigateTo({
+				url:'adminProDetailManager?type=0'
+			})			
+		},
+		goAttr(e){
+			let id = e.currentTarget.dataset.id;
+			wx.navigateTo({
+				url:'adminProDetailAttrManager?goodsId='+id
+			})
 		}
 	}
 
 	onLoad(){
+		this.shopId = wepy.getStorageSync(SHOPID)||{};
+		this.token = wepy.getStorageSync(TOKEN)||{};
 		this.getCategoryList();
 	}
 
 	async getCategoryList(){
 			let that = this;
 			const json = await api.getCategory({
-				query:{}
-			})
+				query:{
+					fShopId:that.shopId
+				}
+			});
 			console.log(json);		
 			if(json.data.code == 0){
 				this.categoryList = json.data.data;
@@ -191,39 +291,32 @@ export default class AdminProManager extends wepy.page{
 			}
 			for(let i =0;i<that.categoryList.length;i++){
 				if(i==0)that.category.push('全部');
-				that.category.push(that.categoryList[i].name);
+				that.category.push(that.categoryList[i].fListName);
 			}
-			this.getFoodListMsg('');
+			this.getFoodListMsg(null);
 			console.log("category===",that.category);
 			this.$apply();
 		}
 
 	async getFoodListMsg(categoryId){
-			const json = await api.getFoodMsgList({
+		let that = this;
+			const json = await api.getShopGoods({
 				query:{
-					categoryId:categoryId
+					fShopId:that.shopId,
+					fGoodsListId:that.categoryId,
+					fGoodsName:that.searchContent,
+					fGoodsId:''
 				}
 			});
-			
+			console.log("goodsData===",json);
 			if(json.data.code == 0){
 				this.goodsData = json.data.data;
 			}else{
 				tip.error(json.data.msg);
 				return;
 			}
-			console.log("goodsData===",this.goodsData);
 			this.$apply();
 		}
-
-	async getAttrListMsg(foodId){
-			let json = await api.getAttrMsgList({
-				query:{
-					id:foodId
-				}
-			});
-			console.log("请求属性信息=====");
-			console.log(json);		
-	}
 
 		bindPickerChange(e){
 			this.index = e.detail.value;
@@ -231,7 +324,7 @@ export default class AdminProManager extends wepy.page{
 				//分类选择‘全部’
 				this.categoryId = '';
 			}else{
-				this.categoryId = this.categoryList[this.index-1].id;	
+				this.categoryId = this.categoryList[this.index-1].fListId;	
 			}
 			//获取商品列表
 			this.getFoodListMsg(this.categoryId);

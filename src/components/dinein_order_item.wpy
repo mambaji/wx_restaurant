@@ -38,7 +38,7 @@
   }
   .order_list_footer {
     display: flex;
-    flex-direction:column;
+    flex-direction:row;
     justify-content: flex-end;
     align-items: flex-end;
     padding-top: 20rpx;
@@ -50,6 +50,7 @@
     	border:1rpx solid #cdcdcd;
     	border-radius:20rpx;
     	font-size:28rpx;
+    	margin-left:20rpx;
     }
   }
   .order_list_top {
@@ -69,40 +70,47 @@
 		<!-- <view wx:for="{{orderList}}" wx:for-item="item" wx:key="index"> -->
 		<repeat for="{{orderList}}" key="index" index="index" item="item">
 			<view class="list">
-				<navigator class="item_content" url="/pages/orderDetail?orderNo={{item.orderNo}}">
+				<view class="item_content" @tap="navigatorOrderDetail" data-index="{{index}}" data-item="{{item}}">
 					<view class="order_list_top">
-						<text class="type">{{item.type==0?'堂吃':'外卖'}}</text>
-						<text class="status" wx:if="{{item.status==0}}">待支付</text>
-						<text class="status" wx:if="{{item.status==1}}">已付款，待确认</text>
-						<text class="status" wx:if="{{item.status==6}}">已确认，待上菜</text>
-						<text class="status" wx:if="{{item.status==4}}">已完成</text>
+						<text class="type">{{item.ftype==0?'堂吃':'外卖'}}</text>
+						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
+						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
+						<text class="status" wx:if="{{item.fStatus==6}}">已确认，待上菜</text>
+						<text class="status" wx:if="{{item.fStatus==4}}">已完成</text>
 					</view>
 					<view class="order_list_content">
 						<repeat for="{{item.goodsData}}">
 							<view class="goods_list" wx:key="index">
-								<text class="goods_name">{{item.goodsName}}</text>
+								<text class="goods_name">{{item.name}}</text>
 								<text class="goods_num">x{{item.num}}</text>
 							</view>
 						</repeat>
 						<view class="pro_total">
-							共{{item.totalNum}}件商品
-							合计:￥{{item.allAmount}}
-							<text wx:if="{{item.payType==1}}">(微信支付)</text>
-							<text wx:if="{{item.payType==0}}">(现金支付)</text>
-						</view>
-				<!-- 		<view class="data">
-							{{item.data}}
-						</view>	 -->					
+							共{{item.fUnionNum}}件商品
+							合计:￥{{item.fAllAmount}}
+							<text wx:if="{{item.fPayType==1}}">(微信支付)</text>
+							<text wx:if="{{item.fpayType==0}}">(现金支付)</text>
+						</view>				
 					</view>
-					<view class="order_list_footer">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.status==0}}">
+					<!-- 用户端 type==1-->
+					<view class="order_list_footer" wx:if="{{type==1}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}" data-optstatus="1" data-item="{{item}}" @tap.stop="updateOrderStatus">
 							立即支付
 						</view>
-						<view class="option_btn" id="btn_cancel" wx:if="{{item.status==0}}">
+						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==0}}" data-optstatus="5" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							取消订单
 						</view>						
 					</view>
-				</navigator>
+					<!-- 商户端 type==0-->
+					<view class="order_list_footer" wx:if="{{type==0}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}" data-optstatus="6" data-item="{{item}}" @tap.stop="updateOrderStatus">
+							确认订单
+						</view>
+						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==6}}" data-optstatus="4" data-item="{{item}}" @tap.stop="updateOrderStatus">
+							完成
+						</view>						
+					</view>
+				</view>
 			</view>			
 		</repeat>
 		<!-- </view> -->
@@ -113,6 +121,10 @@
 import wepy from 'wepy'
 import tip from '@/utils/tip'
 import api from '@/api/api'
+import {
+	ORDER_DETAIL,
+	TOKEN
+} from '@/utils/constant'
 export default class dineinOrderItem extends wepy.component{
 	props = {
 		orderList:{
@@ -122,12 +134,17 @@ export default class dineinOrderItem extends wepy.component{
 				style:0
 			}],
 			type:Object
+		},
+		type:{
+
 		}	
 	}
 
-	async updateOrderStatus(orderNo,flag){
-
+	data = {
+		url:'',
+		token:'',
 	}
+
 
 	methods = {
 
@@ -141,12 +158,46 @@ export default class dineinOrderItem extends wepy.component{
 			this.orderList = val;
 			console.log("val....",this.orderList);
 			this.$apply();
+		},
+
+		async updateOrderStatus(e){
+			let that = this;
+			let item = e.currentTarget.dataset.item;
+			let index = e.currentTarget.dataset.index;
+			let optstatus = e.currentTarget.dataset.optstatus;
+			const json = await api.updateOrderStatus({
+				query:{
+					token:that.token,
+					fOrderId:item.fOrderId,
+					fStatus:optstatus
+				},
+				method:'POST'
+			});
+			console.log("updateOrderStatus===",json);
+			if(json.data.code==0){
+				this.orderList[index].fStatus = optstatus;
+			}
+			this.$apply();
+		},
+
+		navigatorOrderDetail(e){
+			let index = e.currentTarget.dataset.index;
+			let that = this;
+			wepy.setStorageSync(ORDER_DETAIL,that.orderList[index]);
+			if(this.type==1){
+    			wx.navigateTo({
+    				url: '/pages/orderDetail?orderListItem='+ that.orderList[index]
+    			});	
+			}else{
+    			wx.navigateTo({
+    				url: '/pages/adminOrderDetail?orderListItem='+ that.orderList[index]
+    			});	
+			}			
 		}
 	}
 
 	onLoad(){
-		let that = this;
-		console.log("返回的数据orderList===",this.orderList,this.orderList.length);
+		this.token = wepy.getStorageSync(TOKEN)||{};
 	}
 }
 </script>
