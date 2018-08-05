@@ -494,6 +494,9 @@ export default class CommitOrder extends wepy.page{
 				this.remark = null;
 			}
 
+			let currentDate = util.getCurrentTime();
+			console.log("当前下单时间:",currentDate);
+
 			const json = await api.submitOrder({
 				query:{
 					token:token,
@@ -515,7 +518,8 @@ export default class CommitOrder extends wepy.page{
 					fAddressId:this.addressInfo.fId,
 					fCouponPrice:0,
 					fOrderNo:orderNo,
-					fTable:0
+					fTable:0,
+					fDate:currentDate
 				},
 				method:'POST'
 			});

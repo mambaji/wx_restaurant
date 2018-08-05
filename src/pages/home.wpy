@@ -370,7 +370,8 @@
 import wepy from 'wepy';
 import api from '@/api/api';
 import {
-	SHOPID
+	SHOPID,
+	SHOPPHONE
 } from '@/utils/constant';
 export default class Home extends wepy.page{
 	config = {
@@ -426,11 +427,17 @@ export default class Home extends wepy.page{
 			let data = json.data.data;
 			that.open_time = data.fOpenTime;
 			that.phone = data.fPhone;
+			wepy.setStorageSync(SHOPPHONE,that.phone);//保存商家手机号码，用于其它页面可直接获取
 			that.address = data.fAddress;
 			that.shop_name = data.fName;
 			that.latitude = data.fAddressX;
 			that.longitude = data.fAddressY;
 			this.notice = data.fNotice;
+
+			if(this.notice==null||this.notice==''){
+				this.notice = that.shop_name+"没啥可说的..."
+			}
+
 		}else{
 
 		}
@@ -473,20 +480,23 @@ export default class Home extends wepy.page{
     		})
 		},
 		onList(e){
-			wx.scanCode({
-  				onlyFromCamera: true,
-  				scanType:'qCode',
-  				success:(res)=>{
-    				console.log("扫描店外小程序二维码success：",res);
-    				let tableNo = res.result;
-    				wx.navigateTo({
-    					url: 'foodMenuOrder?tableNo='+tableNo
-    				})	
-  				},
-  				fail:(res)=>{
-  					console.log("扫描店外小程序二维码fail:",res);
-  				}
-			})
+			wx.navigateTo({
+    			url: 'list'
+    		});	
+			// wx.scanCode({
+  	// 			onlyFromCamera: true,
+  	// 			scanType:'qCode',
+  	// 			success:(res)=>{
+   //  				console.log("扫描店外小程序二维码success：",res);
+   //  				let tableNo = res.result;
+   //  				wx.navigateTo({
+   //  					url: 'list'
+   //  				})	
+  	// 			},
+  	// 			fail:(res)=>{
+  	// 				console.log("扫描店外小程序二维码fail:",res);
+  	// 			}
+			// })
 		},
 		onAddresscover(){
 			let that = this;

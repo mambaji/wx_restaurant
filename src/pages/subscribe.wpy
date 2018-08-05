@@ -184,6 +184,9 @@ export default class Subscribe extends wepy.page{
 		console.log("用户提交预约表单===",json);
 		if(json.data.code==0){
 			tip.toast("提交预约成功!");
+			wx.navigateBack({
+  				delta: 1
+			})
 		}
 
 		const getjson = await api.getRecord({

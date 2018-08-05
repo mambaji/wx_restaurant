@@ -70,9 +70,9 @@
 		<!-- <view wx:for="{{orderList}}" wx:for-item="item" wx:key="index"> -->
 		<repeat for="{{orderList}}" key="index" index="index" item="item">
 			<view class="list">
-				<view class="item_content" @tap="navigatorOrderDetail">
+				<view class="item_content" @tap="navigatorOrderDetail" data-index="{{index}}">
 					<view class="order_list_top">
-						<text class="type">{{item.ftype==0?'堂吃':'外卖'}}</text>
+						<text class="type">{{item.ftype==0?'堂吃:'+item.fOrderNo:'外卖:'+item.fOrderNo}}</text>
 						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
 						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
 						<text class="status" wx:if="{{item.fStatus==2}}">待配送</text>	
@@ -99,25 +99,25 @@
 					</view>
 					<!-- 用户端 type==1 -->
 					<view class="order_list_footer" wx:if="{{type==1}}">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}" @tap.stop="payMoney">
 							立即支付
 						</view>
-						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==0||item.fStatus==1||item.fStatus==2}}">
+						<view class="option_btn" id="btn_cancel" data-status="5" data-index="{{index}}" @tap.stop="updateOrderStatus" wx:if="{{item.fStatus==0||item.fStatus==1||item.fStatus==2}}">
 							取消订单
 						</view>						
-						<view class="option_btn" id="btn_comfirm" wx:if="{{item.fStatus==3}}">
+						<view class="option_btn" id="btn_comfirm" data-status="4" data-index="{{index}}" @tap.stop="updateOrderStatus" wx:if="{{item.fStatus==3}}">
 							确认收货
 						</view>						
 					</view>
 					<!-- 商户端 type==0 -->
 					<view class="order_list_footer" wx:if="{{type==0}}">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}" data-item="{{item}}" data-status="2" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							确认订单
 						</view>
-						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}" data-item="{{item}}" data-status="5" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							拒绝订单
 						</view>						
-						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==0||item.fStatus==1||item.fStatus==2}}">
+						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==2}}" data-item="{{item}}" data-status="3" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							配送
 						</view>							
 					</view>					
@@ -132,6 +132,10 @@
 import wepy from 'wepy'
 import tip from '@/utils/tip'
 import api from '@/api/api'
+import {
+	ORDER_DETAIL,
+	TOKEN
+} from '@/utils/constant'
 export default class parceOrderItem extends wepy.component{
 	props = {
 		orderList:{
@@ -149,11 +153,10 @@ export default class parceOrderItem extends wepy.component{
 
 	data = {
 		url:'',
+		token:'',
 	}
 
-	async updateOrderStatus(orderNo,flag){
 
-	}
 
 	methods = {
 
@@ -173,21 +176,43 @@ export default class parceOrderItem extends wepy.component{
 			let index = e.currentTarget.dataset.index;
 			let that = this;
 			wepy.setStorageSync(ORDER_DETAIL,that.orderList[index]);
+			console.log("navigatorOrderListItem==",that.orderList[index]);
 			if(this.type==1){
     			wx.navigateTo({
-    				url: '/pages/orderDetail?orderListItem='+ that.orderList[index]
+    				url: '/pages/orderDetail'
     			});	
 			}else{
     			wx.navigateTo({
-    				url: '/pages/adminOrderDetail?orderListItem='+ that.orderList[index]
+    				url: '/pages/adminOrderDetail'
     			});	
 			}			
-		}
+		},
+
+		async updateOrderStatus(e){
+			let that = this;
+			let item = e.currentTarget.dataset.item;
+			let optstatus = e.currentTarget.dataset.status;
+			let index = e.currentTarget.dataset.index;
+			const json = await api.updateOrderStatus({
+				query:{
+					token:that.token,
+					fOrderId:item.fOrderId,
+					fStatus:optstatus
+				},
+				method:'POST'
+			});
+			console.log("updateOrderStatus===",json);
+			if(json.data.code==0){
+				this.orderList[index].fStatus = optstatus;
+			}
+			this.$apply();
+		},
 	}
 
 
 
 	onLoad(){
+		this.token = wepy.getStorageSync(TOKEN)||{};
 	}
 }
 </script>

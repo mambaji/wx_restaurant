@@ -22,6 +22,9 @@ export const OPENID = "openId";
 //SHOPID
 export const SHOPID = "shopId";
 
+//SHOPPHONE
+export const SHOPPHONE = "shopPhone";
+
 //分类选择itemcode
 export const ACTIVE_CODE = "activecode";
 

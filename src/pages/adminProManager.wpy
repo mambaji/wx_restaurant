@@ -1,4 +1,4 @@
-<style lang="less">
+	<style lang="less">
 	page{
 		background:#f2f2f2;
 	}
@@ -114,7 +114,7 @@
 				</view>
 			</picker>
 			<i class="iconfont icon-arrowdown"></i>
-			<input class="search_inpput" type="text" name="search_text" confirm-type="search" placeholder="搜索商品名称" bindinput="getSearchContent" bindblur="searchLoseFocus">
+			<input class="search_inpput" type="text" name="search_text" confirm-type="search" placeholder="搜索商品名称" bindinput="getSearchContent" bindblur="searchLoseFocus" />
 	</view>
 	<view class="middle_container" > 
 		<repeat for="{{goodsData}}" key="index" index="index" item="item">
@@ -124,9 +124,9 @@
 					<view class="goodsName">{{item.fName}}</view>
 				</view>
 				<view class="list_footer">
-					<view class="btn_delete" data-id="{{item.fGoodsId}}" @tap.stop="optionDelGoods">删除</view>
-					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="1" wx:if="{{item.fStatus==0}}">上架</view>
-					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="0" wx:if="{{item.fStatus==1}}">下架</view>
+					<view class="btn_delete" data-id="{{item.fGoodsId}}" @tap.stop="optionDelGoods" data-index="{{index}}">删除</view>
+					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="1" wx:if="{{item.fStatus==0}}" data-index="{{index}}">上架</view>
+					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="0" wx:if="{{item.fStatus==1}}" data-index="{{index}}">下架</view>
 					<view class="btn_attr" @tap.stop="goAttr" data-id="{{item.fGoodsId}}">规格管理</view>		
 				</view>
 			</view>
@@ -168,7 +168,7 @@ export default class AdminProManager extends wepy.page{
 		searchContent:'',
 	}
 
-	async onUpdateStatus(goodsId,status){
+	async onUpdateStatus(goodsId,status,index){
 		const json  = await api.updateGoodsStatus({
 			query:{
 				token:this.token,
@@ -179,13 +179,14 @@ export default class AdminProManager extends wepy.page{
 		})
 		console.log("onUpdateStatus===",json);
 		if(json.data.code==0){
+			this.goodsData[index].fStatus = status;
 			tip.toast("更新商品状态成功!");
 		}
 		this.$apply();
 	}
 
 
-	async onDelGoods(goodsId){
+	async onDelGoods(goodsId,index){
 		const json = await api.delGoods({
 			query:{
 				token:this.token,
@@ -195,6 +196,7 @@ export default class AdminProManager extends wepy.page{
 		})
 		console.log("onDelGoods===",json);
 		if(json.data.code==0){
+			this.goodsData.splice(index,1);
 			tip.toast("删除成功!");
 		}
 		this.$apply();
@@ -228,6 +230,7 @@ export default class AdminProManager extends wepy.page{
 		optionDelGoods(e){
 			let that = this;
 			let id = e.currentTarget.dataset.id;
+			let index = e.currentTarget.dataset.index;
 			console.log("optionDelGoods===");
 			wx.showModal({
         	title: '',
@@ -235,7 +238,7 @@ export default class AdminProManager extends wepy.page{
         	showCancel: true,
         	success: res => {
           	if (res.confirm) {
-  				that.onDelGoods(id);
+  				that.onDelGoods(id,index);
           	} else if (res.cancel) {
 
           	}
@@ -248,7 +251,8 @@ export default class AdminProManager extends wepy.page{
 		optionStatus(e){
 			let status = e.currentTarget.dataset.status;
 			let id = e.currentTarget.dataset.id;
-			this.onUpdateStatus(id,status);
+			let index = e.currentTarget.dataset.index;
+			this.onUpdateStatus(id,status,index);
 			
 		},
 		goProDetail(e){

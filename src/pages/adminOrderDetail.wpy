@@ -158,16 +158,16 @@
 
 <template>
 	<view class="top_container">
-		<text wx:if="{{orderMsg.status==0}}">待支付</text>
-		<text wx:if="{{orderMsg.status==1}}">已支付，待确认</text>
-		<text wx:if="{{orderMsg.status==2}}">待配送</text>
-		<text wx:if="{{orderMsg.status==3}}">订单配送中...</text>
-		<text wx:if="{{orderMsg.status==6}}">已确认，待上菜</text>
-		<text wx:if="{{orderMsg.status==4}}">已完成</text>
-		<text wx:if="{{orderMsg.status==5}}">已取消</text>
+		<text wx:if="{{orderListItem.fStatus==0}}">待支付</text>
+		<text wx:if="{{orderListItem.fStatus==1}}">已支付，待确认</text>
+		<text wx:if="{{orderListItem.fStatus==2}}">待配送</text>
+		<text wx:if="{{orderListItem.fStatus==3}}">订单配送中...</text>
+		<text wx:if="{{orderListItem.fStatus==6}}">已确认，待上菜</text>
+		<text wx:if="{{orderListItem.fStatus==4}}">已完成</text>
+		<text wx:if="{{orderListItem.fStatus==5}}">已取消</text>
 	</view>
 	<view class="content_container">
-		<repeat for="{{orderMsg.goodsData}}" key="index" index="index" item="item">
+		<repeat for="{{orderListItem.goodsList}}" key="index" index="index" item="item">
 			<view class="list">
 				<image src="../images/manbasji_logo.jpg"></image>
 				<view class="name">{{item.fGoodsName}}</view>
@@ -180,35 +180,35 @@
 		<view class="order_price_content">
 			<view class="pack_price">
 				<view class="text1">餐盒费</view>
-				<view class="text2">￥{{orderMsg.fPackPrice}}</view>
+				<view class="text2">￥{{orderListItem.fPackPrice}}</view>
 			</view>
 			<view class="distribute_price">
 				<view class="text1">配送费</view>
-				<view class="text2">￥{{orderMsg.fDistributionPrice}}</view>
+				<view class="text2">￥{{orderListItem.fDistributionPrice}}</view>
 			</view>
 		</view>
 		<view class="discount_content">
 			<view class="discount_price">
 				<view class="text1">折扣</view>
-				<view class="text2">￥{{orderMsg.fDiscountPrice}}</view>
+				<view class="text2">￥{{orderListItem.fDiscountPrice}}</view>
 			</view>
 			<view class="counpon_price">
 				<view class="text1">优惠</view>
-				<view class="text2">￥{{orderMsg.fReductionPrice}}</view>
+				<view class="text2">￥{{orderListItem.fReductionPrice}}</view>
 			</view>
 		</view>
 		<view class="all_price">
-			实付<text>￥{{orderMsg.fAllAmount}}</text>
+			实付<text>￥{{orderListItem.fAllAmount}}</text>
 		</view>
-		<view class="option" id="btn_option">
+		<view class="option" id="btn_option" wx:if="{{orderListItem.ftype==1}}" @tap.stop="onCallPhone">
 			<i class="iconfont icon-phone"></i>
 			联系顾客
 		</view>
 	</view>
 	<view class="footer_container">
 		<view class="other_msg">
-			<view class="title_value" wx:if="{{orderMsg.type==0}}">配送地址<text>{{address}}</text></view>
-			<view class="title_value" wx:if="{{orderMsg.type==1}}">餐桌号<text>{{orderListItem.fTableNo}}</text></view>
+			<view class="title_value" wx:if="{{orderListItem.ftype==1}}">配送地址<text>{{address}}</text></view>
+			<view class="title_value" wx:if="{{orderListItem.ftype==0}}">餐桌号<text>{{orderListItem.fTableNo}}</text></view>
 		</view>
 		<view class="order_msg">
 			<view class="title_value">订单号码<text>{{orderListItem.fOrderNo}}</text></view>
@@ -223,7 +223,8 @@
 import wepy from 'wepy';
 import api from '@/api/api';
 import {
-	ORDER_DETAIL
+	ORDER_DETAIL,
+	SHOPID
 } from '@/utils/constant'
 export default class AdminOrderDetail extends wepy.page{
 	config = {
@@ -233,21 +234,52 @@ export default class AdminOrderDetail extends wepy.page{
 	}
 
 	data = {
+		phone:'',
 		address:'',
 		orderId:'',
-		orderListItem:{}
+		orderListItem:{},
+		shopId:'',
+		addressMsg:{},
 	}
 
 	onLoad(opts){
-		this.orderListItem = wepy.getStorageSync(ORDER_DETAIL);
+		this.orderListItem = wepy.getStorageSync(ORDER_DETAIL)||{};
+		this.shopId = wepy.getStorageSync(SHOPID)||{}
+		console.log("orderListItem===",this.orderListItem);
 		this.onGetOrderDetail();
+		//订单类型是外卖类型的请求获取顾客地址
+		if(this.orderListItem.ftype==1){
+			this.getUserAddress();
+		}
+
+	}
+
+	async getUserAddress(){
+		let that = this;
+		const json =await api.getAddressAll({
+			query:{
+				fShopId:that.shopId,
+				fCustId:'',
+				fId:this.orderListItem.fAddressId,
+			}
+		});
+		console.log("发送getUserAddress请求===",json);
+		if(json.data.code == 0){
+			this.addressMsg = json.data.data[0];
+			this.address = this.addressMsg.fCityId+this.addressMsg.fAreaId+this.addressMsg.fAddress+'\n'+this.addressMsg.fName+this.addressMsg.fPhone;
+			this.phone = this.addressMsg.fPhone
+		}else{
+			tip.error(json.data.msg);
+		}
+		that.showLoading = false;
+		this.$apply();
 	}
 
 	async onGetOrderDetail(){
 		let that = this;
 		const json = await api.getOrderDetail({
 			query:{
-				fOrderId:orderListItem.fOrderId
+				fOrderId:this.orderListItem.fOrderId
 			}
 		});
 
@@ -255,7 +287,18 @@ export default class AdminOrderDetail extends wepy.page{
 		if(json.data.code==0){
 			this.orderListItem.goodsList = json.data.data;
 		}
+		console.log("合并后的orderListItem==",this.orderListItem);
 		this.$apply();
+	}
+
+	methods = {
+		onCallPhone(e){
+			console.log("onCallPhone",that.phone);
+			let that = this;
+			wx.makePhoneCall({
+				phoneNumber:that.phone
+			});
+		}
 	}
 }
 </script>

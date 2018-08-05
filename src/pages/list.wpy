@@ -153,14 +153,23 @@ export default class List extends wepy.page{
 		statusMsg:'',
 		num:'',//当前排队人数
 		showNumModal:false,
-		inputNum:''//输入的用餐人数
+		inputNum:'',//输入的用餐人数
+		timer:{},
 	}
 
 	onLoad(){
-		this.getCurListPeople();
+	}
+
+	onShow(){
+		this.getCurListPeople('');
 	}
 
 	onHide(){
+		clearTimeout(this.timer);
+	}
+
+	onUnload(){
+		clearTimeout(this.timer);
 	}
 
 	//获取排队号码
@@ -188,27 +197,30 @@ export default class List extends wepy.page{
 	}
 
 	//获取当前排队人数，轮询监控
-	async getCurListPeople(){
+	async getCurListPeople(fEntryNo){
 		const json = await api.getListPeopleNum({
 			query:{
-				fShopId:'1'
+				fShopId:'1',
+				fEntryNo:fEntryNo
 			}
 		});
-		console.log("获取当前排队人数==",json.data.data);
+		console.log("获取当前排队人数==",json);
 		if(json.data.code !=0){
 			console.log(json.data.msg);
 			tip.toast("获取失败，请稍后重试!");
 			return;
 		}
 		let that = this;
-		let num  = json.data.data.P_LineNum;
+		that.num  = json.data.data.P_LineNum;
+		console.log("当前排队人数P_LineNum：",that.num);
+		console.log("当前排队号码listNum:",that.listNum);
 		// let num = Math.ceil(Math.random()*10); 
-		that.num = num;
 		that.statusMsg = "排在您前面的人数有"+that.num+"人";
-		that.$apply();		
-		// setTimeout(function(){
-		// 	that.getCurListPeople();
-		// },30000);
+		that.$apply();	
+
+		this.timer=setTimeout(function(){
+			that.getCurListPeople(that.listNum);
+		},10000);
 	}
 
 	//取消排队

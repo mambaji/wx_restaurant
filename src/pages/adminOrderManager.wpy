@@ -9,6 +9,7 @@
 			<dineinOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==0}}"></dineinOrderItem>
 			<parceOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==1}}">
 			</parceOrderItem>
+			<subscribeOrderItem :subscribeList.sync="subscribeList" :type.sync="type" wx:if="{{currentTab==2}}"></subscribeOrderItem>
 			<!-- 加载更多 -->
 			<bottomLoadMore :show.sync="showLoading" message="正在加载"></bottomLoadMore>
 			<!-- 暂无数据显示 -->
@@ -29,6 +30,7 @@ import{
 import Tab from '@/components/tab' //选项卡组件
 import DineinOrderItem from '@/components/dinein_order_item'//堂吃订单列表组件
 import ParceOrderItem from '@/components/parce_order_item'
+import SubscribeOrderItem from '@/components/subscribe_order_item'
 // import OrderItem from '@/components/order_item' //订单列表组件
 import BottomLoadMore from '../components/common/bottomLoadMore' //底部加载更多组件
 import PlaceHolder from '../components/common/placeholder' //空列表显示组件
@@ -42,13 +44,15 @@ export default class AdminOrderManager extends wepy.page{
 		bottomLoadMore: BottomLoadMore,
 		placeholder: PlaceHolder,
 		dineinOrderItem:DineinOrderItem,
-		parceOrderItem:ParceOrderItem
+		parceOrderItem:ParceOrderItem,
+		subscribeOrderItem:SubscribeOrderItem
 	}
 	data = {
 		winHeight: 0,
 		totalCount:0,//订单条目数
 		tabList:["堂吃","外卖","预约"],
 		orderList:[],//订单列表数据
+		subscribeList:[],
 		currentPage: 1,//当前加载的页面序号
 		orderStatus: "",//订单状态
 		currentTab: 0,
@@ -83,6 +87,38 @@ export default class AdminOrderManager extends wepy.page{
 	// 	}
 	// }
 	// 
+	
+	/**
+	 *	获取预约记录
+	 */
+	async getSubscribeList(){
+		let that = this;
+		const json = await api.getRecord({
+			query:{
+				fCustId:'',
+				fShopId:that.shopId
+			}
+		})
+		console.log("getSubscribeList===",json);
+		if(json.data.code == 0){
+			this.subscribeList = json.data.data;
+			if(this.subscribeList.length==0){
+				this.is_empty = true;
+				return;
+			}else{
+				this.is_empty = false;
+			}
+			for(let i = 0;i<this.subscribeList.length;i++){
+				this.subscribeList[i].fDate = this.subscribeList[i].fDate.replace("T"," ");
+				this.subscribeList[i].fDateTime = this.subscribeList[i].fDateTime.replace("T"," ");
+			}
+		
+		}else{
+			this.is_empty = false;
+		}
+		this.$apply();
+	}
+
 	async getOrderMsg(fType,P_Min,P_Max){
 		let that = this;
 		const json = await api.getOrderList({

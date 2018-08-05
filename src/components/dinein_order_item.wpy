@@ -72,11 +72,12 @@
 			<view class="list">
 				<view class="item_content" @tap="navigatorOrderDetail" data-index="{{index}}" data-item="{{item}}">
 					<view class="order_list_top">
-						<text class="type">{{item.ftype==0?'堂吃':'外卖'}}</text>
+						<text class="type">{{item.ftype==0?'堂吃:'+item.fOrderNo:'外卖:'+item.fOrderNo}}</text>
 						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
 						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
 						<text class="status" wx:if="{{item.fStatus==6}}">已确认，待上菜</text>
 						<text class="status" wx:if="{{item.fStatus==4}}">已完成</text>
+						<text class="status" wx:if="{{item.fStatus==5}}">已取消</text>
 					</view>
 					<view class="order_list_content">
 						<repeat for="{{item.goodsData}}">
@@ -94,7 +95,7 @@
 					</view>
 					<!-- 用户端 type==1-->
 					<view class="order_list_footer" wx:if="{{type==1}}">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}" data-optstatus="1" data-item="{{item}}" @tap.stop="updateOrderStatus">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}" data-optstatus="1" data-item="{{item}}" data-index="{{index}}" @tap.stop="payMoney">
 							立即支付
 						</view>
 						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==0}}" data-optstatus="5" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
@@ -103,10 +104,10 @@
 					</view>
 					<!-- 商户端 type==0-->
 					<view class="order_list_footer" wx:if="{{type==0}}">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}" data-optstatus="6" data-item="{{item}}" @tap.stop="updateOrderStatus">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}" data-optstatus="6" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							确认订单
 						</view>
-						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==6}}" data-optstatus="4" data-item="{{item}}" @tap.stop="updateOrderStatus">
+						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==6}}" data-optstatus="4" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							完成
 						</view>						
 					</view>
@@ -175,7 +176,7 @@ export default class dineinOrderItem extends wepy.component{
 			});
 			console.log("updateOrderStatus===",json);
 			if(json.data.code==0){
-				this.orderList[index].fStatus = optstatus;
+				that.orderList[index].fStatus = optstatus;
 			}
 			this.$apply();
 		},

@@ -484,8 +484,8 @@ export default class AdminProDetailAttrManager extends wepy.page{
 			
 		}
 
-		async onDelAttrItem(data){
-			const json = await api.delGoods({
+		async onDelAttrItem(data,index,cindex){
+			const json = await api.delGoodsAttribute({
 				query:{
 					token:this.token,
 					data:data
@@ -614,10 +614,10 @@ export default class AdminProDetailAttrManager extends wepy.page{
 			let data = [];
 			let item = {};
 			item.fShopId = this.shopId;
-			item.fGoodsId = this.goodsId;
 			item.fItemId = this.attrList[index].attrNameList[cindex].fItemId;
+			item.fGoodsId = this.goodsId;
 			data.push(item);
-			this.onDelAttrItem(data);
+			this.onDelAttrItem(data,index,cindex);
 		},
 
 	}

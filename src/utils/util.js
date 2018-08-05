@@ -9,7 +9,7 @@ function getCurrentTime() {
   var f = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
   var s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
   var rand = Math.round(Math.random() * 899 + 100);
-  keep = y + '-' + m + '-' + d + ',' + h + ':' + f;
+  keep = y + '-' + m + '-' + d + ' ' + h + ':' + f;
   return keep; //20160614134947
 }
 

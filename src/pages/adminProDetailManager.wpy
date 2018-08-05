@@ -39,6 +39,12 @@
 			color:#999;
 			font-size:28rpx;
 		}
+		.text{
+			float:left;
+			color:#999;
+			font-size:28rpx;
+			margin-right:40rpx;
+		}
 		input{
 			float:left;
 			height:50rpx;
@@ -172,11 +178,11 @@
 			</view>
 			<view class="goodsName_input">
 				<text>商品现价</text><span>*</span>
-				<input type="text" name="goodsPrice" value="{{goodsPrice}}">
+				<input type="text" name="goodsPrice" value="{{goodsPrice}}"/>
 			</view>
 			<view class="goodsName_input">
-				<text>商品原价</text>
-				<input type="text" name="oldPrice" value="{{oldPrice}}">
+				<text class="text">商品原价</text>
+				<input type="text" name="oldPrice" value="{{oldPrice}}"/>
 			</view>
 		
 		<view class="goodsType_input">
@@ -254,22 +260,23 @@ export default class AdminProDetailManager extends wepy.page{
 		this.getCategoryList();
 	}
 
-	onSaveGoods(e){
+	async onSaveGoods(e){
+		let that = this;
 		console.log("form===",e.detail.value);
 		let goodsName = e.detail.value.goodsName;
-		let goodsPirce = e.detail.value.goodsPrice;
+		let goodsPrice = e.detail.value.goodsPrice;
 		let oldPrice = e.detail.value.oldPrice;
 		let goodsDesc = e.detail.value.goodsDesc;
 		let categoryId = this.categoryId;
 		let type_id = this.type_id;
 		let pic = this.imageURL;
 
-		if(categoryId==''||goodsName == '' || goodsPrice == ''||pic == ''){
+		if(categoryId==''||goodsName == '' || goodsPrice == ''||pic == 'url'){
 			tip.toast("信息填写不完整！");
 			return;
 		}
 
-		const json = api.addGoods({
+		const json = await api.addGoods({
 			query:{
 				token:that.token,
 				fShopId:that.shopId,
@@ -281,7 +288,8 @@ export default class AdminProDetailManager extends wepy.page{
 				fOldPrice:oldPrice,
 				fLable:type_id,
 				fStatus:1,
-			}
+			},
+			method:'POST'
 		});
 		console.log("saveGoods==",json);
 		if(json.data.code==0){
@@ -321,7 +329,7 @@ export default class AdminProDetailManager extends wepy.page{
 
 		bindCategoryPickerChange(e){
 			this.index = e.detail.value;
-			this.categoryId = this.categoryList[index].fListId;
+			this.categoryId = this.categoryList[this.index].fListId;
 			console.log("bindCategoryPickerChange==",this.index);
 		}
 

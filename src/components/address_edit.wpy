@@ -71,7 +71,8 @@ import tip from '@/utils/tip'
 import api from "@/api/api"
 import {
   USER_SPECICAL_INFO,
-  TOKEN
+  TOKEN,
+  SHOPID
 } from '@/utils/constant';
 import AreaPicker from "./common/wepy-area-picker"
 export default class AddressEdit extends wepy.component {
@@ -99,6 +100,7 @@ export default class AddressEdit extends wepy.component {
     console.log("保存===",address);
     let that = this;
     let token = wepy.getStorageSync(TOKEN) || {};
+    let shopId = wepy.getStorageSync(SHOPID)||{};
     let isDefult = 0;
     if (this.isDefult) {
       isDefult = 1;
@@ -106,6 +108,7 @@ export default class AddressEdit extends wepy.component {
     const json = await api.updateAddress({
       query: {
         token: token,
+        fShopId:shopId,
         fId: this.id,
         fAddress: address.addressDetail,
         fAddressX:'0',
@@ -169,9 +172,13 @@ export default class AddressEdit extends wepy.component {
       }
       console.log("==========ee=========");
       console.log(this.isDefult);
-      this.province = { code: this.editInfo.fProvinceId, name: this.editInfo.provinceStr };
-      this.city = { code: this.editInfo.fCityId, name:this.editInfo.cityStr };
-      this.area = { code: this.editInfo.fAreaId, name: this.editInfo.areaStr };
+      this.provinceName = this.editInfo.fProvinceId;
+      this.cityName = this.editInfo.fCityId;
+      this.areaName = this.editInfo.fAreaId;
+
+      this.province = { code:'', name: this.editInfo.fProvinceId };
+      this.city = { code:'', name:this.editInfo.fCityId };
+      this.area = { code:'', name: this.editInfo.fAreaId };
 
       this.$apply();
     },

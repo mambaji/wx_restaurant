@@ -8,7 +8,7 @@ const TIMESTAMP = util.getCurrentTime()
 const SIGN = md5.hex_md5((TIMESTAMP + API_SECRET_KEY).toLowerCase())
 
 const wxRequest = async(params = {}, url) => {
-    tip.loading();
+    // tip.loading();
     let data = params.query || {};
     console.log(data);
     console.log(url);
