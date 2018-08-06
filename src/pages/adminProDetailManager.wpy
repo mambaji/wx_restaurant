@@ -119,6 +119,12 @@
 			border:1rpx dashed #cdcdcd;
 			text-align:center;
 		}
+		image{
+			height:120rpx;
+			width:120rpx;
+			margin-top:30rpx;
+			float:left;
+		}
 	}
 	.goodsAttr{
 		height:80rpx;
@@ -199,7 +205,7 @@
 			<view wx:if="{{!isImage}}" @tap = "onUploadImage">
 				<i class="iconfont icon-add"></i>
 			</view>
-			<image class="goodsPic" wx:if="{{isImage}}"></image>
+			<image class="goodsPic" wx:if="{{isImage}}" src="{{imageURL}}"></image>
 		</view>
 		<view class="goodsAttr" @tap="goAttr" wx:if="{{isGoodsSave}}">
 			<text>商品规格</text>
@@ -238,8 +244,10 @@ export default class AdminProDetailManager extends wepy.page{
 		type_id:'',
 		shopId:'',
 		imageURL:'',
+		lastImageURL:'',//之前的imageUrl，当图片修改时，需要把该值删除
 		isGoodsSave:false,
 		token:'',
+		uptoken:'JNQX9tOUgiTVZm3x4Y2-668lzoP15C4JGs2bBY1w:SZfwDgaYZWO7sDDZDqcfTFjgJJg=:eyJzY29wZSI6ImJsb2dpbWFnZSIsImRlYWRsaW5lIjoxNTMzNDc0OTExfQ==',
 
 
 		goodsName:'',
@@ -261,6 +269,8 @@ export default class AdminProDetailManager extends wepy.page{
 	}
 
 	async onSaveGoods(e){
+		this.onDelImage();
+		return;
 		let that = this;
 		console.log("form===",e.detail.value);
 		let goodsName = e.detail.value.goodsName;
@@ -327,6 +337,17 @@ export default class AdminProDetailManager extends wepy.page{
 			this.$apply();
 		}
 
+	async onDelImage(){
+		const json = await api.delImage({
+			query:{
+				token:this.token,
+				fImageName:'testqiniuImage1.png'
+			},
+			method:'POST'
+		})
+		console.log("onDelImage===",json);
+	}
+
 		bindCategoryPickerChange(e){
 			this.index = e.detail.value;
 			this.categoryId = this.categoryList[this.index].fListId;
@@ -351,15 +372,28 @@ export default class AdminProDetailManager extends wepy.page{
 				count:1,
 				success:function(res){
 					var tempFilePath = res.tempFilePaths[0];
-					upload.upload(tempFilePath,(res)=>{
+					upload.upload(that.token,tempFilePath,(res)=>{
 						that.imageURL = res.imageURL
+						if(that.imageURL!=''){
+							that.isImage = true;
+						}
+						that.$apply()
 					},(error)=>{
 						console.log('error:'+error);
 					},{
-
+						region:'SCN',
+						domain:'http://opmzmyurr.bkt.clouddn.com',
+						key:'testqiniuImage1.png',
+						uptokenURL:'https://www.passingjoy.com/test/wechat/auth/uptoken/'
+						// uptoken:that.uptoken
+					},(res)=>{
+						console.log('上传进度',res.progress);
+						console.log('已经上传的数据长度',res.totalBytesSent);
+						console.log("上传结果:",res);
 					})
 				}
 			});
+			console.log("上传后的imageUrl：",that.imageURL);
 		},
 
 	}

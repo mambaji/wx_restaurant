@@ -18,6 +18,12 @@ const apiHost = 'https://api.it120.cc/manbasji/';
 const apisuHost = 'https://api.it120.cc/suya/';
 const apiTHost= 'https://www.passingjoy.com/test/wechat';
 
+//获取上传图片uptoken
+const getUptoken = (params) => wxRequest(params,apiTHost+'/auth/uptoken/');
+
+//删除七牛图片
+const delImage = (params) => wxRequest(params,apiTHost+'/auth/delete/');
+
 //微信的code换取sessionKey和openId
 const sendWxCode = (params) => wxRequest(params,apiTHost+'/auth/wxlogin/');
 // const sendWxCode = (params) => wxRequest(params,apiHost+'/user/wxapp/login');
@@ -116,6 +122,7 @@ const getShopGoods = (params) => wxRequest(params,apiTHost+'/goods/all/');
 
 
 export default {
+  getUptoken,
   sendWxCode,
   checkToken,
   getMyOrderList,
@@ -146,4 +153,5 @@ export default {
   updateGoodsAttribute,
   delGoodsAttribute,
   getShopGoods,
+  delImage,
 }

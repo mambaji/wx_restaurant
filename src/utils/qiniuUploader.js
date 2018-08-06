@@ -48,7 +48,7 @@ function updateConfigWithOptions(options) {
     config.qiniuShouldUseQiniuFileName = options.shouldUseQiniuFileName
 }
 
-function upload(filePath, success, fail, options, progress, cancelTask) {
+function upload(token,filePath, success, fail, options, progress, cancelTask) {
     if (null == filePath) {
         console.error('qiniu uploader need filePath to upload');
         return;
@@ -61,7 +61,7 @@ function upload(filePath, success, fail, options, progress, cancelTask) {
     } else if (config.qiniuUploadTokenURL) {
         getQiniuToken(function() {
             doUpload(filePath, success, fail, options, progress, cancelTask);
-        });
+        },token);
     } else if (config.qiniuUploadTokenFunction) {
         config.qiniuUploadToken = config.qiniuUploadTokenFunction();
         if (null == config.qiniuUploadToken && config.qiniuUploadToken.length > 0) {
@@ -91,6 +91,7 @@ function doUpload(filePath, success, fail, options, progress, cancelTask) {
     if (!config.qiniuShouldUseQiniuFileName) {
       formData['key'] = fileName
     }
+    console.log("formData===",formData);
     var uploadTask = wx.uploadFile({
         url: url,
         filePath: filePath,
@@ -134,10 +135,14 @@ function doUpload(filePath, success, fail, options, progress, cancelTask) {
     })
 }
 
-function getQiniuToken(callback) {
+function getQiniuToken(callback,token) {
   wx.request({
     url: config.qiniuUploadTokenURL,
+    data:{
+        token:token
+    },
     success: function (res) {
+        console.log("调用接口获取uptoken==",res.data.uptoken);
       var token = res.data.uptoken;
       if (token && token.length > 0) {
         config.qiniuUploadToken = token;
