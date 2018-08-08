@@ -10,8 +10,6 @@
 			<parceOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==1}}">
 			</parceOrderItem>
 			<subscribeOrderItem :subscribeList.sync="subscribeList" :type.sync="type" wx:if="{{currentTab==2}}"></subscribeOrderItem>
-			<!-- 加载更多 -->
-			<bottomLoadMore :show.sync="showLoading" message="正在加载"></bottomLoadMore>
 			<!-- 暂无数据显示 -->
 			<placeholder :show.sync="is_empty" message="暂无发现数据"></placeholder>
 		</scroll-view>	
@@ -37,7 +35,8 @@ import BottomLoadMore from '../components/common/bottomLoadMore' //底部加载�
 import PlaceHolder from '../components/common/placeholder' //空列表显示组件
 export default class OrderList extends wepy.page{
 	config = {
-		navigationBarTitleText: '我的订单'
+		navigationBarTitleText: '我的订单',
+		enablePullDownRefresh:true
 	}
 	components = {
 		tab: Tab, 
