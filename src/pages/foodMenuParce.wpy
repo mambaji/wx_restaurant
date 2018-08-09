@@ -596,7 +596,8 @@ export default class foodMsgModal extends wepy.page{
 			query:{
 				fShopId:this.shopId,
 				fGoodsListId:2,
-				fGoodsName:''
+				fGoodsName:'',
+				fGoodsId:''
 			}
 		})
 		console.log("getFoodMsgList===",json);
