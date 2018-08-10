@@ -37,11 +37,11 @@ const getMyOrderList = (params) => wxRequest(params, apiMall + '/api/mall/goodsO
 
 //获取商家信息
 // const getShopInfo = (params) => wxRequest(params,apiHost + '/shop/subshop/list');
-const getShopInfo = (params) => wxRequest(params,apiTHost + '/business/info/');
+const getShopInfo = (params) => wxRequest(params,apiTHost + '/shop/info/');
 
 //查询用户所有收货地址
 // const getAddressAll = (params) => wxRequest(params,apiHost + '/user/shipping-address/list');
-const getAddressAll = (params) => wxRequest(params,apiTHost + '/address/get/');
+const getAddressAll = (params) => wxRequest(params,apiTHost + '/address/list/');
 
 //添加用户收货地址
 // const addAddress = (params) => wxRequest(params,apiHost+'/user/shipping-address/add');
@@ -71,7 +71,7 @@ const getCategory = (params) => wxRequest(params,apiTHost +'/category/list/');
 const getFoodMsgList = (params) => wxRequest(params,apiTHost + '/goods/list/');
 
 //获取商品属性
-const getAttrMsgList = (params) => wxRequest(params,apiTHost + '/goods/attribute/list/');
+const getAttrMsgList = (params) => wxRequest(params,apiTHost + '/attribute/list/');
 
 //获取规格价格
 const getAttrPrice = (params) => wxRequest(params,apiHost+'/shop/goods/price/');
@@ -99,7 +99,7 @@ const updateOrderStatus = (params) => wxRequest(params,apiTHost+'/order/status/'
 const addGoods = (params) => wxRequest(params,apiTHost+'/goods/add/');
 
 //添加属性
-const addGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/goods/attribute/add/');
+const addGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/attribute/add/');
 
 //商品信息修改
 const updateGoods = (params) =>wxRequest(params,apiTHost+'/goods/revise/');
@@ -111,13 +111,13 @@ const delGoods = (params) =>wxRequest(params,apiTHost+'/goods/del/');
 const updateGoodsStatus = (params) =>wxRequest(params,apiTHost+'/goods/status/');
 
 //商品属性修改
-const updateGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/goods/attribute/revise/');
+const updateGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/attribute/revise/');
 
 //商品属性删除
-const delGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/goods/attribute/del/');
+const delGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/attribute/del/');
 
 //获取后台商品信息
-const getShopGoods = (params) => wxRequest(params,apiTHost+'/goods/all/');
+const getShopGoods = (params) => wxRequest(params,apiTHost+'/goods/list/');
 
 
 

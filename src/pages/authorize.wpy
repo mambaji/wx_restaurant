@@ -105,9 +105,6 @@ export default class Authrorize extends wepy.page{
 				wepy.switchTab({
 					url:'/pages/home'
 				})
-				// wx.navigateTo({
-   	// 				url: '/pages/home	'
-   	// 			})	
 			}else{
 				//token过期，重新请求token
 				that.wxlogin();

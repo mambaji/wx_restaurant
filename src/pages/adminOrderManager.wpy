@@ -2,8 +2,8 @@
 		<view class="swpier-tab-pd">
 			<tab @currentTab.user="getCurrentTab" :tabList.sync="tabList" :currentTab.sync="currentTab"></tab>
 		</view>
-		<view class="content_container" style="height:{{winHeight - 31}}px">
-		<scroll-view scroll-y="true" class="swiper-item-box" style="height:{{winHeight - 31}}px" bindscrolltolower="onReachBottom">
+		<view class="content_container" style="height:{{windowHeight - 40}}px">
+		<scroll-view scroll-y="true" class="swiper-item-box" style="height:{{windowHeight - 40}}px" bindscrolltoupper="onRefreshData" bindscrolltolower="onReachBottom">
 			<!-- 订单列表item -->
 			<!-- <orderItem :orderList.sync="orderList"></orderItem> -->
 			<dineinOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==0}}"></dineinOrderItem>
@@ -48,13 +48,13 @@ export default class AdminOrderManager extends wepy.page{
 		subscribeOrderItem:SubscribeOrderItem
 	}
 	data = {
-		winHeight: 0,
+		windowHeight: 0,
 		totalCount:0,//订单条目数
 		tabList:["堂吃","外卖","预约"],
 		orderList:[],//订单列表数据
 		subscribeList:[],
 		currentPage: 1,//当前加载的页面序号
-		orderStatus: "",//订单状态
+		orderStatus: 0,//订单状态
 		currentTab: 0,
 		is_empty:true,
 		flag: 0,
@@ -67,26 +67,15 @@ export default class AdminOrderManager extends wepy.page{
 		yuyueCount:'',
 		receiveFlg:0,
 		type:0,
-	}
 
-	// async getMyOrderSize(){
-	// 	console.log("订单数量统计");
-	// 	let that = this;
-	// 	let userSpecialInfo = wepy.getStorageSync(USER_SPECICAL_INFO) || {};
-	// 	let openId = userSpecialInfo.openid;
-	// 	const json = await api.getMyOrderSize({
-	// 		query:{
-	// 			openId:openid
-	// 		}
-	// 	});
-	// 	if(json.data.code == 0){
-	// 		that.tanchiCount = json.data.pendingPayCount;
-	// 		that.waimaiCount = json.data.backrdersCount;
-	// 		that.shippedCount = json.data.shippedCount;
-	// 		that.$apply();
-	// 	}
-	// }
-	// 
+		hideRefresh: true,
+		hideLoadMore: true,
+		refreshTime: '',// 刷新时间
+		allPages: '',// 总页数
+		currentPage: 1,// 当前页数 默认是1
+		p_min: '',
+		p_max: '',
+	}
 	
 	/**
 	 *	获取预约记录
@@ -132,7 +121,19 @@ export default class AdminOrderManager extends wepy.page{
 		});
 		console.log("getOrderMsg===",json);
 		if(json.data.code == 0){
-			this.orderList = json.data.data;
+			if(that.currentPage == 1){
+				//刷新
+				that.orderList = json.data.data;
+				that.hideRefresh = true
+			}else{
+				//加载更多
+				that.hideLoadMore = true
+				if(json.data.data.length == 0){
+					return
+				}
+				this.orderList.push(json.data.data);
+			}
+
 			if(this.orderList.length == 0){
 				this.is_empty = true;
 				this.$apply();
@@ -160,10 +161,50 @@ export default class AdminOrderManager extends wepy.page{
 		}
 		this.$apply();
 		console.log("is_empty===",this.is_empty);
+	}
 
+	/**
+	 * 上拉加载
+	 */
+	onReachBottom(e){
+		console.log("上拉加载",e)
+		let that = this
+		setTimeout(function(){
+			that.currentPage ++
+			that.p_min += 10
+			that.p_max += 10
+			if(that.orderStatus !== 2){
+				that.getOrderMsg(that.orderStatus,that.p_min,that.p_max)
+			}						
+		},300)
+	}
+
+	/**
+	 * 下拉刷新
+	 */
+	onRefreshData(e){
+		console.log("下拉刷新",e)
+		let that = this
+		setTimeout(function(){
+			that.currentPage = 1
+			that.p_min = 0
+			that.p_max = 9
+			if(that.orderStatus !== 2){
+				that.getOrderMsg(that.orderStatus,that.p_min,that.p_max)
+			}
+		},300)
 	}
 
 	onLoad(){
+		let systemInfo = wx.getStorageSync(SYSTEM_INFO);			
+		if(systemInfo==null||systemInfo==""||systemInfo==undefined){
+			systemInfo = wepy.getSystemInfoSync();
+       		wepy.setStorageSync(SYSTEM_INFO, systemInfo);						
+		}
+		this.windowHeight = systemInfo.windowHeight;
+		console.log("windowHeight=====");
+		console.log(this.windowHeight);	
+		this.$apply();
 		this.shopId = wepy.getStorageSync(SHOPID)||{};
 		this.token = wepy.getStorageSync(TOKEN)||{};
 		this.getOrderMsg(0,0,9);
@@ -221,10 +262,6 @@ export default class AdminOrderManager extends wepy.page{
 		currentTab(val){
 			console.log("currentTab====="+val)
 		}
-	}
-	//加载更多
-	onReachBottom(){
-
 	}
 }
 </script>

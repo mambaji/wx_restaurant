@@ -1,7 +1,6 @@
 <template>
 	<view class="container">
 		<view class="top_box">
-	<!-- 		<image class="backg" mode="scaleToFill" src="../images/food_pic1.png"></image> -->
 	    <view wx:if="{{isAddressCover}}" class="address_cover">
 	    	<text class="address">{{address}}</text>
     	</view>
@@ -19,39 +18,8 @@
 		</view>
 
 		<view class="middle_box">
-<!-- 			<view class="btn_subscribebox" @tap="onSubscribe">
-				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
-			</image>
-			<i class="iconfont icon-subscribe" style="color:#259b24"></i>
-			</view>
-			<view class="btn_orderbox textsize2" @tap="onOrder">
-				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
-			</image>
-			<i class="iconfont icon-diner" style="color:#ff3d00"></i>
-			</view>
-			<view class="btn_parcelbox textsize2" @tap="onParce">
-				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
-			</image>
-			<i class="iconfont icon-parce" style="color:#ffc400"></i>
-			</view>
-			<view class="btn_listbox textsize2" @tap="onList">
-				<image class="" mode="scaleToFill" src="../images/icon_dish.png">
-			</image>
-			<i class="iconfont icon-list" style="color:#795548"></i>
-			</view> -->
-			
-<!-- 			<image class="btn_orderbox" mode="scaleToFill" src="../images/icon_dish.png">
-			</image>
-			<i class="iconfont icon-diner"></i>
-			<image class="btn_parcelbox" mode="scaleToFill" src="../images/icon_dish.png">
-				<i class="iconfont icon-parce"></i>
-			</image>
-			<image class="btn_listbox" mode="scaleToFill" src="../images/icon_dish.png">
-				<i class="iconfont icon-list"></i>
-			</image>	 -->	
 			<view class="dish_container">
-	<!-- 			<image class="" mode="scaleToFill" src="../images/icon_dish.png">
-			</image> -->
+			</image>
 			<view class="s">
 			<i class="iconfont icon-subscribe" style="color:#259b24" @tap="onSubscribe"></i>
 			<view>预约</view>
@@ -69,21 +37,7 @@
 			<view>排队</view>	
 			</view>						
 		</view>
-<!-- 		<view class="bottom_box">
-			<view class="opentime_box textsize2 textcolor2">
-					营业时间：{{open_time}}
-			</view>
-			<view class="contact_box textsize2 textcolor2">
-					联系电话：{{phone}}
-			</view>
-			<view class="address_box textsize2 textcolor2" @tap="showMap">
-				店铺地址：{{address}}
-				<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>
-			</view>
-		</view>	 -->
-
-			<!-- <i class="iconfont icon-diner" style="color:#ff3d00"></i> -->
-			</view>
+		</view>
 	</view>
 </template>
 
@@ -378,14 +332,6 @@ export default class Home extends wepy.page{
 		navigationBarTitleText:'首页',
 		navigationBarBackgroundColor: '#413d3c',
 		navigationBarTextStyle: 'white',
-		// window: {
-  //     		backgroundTextStyle: 'dark',
-  //     		navigationBarBackgroundColor: '#FFFFFF',
-  //     		navigationBarTitleText: 'WeChat',
-  //     		navigationBarTextStyle: 'black',
-  //     		enablePullDownRefresh: false,
-  //     		backgroundColor: '#ffffff'
-  //   	},
 	}
 
 	components = {
@@ -480,23 +426,22 @@ export default class Home extends wepy.page{
     		})
 		},
 		onList(e){
-			wx.navigateTo({
-    			url: 'list'
-    		});	
-			// wx.scanCode({
-  	// 			onlyFromCamera: true,
-  	// 			scanType:'qCode',
-  	// 			success:(res)=>{
-   //  				console.log("扫描店外小程序二维码success：",res);
-   //  				let tableNo = res.result;
-   //  				wx.navigateTo({
-   //  					url: 'list'
-   //  				})	
-  	// 			},
-  	// 			fail:(res)=>{
-  	// 				console.log("扫描店外小程序二维码fail:",res);
-  	// 			}
-			// })
+			// wx.navigateTo({
+   //  			url: 'list'
+   //  		});	
+			wx.scanCode({
+  				onlyFromCamera: true,
+  				scanType:'qCode',
+  				success:(res)=>{
+    				console.log("扫描店外小程序二维码success：",res);
+    				wx.navigateTo({
+    					url: 'list'
+    				})	
+  				},
+  				fail:(res)=>{
+  					console.log("扫描店外小程序二维码fail:",res);
+  				}
+			})
 		},
 		onAddresscover(){
 			let that = this;
@@ -526,8 +471,6 @@ export default class Home extends wepy.page{
 			this.$apply();
 		}
 	}
-
-
 }
 </script>
 
