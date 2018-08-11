@@ -1,0 +1,102 @@
+<style lang="less">
+	page{
+		background:#fff;
+	}
+	input{
+		width:80%;
+		height:80rpx;
+		border:1rpx solid #cdcdcd;
+		border-radius:8rpx;
+		margin: 0 auto;
+		margin-top:70rpx;
+		padding-left:20rpx;
+	}
+	button{
+		width:90%;
+		background:#ffc400;
+		margin-left:5%;
+		margin-top:100rpx;
+	}
+	.container{
+		margin-top:160rpx;
+		width:100%;
+	}
+</style>
+
+<template>
+	<view class="container">
+	<form bindsubmit="formSubmit">
+		<input type="text" name="account" placeholder="用户名" />
+		<input type="password" name="pwd" placeholder="密码" />
+		<button formType="submit">登录</button>
+	</form>
+	</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import {
+	TOKEN,
+	BE_SHOPADMIN,
+	SHOPID
+} from '@/utils/constant'
+import api from '@/api/api'
+import tip from '@/utils/tip'
+export default class AdminLogin extends wepy.page{
+	config = {
+		navigationBarTitleText:'管理员登录',
+	}
+
+	data = {
+		token:'',
+		shopId:''
+	}
+
+	onLoad(opts){
+		this.token = wepy.getStorageSync(TOKEN)||{}
+		this.shopId = wepy.getStorageSync(SHOPID)||{}
+	}
+
+	async formSubmit(e){
+		console.log(e)
+		let that = this;
+		let account = e.detail.value.account
+		let pwd = e.detail.value.pwd
+		if(account == ''){
+			tip.toast("用户名不能为空!")
+			return
+		}
+		if(pwd == ''){
+			tip.toast("密码不能为空!")
+			return
+		}
+		const json = await api.adminLogin({
+			query:{
+				token:that.token,
+				fShopId:that.shopId,
+				fAccount:account,
+				fPwd:pwd
+			}
+		})
+		console.log("管理员登录接口:",json);
+		if(json.data.code==0){
+			tip.toast("登录成功...")
+			wepy.setStorageSync(BE_SHOPADMIN,true)// 登录成功，即为管理员
+			setTimeout(function(){
+				that.onToBack()
+			},1500)
+		}else{
+			tip.toast("用户名或密码错误!")
+			wepy.setStorageSync(BE_SHOPADMIN,false)
+		}
+	}
+
+	onToBack(){
+		wx.navigateBack({
+			delta:1
+		})	
+	}
+
+
+}
+</script>
