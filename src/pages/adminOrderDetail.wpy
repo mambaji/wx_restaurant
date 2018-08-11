@@ -167,7 +167,7 @@
 		<text wx:if="{{orderListItem.fStatus==5}}">已取消</text>
 	</view>
 	<view class="content_container">
-		<repeat for="{{orderListItem.goodsList}}" key="index" index="index" item="item">
+		<repeat for="{{goodsList}}" key="index" index="index" item="item">
 			<view class="list">
 				<image src="../images/manbasji_logo.jpg"></image>
 				<view class="name">{{item.fGoodsName}}</view>
@@ -207,7 +207,7 @@
 	</view>
 	<view class="footer_container">
 		<view class="other_msg">
-			<view class="title_value" wx:if="{{orderListItem.ftype==1}}">配送地址<text>{{address}}</text></view>
+			<view class="title_value" wx:if="{{orderListItem.ftype==1}}"><span style="height:80rpx">配送地址</span><text>{{address}}</text></view>
 			<view class="title_value" wx:if="{{orderListItem.ftype==0}}">餐桌号<text>{{orderListItem.fTableNo}}</text></view>
 		</view>
 		<view class="order_msg">
@@ -240,6 +240,7 @@ export default class AdminOrderDetail extends wepy.page{
 		orderListItem:{},
 		shopId:'',
 		addressMsg:{},
+		goodsList:[]
 	}
 
 	onLoad(opts){
@@ -266,7 +267,7 @@ export default class AdminOrderDetail extends wepy.page{
 		console.log("发送getUserAddress请求===",json);
 		if(json.data.code == 0){
 			this.addressMsg = json.data.data[0];
-			this.address = this.addressMsg.fCityId+this.addressMsg.fAreaId+this.addressMsg.fAddress+'\n'+this.addressMsg.fName+this.addressMsg.fPhone;
+			this.address = this.addressMsg.fCityId+this.addressMsg.fAreaId+this.addressMsg.fAddress+this.addressMsg.fName+this.addressMsg.fPhone;
 			this.phone = this.addressMsg.fPhone
 		}else{
 			tip.error(json.data.msg);
@@ -285,7 +286,7 @@ export default class AdminOrderDetail extends wepy.page{
 
 		console.log("onGetOrderDetail===",json);
 		if(json.data.code==0){
-			this.orderListItem.goodsList = json.data.data;
+			this.goodsList = json.data.data;
 		}
 		console.log("合并后的orderListItem==",this.orderListItem);
 		this.$apply();
@@ -293,8 +294,8 @@ export default class AdminOrderDetail extends wepy.page{
 
 	methods = {
 		onCallPhone(e){
-			console.log("onCallPhone",that.phone);
 			let that = this;
+			console.log("onCallPhone",that.phone);
 			wx.makePhoneCall({
 				phoneNumber:that.phone
 			});

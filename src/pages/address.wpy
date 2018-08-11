@@ -4,7 +4,7 @@
   </view>
   <view class="{{currentPage==1?'':'hidden'}}">
     <addressAdd @currentPage.user="getCurrentPage"></addressAdd>
-  </view>
+  </view> 
   <view class="{{currentPage==2?'':'hidden'}}">
     <addressEdit @currentPage.user="getCurrentPage" ></addressEdit>
   </view>
@@ -45,7 +45,7 @@
 			this.currentPage =0;
 			console.log("接受的类型是",option.type);
 			this.type =(option.type == undefined?"":option.type);
-			this.$invoke("addressList","setOrgType",this.type);
+			this.$invoke("addressList","setOrgType",this.type); 	
 		}
 
 		onShow(){
@@ -64,11 +64,11 @@
 			}
 		}
 
-		events = {
-			refreshAddList(msg){
-				this.getUserAddress();
-			}
-		}
+		// events = {
+		// 	refreshAddList(msg){
+		// 		this.getUserAddress();
+		// 	}
+		// }
 
 		async getUserAddress(){
 			let that = this;

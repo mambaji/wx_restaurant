@@ -18,6 +18,9 @@ const apiHost = 'https://api.it120.cc/manbasji/';
 const apisuHost = 'https://api.it120.cc/suya/';
 const apiTHost= 'https://www.passingjoy.com/test/wechat';
 
+//管理员登录接口
+const adminLogin = (params) => wxRequest(params,apiTHost+'/auth/login/');
+
 //获取上传图片uptoken
 const getUptoken = (params) => wxRequest(params,apiTHost+'/auth/uptoken/');
 
@@ -37,7 +40,7 @@ const getMyOrderList = (params) => wxRequest(params, apiMall + '/api/mall/goodsO
 
 //获取商家信息
 // const getShopInfo = (params) => wxRequest(params,apiHost + '/shop/subshop/list');
-const getShopInfo = (params) => wxRequest(params,apiTHost + '/shop/info/');
+const getShopInfo = (params) => wxRequest(params,apiTHost + '/auth/info/');
 
 //查询用户所有收货地址
 // const getAddressAll = (params) => wxRequest(params,apiHost + '/user/shipping-address/list');
@@ -55,6 +58,9 @@ const submitRecord = (params) => wxRequest(params,apiTHost+'/record/submit/');
 
 //获取预约记录
 const getRecord = (params) => wxRequest(params,apiTHost+'/record/get/');
+
+//取消预约记录
+const cancelRecord = (params) =>wxRequest(params,apiTHost+'/record/cancel/');
 
 //删除用户收货地址
 // const deleteAddress = (params) => wxRequest(params,apiHost+'/user/shipping-address/delete');
@@ -154,4 +160,6 @@ export default {
   delGoodsAttribute,
   getShopGoods,
   delImage,
+  adminLogin,
+  cancelRecord
 }

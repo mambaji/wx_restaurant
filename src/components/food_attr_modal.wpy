@@ -58,6 +58,24 @@ export default class foodAttrModal extends wepy.component{
 	}	
 
 	methods = {
+		refreshShopCartList(val){
+			if(val==undefined){
+				this.shopCart = []
+				return;
+			}
+			this.shopCart = val
+			this.$apply()
+		},
+		refreshAttrList(val){
+			if(val == undefined){return}
+			this.attrMsgList = val
+			this.$apply()
+		},
+		refreshGoodsMsgList(val){
+			if(val==undefined){return}
+			this.goodsMsg = val
+			this.$apply()
+		},
 		touchAttrMask(){
 			this.showAttrModal = false;
 			this.$emit('attrModal', this.showAttrModal);
@@ -165,7 +183,8 @@ export default class foodAttrModal extends wepy.component{
 				}else{
 					this.attrListItem.fNum = 0;
 				}
-			}		
+			}
+			console.log("attrListItem==",this.attrListItem)		
 		},
 		addShopCart(e){
 			let isGoodsAdd = true;//购物车中是否有该商品id,true则没有，直接push到shopCart中；

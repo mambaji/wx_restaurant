@@ -167,7 +167,7 @@
 		<text wx:if="{{orderListItem.fStatus==5}}">已取消</text>
 	</view>
 	<view class="content_container">
-		<repeat for="{{orderListItem.goodsList}}" key="index" index="index" item="item">
+		<repeat for="{{goodsList}}" key="index" index="index" item="item">
 			<view class="list">
 				<image src="{{item.fGoodsImg}}"></image>
 				<view class="name">{{item.fGoodsName}}</view>
@@ -222,6 +222,7 @@
 <script>
 import wepy from 'wepy';
 import api from '@/api/api';
+import tip from '@/utils/tip'
 import {
 	ORDER_DETAIL,
 	SHOPPHONE
@@ -239,12 +240,13 @@ export default class OrderDetail extends wepy.page{
 		orderId:'',
 		orderListItem:{},
 		phone:'',
+		goodsList:[]
 	}
 
 	onLoad(opts){
 		this.orderListItem = wepy.getStorageSync(ORDER_DETAIL);
-		this.onGetOrderDetail();
 		this.phone = wepy.getStorageSync(SHOPPHONE)||{}
+		this.onGetOrderDetail();
 	}
 
 	async onGetOrderDetail(){
@@ -254,12 +256,11 @@ export default class OrderDetail extends wepy.page{
 				fOrderId:this.orderListItem.fOrderId
 			}
 		});
-
 		console.log("onGetOrderDetail===",json);
 		if(json.data.code==0){
-			this.orderListItem.goodsList = json.data.data;
+			this.goodsList = json.data.data;
+			this.$apply();
 		}
-		this.$apply();
 	}
 
 	methods = {

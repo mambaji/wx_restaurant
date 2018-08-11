@@ -323,6 +323,7 @@
 <script>
 import wepy from 'wepy';
 import api from '@/api/api';
+import tip from '@/utils/tip'
 import {
 	SHOPID,
 	SHOPPHONE
@@ -354,7 +355,15 @@ export default class Home extends wepy.page{
 	}
 
 	async onLoad(){
-		this.shopId = wepy.getStorageSync(SHOPID)||{};
+		wx.getSystemInfo({
+			success:function(res){
+				var version = res.SDKVersion;
+				version = version.replace(/\./g,"")
+				console.log("version===",version)
+			}
+		})
+		this.shopId = parseInt(wepy.getStorageSync(SHOPID)||{});
+		console.log(this.shopId)
 		//加载商户信息
 		this.getShopInfo();
 	}
@@ -383,7 +392,6 @@ export default class Home extends wepy.page{
 			if(this.notice==null||this.notice==''){
 				this.notice = that.shop_name+"没啥可说的..."
 			}
-
 		}else{
 
 		}
@@ -405,15 +413,18 @@ export default class Home extends wepy.page{
 		},
 		//店内点单
 		onOrder(e){
+			let tableNum = 1
+    				wx.navigateTo({
+    					url: 'foodMenuOrder?tableNum='+tableNum
+    				})
+    				return			
 			wx.scanCode({
   				onlyFromCamera: true,
   				scanType:'qCode',
   				success:(res)=>{
     				console.log("扫描桌面二维码success：",res);
     				let tableNum = res.result;
-    				wx.navigateTo({
-    					url: 'foodMenuOrder?tableNum='+tableNum
-    				})
+
   				},
   				fail:(res)=>{
   					console.log("扫描桌面二维码fail:",res);

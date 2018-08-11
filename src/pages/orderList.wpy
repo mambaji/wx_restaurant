@@ -107,6 +107,7 @@ export default class OrderList extends wepy.page{
 		}else{
 			this.is_empty = false;
 		}
+		this.$invoke("subscribeOrderItem","refreshList",this.subscribeList)
 		this.$apply();
 	}
 
@@ -161,6 +162,12 @@ export default class OrderList extends wepy.page{
 			}
 			console.log("转化后的orderList===",this.orderList);
 		}
+		if(fType==0){
+			this.$invoke("dineinOrderItem","refreshList",this.orderList)
+		}else{
+			this.$invoke("parceOrderItem","refreshList",this.orderList)
+		}
+		
 		that.$apply();
 		console.log("is_empty===",this.is_empty);
 	}
@@ -227,6 +234,18 @@ export default class OrderList extends wepy.page{
 		this.custId = wepy.getStorageSync(CUSTID)||{};
 		this.token = wepy.getStorageSync(TOKEN)||{};
 		this.getOrderMsg(0,0,9);
+		// this.getSubscribeList();
+		// for(let i = 0;i<10;i++){
+		// 	let item = {}
+		// 	item.fCustName = '小姐'
+		// 	item.fDate = '2018-07-27'
+		// 	item.fDateTime = '2018-07-27 14:04:00'
+		// 	item.fId = 5
+		// 	item.fPeopleNum = 2
+		// 	item.fPhone = 15918881632
+		// 	item.fTableNum = null
+		// 	this.subscribeList.push(item)
+		// }
 	}
 
 	onShow(){
@@ -297,6 +316,6 @@ export default class OrderList extends wepy.page{
 		z-index:999;
 	}
 	.swiper-item-box{
-		margin-top:60rpx;
+		margin-top:80rpx;
 	}
 </style>

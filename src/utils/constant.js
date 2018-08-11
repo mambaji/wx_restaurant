@@ -10,6 +10,9 @@ export const USER_SPECICAL_INFO = "userSpecialInfo";
  */
 export const USER_INFO = "userInfo";
 
+//是否商户管理员
+export const BE_SHOPADMIN = "shopAdmin";
+
 // 用户token
 export const TOKEN = "token";
 
@@ -31,19 +34,17 @@ export const ACTIVE_CODE = "activecode";
 //属性选择itemcode
 export const ATTR_ACTIVE_CODE = "attractivecode";
 
-//购物车
+//购物车z
 export const SHOP_CART = 'shopcart';
 
 //订单详情
 export const ORDER_DETAIL = "orderDetail";
-
 
 /**
  * 系统信息
  * @type {String}
  */
 export const SYSTEM_INFO = "systemInfo";
-
 
 export const ADDRESS_ID = "addressId";
 

@@ -17,7 +17,6 @@
 	.textcolor4{
 		color:#999999;
 	}
-
 	.top_box{
 		width:100%;
 		height:220rpx;
@@ -65,6 +64,16 @@
 		border:2rpx solid #f2f2f2;
 		border-top-width:0rpx;
 		padding-left:30rpx;
+	}
+	.admin_login{
+		position:fixed;
+		bottom:80rpx;		
+		width:90%;
+		margin-left:5%;
+		text-align:center;
+		background:#ffc400;
+		color:#666;
+		font-size:36rpx;
 	}	
 </style>
 <template>
@@ -78,7 +87,7 @@
 					<view style="float:left">我的地址</view>
 					<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>
 			</view>
-			<view class="admin_box textsize22 textcolor2" @tap="goAdmin">
+			<view class="admin_box textsize22 textcolor2" wx:if="{{isadmin}}" @tap="goAdmin">
 					<view style="float:left">管理员后台</view>
 					<image class="icon_arrow" src="../images/icon_arrow_right.png"></image>				
 			</view>
@@ -88,13 +97,17 @@
 			</view>	 -->
 		</view>
 	</view>
+	<button class="admin_login" @tap="goAdminLogin" wx:if="{{!isadmin}}">管理员登录</button>	
+	<button class="admin_login" @tap="goOutLogin" wx:if="{{isadmin}}">退出登录</button>	
 </template>
 
 <script>
 import wepy from 'wepy';
 import api from '@/api/api';
+import tip from '@/utils/tip'
 import {
-	USER_INFO
+	USER_INFO,
+	BE_SHOPADMIN
 } from '@/utils/constant'
 export default class PersonalCenter extends wepy.page{
 	config = {
@@ -109,7 +122,8 @@ export default class PersonalCenter extends wepy.page{
 
 	data = {
 		user_img:'',
-		user_name:''
+		user_name:'',
+		isadmin:false
 	}
 
 	onLoad(){
@@ -117,7 +131,10 @@ export default class PersonalCenter extends wepy.page{
 		let userinfo = wepy.getStorageSync(USER_INFO);
 		this.user_img = userinfo.avatarUrl;
 		this.user_name = userinfo.nickName;
+	}
 
+	onShow(){
+		this.isadmin = wepy.getStorageSync(BE_SHOPADMIN)||false
 	}
 
 	methods = {
@@ -130,6 +147,16 @@ export default class PersonalCenter extends wepy.page{
 			wepy.navigateTo({
 				url:'/pages/adminHome'
 			})			
+		},
+		goAdminLogin(){
+			wepy.navigateTo({
+				url:'/pages/adminLogin'
+			})		
+		},
+		goOutLogin(){
+			let that = this
+			wepy.setStorageSync(BE_SHOPADMIN,false)
+			this.isadmin = false
 		}
 	}
 }

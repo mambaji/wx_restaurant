@@ -4,7 +4,7 @@
 	}
 	//隐藏滚动条
 	::-webkit-scrollbar{
- 	 	width: 0;
+ 	 	width: 0; 
   	 	height: 0;
   	 	color: transparent;
 	}
@@ -477,12 +477,12 @@
 		<view class="shopcart_num_redpoint" wx:if="{{allPrice==0||allPrice==undefined?false:true}}">{{allProNum}}</view>
 		<text class="all_price">{{allPrice==0||allPrice==undefined?'':'￥'+allPrice}}</text>
 		<text class="distributionPrice">另需配送费{{shopInfo.fDistributionPrice}}元</text>
-		<text class="btn_balance" @tap="onBalance">结算</text>
+		<text class="btn_balance" @tap="onBalance">结算</text> 
 	</view>
 	<!-- 商品信息弹窗 -->
 	<foodMsgModal :modal.sync="modalItem" @msgModal.user="onMsgModal" wx:if="{{showMsgModal}}"></foodMsgModal>
 	<!-- 商品属性弹窗 -->
-	<foodAttrModal :attrMsgList.sync="attrMsgList" :shopCart.sync="shopCart" :goodsMsg.sync="goodsMsg" @attrModal.user="onAttrModal" @addShopCart.user="onAttrAddShopCart" @attrAddProNum.user="attrAddProNum" @attrReduceProNum.user="attrReduceProNum" wx:if="{{showAttrModal}}"></foodAttrModal>
+	<foodAttrModal @attrModal.user="onAttrModal" @addShopCart.user="onAttrAddShopCart" @attrAddProNum.user="attrAddProNum" @attrReduceProNum.user="attrReduceProNum" wx:if="{{showAttrModal}}"></foodAttrModal>
 </template>
 
 <script>
@@ -628,9 +628,8 @@ export default class foodMsgModal extends wepy.page{
 			this.attrMsgList = json.data.data;
 			this.categoryList[this.curCategoryActiveIndex].fGoodsList[this.curGoodsListIndex].fAttrList=this.attrMsgList;
 			this.setAttrItemActive(goodsId,basePrice,goodsName);
-			this.$apply();
 		}
-		
+		this.$apply();
 
 	}
 
@@ -713,6 +712,7 @@ export default class foodMsgModal extends wepy.page{
 		if(isattr){
 			this.$invoke("foodAttrModal","setAttrItem",this.showAttrModal,scItem);
 		}
+		this.$invoke("foodAttrModal","refreshShopCartList",this.shopCart);
 		console.log("onAddShopCart===");
 		this.countShopCart();
 	}
@@ -833,7 +833,9 @@ export default class foodMsgModal extends wepy.page{
 		}
 
 			this.showAttrModal = true;
+			this.$invoke("foodAttrModal","refreshAttrList",this.attrMsgList)
 			this.$invoke("foodAttrModal","setAttrItem",this.showAttrModal,attrListItem);
+
 		console.log("setAttrItemActive==");
 		this.$apply();
 	}
@@ -953,6 +955,9 @@ export default class foodMsgModal extends wepy.page{
 				this.attrMsgList = this.categoryList[this.curCategoryActiveIndex].fGoodsList[this.curGoodsListIndex].fAttrList;
 				this.setAttrItemActive(goodsId,basePrice,goodsName);
 			}
+			this.$invoke("foodAttrModal","refreshGoodsMsgList",this.goodsMsg);
+			this.$invoke("foodAttrModal","refreshShopCartList",this.shopCart);
+
 		},
 		onAttrAddShopCart(attrListItem,isGoodsAdd,isAdd){
 			this.onAddShopCart(attrListItem,isGoodsAdd,isAdd,true);

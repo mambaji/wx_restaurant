@@ -247,7 +247,7 @@ export default class AdminProDetailManager extends wepy.page{
 		lastImageURL:'',//之前的imageUrl，当图片修改时，需要把该值删除
 		isGoodsSave:false,
 		token:'',
-		uptoken:'JNQX9tOUgiTVZm3x4Y2-668lzoP15C4JGs2bBY1w:SZfwDgaYZWO7sDDZDqcfTFjgJJg=:eyJzY29wZSI6ImJsb2dpbWFnZSIsImRlYWRsaW5lIjoxNTMzNDc0OTExfQ==',
+		uptoken:'',
 
 
 		goodsName:'',

@@ -116,7 +116,8 @@ export default class Subscribe extends wepy.page{
 	}
 
 	onLoad(){
-		var datetime = util.getCurrentTime().split(",");
+		var datetime = util.getCurrentTime().split(" ");
+		console.log(datetime)
 		this.date = datetime[0];
 		this.time = datetime[1];
 	}
@@ -153,7 +154,7 @@ export default class Subscribe extends wepy.page{
 		}
 
 
-		let supplyDate = util.getCurrentTime().replace(',',' ');
+		let supplyDate = (util.getCurrentTime().split(" "))[0];
 		let date = this.date+' '+this.time;
 		let name = e.detail.value.name;
 		let phone = e.detail.value.phone;

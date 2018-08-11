@@ -27,7 +27,8 @@ export default class extends wepy.app {
       'pages/adminProDetailManager',
       'pages/adminProDetailAttrManager',       
       'pages/adminOrderManager',
-      'pages/adminOrderDetail'
+      'pages/adminOrderDetail',
+      'pages/adminLogin'
     ],
    window: {
       backgroundTextStyle: 'dark',
