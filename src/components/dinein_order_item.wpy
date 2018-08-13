@@ -3,6 +3,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
+    border-bottom: 0px solid #ffc400;
     .type{
     	font-size:28rpx;
     	color:#999;
@@ -11,6 +12,12 @@
     	font-size:28rpx;
     	color:#999;
     }
+  }
+  .order_list_fdate{
+    padding-bottom: 26rpx;
+    border-bottom: 1px solid #efefef;
+    font-size:28rpx;
+    color:#999;  	
   }
   .order_list_content{
   	width:100%;
@@ -52,11 +59,19 @@
     	font-size:28rpx;
     	margin-left:20rpx;
     }
+    .print_btn{
+    	width:150rpx;
+    	height:50rpx;
+    	line-height:50rpx;
+    	text-align:center;
+    	border:1rpx solid #cdcdcd;
+    	border-radius:20rpx;
+    	font-size:28rpx;
+    	margin-left:20rpx;
+    	background:#ffc400
+    }
   }
-  .order_list_top {
-    padding-bottom: 26rpx;
-    border-bottom: 1px solid #efefef
-  }
+
   .list {
     background: #fff;
     padding: 30rpx;
@@ -72,13 +87,17 @@
 			<view class="list">
 				<view class="item_content" @tap="navigatorOrderDetail" data-index="{{index}}" data-item="{{item}}">
 					<view class="order_list_top">
-						<text class="type">{{item.ftype==0?'堂食:'+item.fOrderNo:'外卖:'+item.fOrderNo}}</text>
+						<text class="type">{{item.ftype==0?'堂食：'+item.fOrderNo:'外卖：'+item.fOrderNo}}</text>
 						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
 						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
 						<text class="status" wx:if="{{item.fStatus==6}}">已确认，待上菜</text>
 						<text class="status" wx:if="{{item.fStatus==4}}">已完成</text>
 						<text class="status" wx:if="{{item.fStatus==5}}">已取消</text>
 					</view>
+					<view class="order_list_fdate">
+						<text>时间：{{item.fDate}}</text>
+					</view>
+					
 					<view class="order_list_content">
 						<repeat for="{{item.goodsData}}">
 							<view class="goods_list" wx:key="index">
@@ -110,6 +129,11 @@
 						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==6}}" data-optstatus="4" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							完成
 						</view>						
+					</view>
+					<view class="order_list_footer" wx:if="{{type==0}}">
+						<view class="print_btn" data-item="{{item}}" data-index="{{index}}" @tap.stop="onPrintOrder">
+							打印单据
+						</view>							
 					</view>
 				</view>
 			</view>			

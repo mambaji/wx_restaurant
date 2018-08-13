@@ -52,6 +52,17 @@
     	border-radius:20rpx;
     	font-size:28rpx;
     }
+    .print_btn{
+    	width:150rpx;
+    	height:50rpx;
+    	line-height:50rpx;
+    	text-align:center;
+    	border:1rpx solid #cdcdcd;
+    	border-radius:20rpx;
+    	font-size:28rpx;
+    	margin-left:20rpx;
+    	background:#ffc400
+    }
   }
   .order_list_top {
     padding-bottom: 26rpx;
@@ -61,6 +72,12 @@
     background: #fff;
     padding: 30rpx;
     margin-top: 15rpx;
+  }
+  .order_list_fdate{
+    padding-bottom: 26rpx;
+    border-bottom: 1px solid #efefef;
+    font-size:28rpx;
+    color:#999;  	
   }
 
 </style>
@@ -80,6 +97,9 @@
 						<text class="status" wx:if="{{item.fStatus==4}}">已完成</text>
 						<text class="status" wx:if="{{item.fStatus==5}}">已取消</text>					
 					</view>
+					<view class="order_list_fdate">
+						<text>时间：{{item.fDate}}</text>
+					</view>
 					<view class="order_list_content">
 						<repeat for="{{item.goodsData}}">
 							<view class="goods_list" wx:key="index">
@@ -93,9 +113,6 @@
 							<text wx:if="{{item.fPayType==1}}">(微信支付)</text>
 							<text wx:if="{{item.fPayType==0}}">(现金支付)</text>
 						</view>
-				<!-- 		<view class="data">
-							{{item.data}}
-						</view>	 -->					
 					</view>
 					<!-- 用户端 type==1 -->
 					<view class="order_list_footer" wx:if="{{type==1}}">
@@ -120,7 +137,12 @@
 						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==2}}" data-item="{{item}}" data-status="3" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							配送
 						</view>							
-					</view>					
+					</view>	
+					<view class="order_list_footer" wx:if="{{type==0}}">
+						<view class="print_btn" data-item="{{item}}" data-index="{{index}}" @tap.stop="onPrintOrder">
+							打印单据
+						</view>							
+					</view>				
 				</view>
 			</view>			
 		</repeat>

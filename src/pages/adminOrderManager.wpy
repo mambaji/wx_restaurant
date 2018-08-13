@@ -16,7 +16,7 @@
 			<placeholder :show.sync="is_empty" message="暂无发现数据"></placeholder>
 		</scroll-view>	
 		</view>	
-</template>
+</template> 
 
 <script>
 import wepy from 'wepy';
@@ -113,7 +113,7 @@ export default class AdminOrderManager extends wepy.page{
 		let that = this;
 		const json = await api.getOrderList({
 			query:{
-				fShopId:that.shopId,
+				fShopId:1,
 				fCustId:'',
 				fType:fType,
 				P_Min:P_Min,
@@ -143,6 +143,7 @@ export default class AdminOrderManager extends wepy.page{
 				this.is_empty = false;
 			}
 			for(let i = 0; i<this.orderList.length;i++){
+				this.orderList[i].fDate = this.orderList[i].fDate.replace("T"," ");
 				this.orderList[i].goodsData = [];
 				if(this.orderList[i].fUnionName == null){
 					continue;
