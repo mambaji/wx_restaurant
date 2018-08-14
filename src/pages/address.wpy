@@ -64,11 +64,11 @@
 			}
 		}
 
-		// events = {
-		// 	refreshAddList(msg){
-		// 		this.getUserAddress();
-		// 	}
-		// }
+		events = {
+			refreshAddList(msg){
+				this.getUserAddress();
+			}
+		}
 
 		async getUserAddress(){
 			let that = this;

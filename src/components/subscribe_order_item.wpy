@@ -5,6 +5,10 @@
 			background:#fff;
 			padding:30rpx;
 			margin-top:15rpx;
+			.status{
+				font-size:28rpx;
+				color:#999;
+			}
 			.name{
 				font-size:28rpx;
 				color:#666;
@@ -67,13 +71,16 @@
 	<view class="subscribe_item">
 		<repeat for="{{subscribeList}}" key="index" index="index" item="item">
 			<view class="list_item">
+				<view class="status" wx:if="{{item.fStatus==-1}}">状态：已取消</view>
+				<view class="status" wx:if="{{item.fStatus==0||item.fStatus==null}}">状态：预约中</view>
+				<view class="status" wx:if="{{item.fStatus==1}}">状态：已到店</view>
 				<view class="name">姓名：{{item.fCustName}}</view>
 				<view class="phone">手机号码：{{item.fPhone}}</view>
 				<view class="date">申请日期：{{item.fDate}}</view>
 				<view class="time">预约时间：{{item.fDateTime}}</view>
 				<view class="num">人数：{{item.fPeopleNum}}</view>
 				<!-- <text class="option">取消预约</text> -->
-				<view class="order_list_footer" wx:if="{{type==0}}">
+				<view class="order_list_footer" wx:if="{{item.fStatus==0}}">
 					<view class="option_btn" id="btn_pay" data-id="{{item.fId}}" data-index="{{index}}" @tap.stop="onCancelSub">取消预约</view>
 				</view>	
 			</view>
@@ -94,7 +101,6 @@ export default class subscribeOrderItem extends wepy.component{
 		type:{
 
 		}
-
 	}
 
 	data = {

@@ -595,7 +595,7 @@ export default class foodMsgModal extends wepy.page{
 		const json = await api.getFoodMsgList({
 			query:{
 				fShopId:this.shopId,
-				fGoodsListId:2,
+				fGoodsListId:categoryId,
 				fGoodsName:'',
 				fGoodsId:''
 			}

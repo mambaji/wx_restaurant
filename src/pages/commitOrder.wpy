@@ -230,12 +230,64 @@
 		z-index:9000;
 		opacity:0.7;
 	}
+
+	.switch_btn{
+		width:94%;
+		height:80rpx;
+		line-height:80rpx;
+		background:#fff;
+		text{
+			margin-left:15px;
+		}
+		switch{
+			float:right;
+			margin-right:10rpx;
+		}
+	}
+.wx-switch-input{width:42px !important;height:20px !important;}
+.wx-switch-input::before{width:42px !important;height: 20px !important;}
+.wx-switch-input::after{width: 18px !important;height: 18px !important;}//中间小圆球
+.get_time{
+	width:94%;
+	background:#fff;
+	margin-bottom:30rpx;
+	margin-top:30rpx;
+	text{
+		width:80%;
+		margin-left:15rpx;
+	}
+	i{
+		margin-right:10rpx;
+		float:right;
+	}
+	picker{
+		float:right;
+		height:50rpx;
+		line-height:50rpx;	
+		margin-top:-40rpx;	
+	}
+
+}
 </style>
 <template>
 	<view style="height:{{wheight-45}}px;">
 	<scroll-view class="scroll_content" scroll-y style="padding:3%;height:{{wheight-45}}px">
+		<!-- 当店自取 -->
+			<view class="switch_btn">
+				<text>到店自取</text><switch bindchange="onSwitchChange"/>
+			</view>
+		<!-- 预约时间 -->
+			<view class="get_time">
+				<text>预约时间</text>
+				<picker mode="time" value="{{time}}" start="09:01" end="23:01" bindchange="bindTimeChange">
+    				<text class="picker">
+      					{{getTime}}
+    				</text>
+  				</picker>
+  				<i class="iconfont icon-pulldown"></i>
+			</view>
 		<!-- 我的地址 -->
-			<view class="empty_address" wx:if="{{!isExit&&type==1}}" @tap="setAddress">
+			<view class="empty_address" wx:if="{{!isExit&&type==1&&!isGetFood}}" @tap="setAddress">
 		        <text class="title">设置收货地址</text>
         		<image class="icon_arrow_right" src="../images/icon_arrow_right.png"></image>
       		</view>
@@ -338,8 +390,9 @@ export default class CommitOrder extends wepy.page{
 		remark:'',
 		tableNo:'',
 		shopInfo:{},
-
 		shopCart:[],
+		isGetFood:false,
+		getTime:''
 	}
 
 	onLoad(option){
@@ -363,6 +416,9 @@ export default class CommitOrder extends wepy.page{
 			}
 			this.shopCart = wepy.getStorageSync(SHOP_CART)||{};
 			console.log("tableNo===",this.tableNo);
+
+		var datetime = util.getCurrentTime().split(" ");
+		this.getTime = datetime[1];			
 	}
 
 	onShow(){
@@ -417,7 +473,7 @@ export default class CommitOrder extends wepy.page{
 					this.addressInfo = json.data.data[0];
 					this.isExit = true;
 				}
-				console.log("addressInfo.length==",this.addressInfo.length);
+				// console.log("addressInfo.length==",this.addressInfo.length);
 				if (this.addressInfo==null) {
 					this.isExit = false;
 				}
@@ -464,6 +520,10 @@ export default class CommitOrder extends wepy.page{
 			this.allProNum = num;
 			console.log("countShopCart===",this.allPrice,this.allProNum,this.shopCart);	
 			this.$apply();		
+		}
+
+		onSwitchChange(e){
+			console.log("onSwitchChange===",e.detail.value)
 		}
 	
 	methods = {

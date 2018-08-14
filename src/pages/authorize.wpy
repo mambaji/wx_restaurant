@@ -36,11 +36,6 @@ export default class Authrorize extends wepy.page{
 		let resSetting = await wepy.getSetting();
 		console.log(resSetting)
 		if((resSetting.authSetting)['scope.userInfo']){
-			// let userInfo = wepy.setStorageSync(USER_INFO);
-			// console.log(userInfo);
-			// if(userInfo == ''|| userInfo == null){
-			// 	return;
-			// }
 			console.log("执行isToken");
 			that.isToken();
 		}
