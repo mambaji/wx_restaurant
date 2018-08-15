@@ -177,12 +177,12 @@
 				<view class="num">x{{item.fNum}}</view>
 			</view>
 		</repeat>
-		<view class="order_price_content" wx:if="{{orderListItem.ftype==1}}">
-			<view class="pack_price">
+		<view class="order_price_content" >
+			<view class="pack_price" wx:if="{{orderListItem.ftype==1||orderListItem.ftype==2}}">
 				<view class="text1">餐盒费</view>
 				<view class="text2">￥{{orderListItem.fPackPrice}}</view>
 			</view>
-			<view class="distribute_price">
+			<view class="distribute_price" wx:if="{{orderListItem.ftype==1}}">
 				<view class="text1">配送费</view>
 				<view class="text2">￥{{orderListItem.fDistributionPrice}}</view>
 			</view>

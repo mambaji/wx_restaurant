@@ -9,7 +9,9 @@
 			<dineinOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==0}}"></dineinOrderItem>
 			<parceOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==1}}">
 			</parceOrderItem>
-			<subscribeOrderItem :subscribeList.sync="subscribeList" :type.sync="type" wx:if="{{currentTab==2}}"></subscribeOrderItem>
+			<getFoodOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==2}}">
+			</getFoodOrderItem>
+			<subscribeOrderItem :subscribeList.sync="subscribeList" :type.sync="type" wx:if="{{currentTab==3}}"></subscribeOrderItem>
 			<!-- 暂无数据显示 -->
 			<!-- <placeholder wx message="暂无发现数据"></placeholder> -->
 		</scroll-view>	
@@ -30,6 +32,7 @@ import Tab from '@/components/tab' //选项卡组件
 import DineinOrderItem from '@/components/dinein_order_item'//堂吃订单列表组件
 import ParceOrderItem from '@/components/parce_order_item'
 import SubscribeOrderItem from '@/components/subscribe_order_item'
+import GetFoodOrderItem from '@/components/getfood_order_item'
 // import OrderItem from '@/components/order_item' //订单列表组件
 import BottomLoadMore from '../components/common/bottomLoadMore' //底部加载更多组件
 import PlaceHolder from '../components/common/placeholder' //空列表显示组件
@@ -44,7 +47,8 @@ export default class OrderList extends wepy.page{
 		placeholder: PlaceHolder,
 		dineinOrderItem:DineinOrderItem,
 		parceOrderItem:ParceOrderItem,
-		subscribeOrderItem:SubscribeOrderItem
+		subscribeOrderItem:SubscribeOrderItem,
+		getFoodOrderItem:GetFoodOrderItem
 	}
 	data = {
 		shopId:'',
@@ -52,7 +56,7 @@ export default class OrderList extends wepy.page{
 		token:'',
 		windowHeight: 0,
 		totalCount:0,//订单条目数
-		tabList:["堂食","外卖","预约"],
+		tabList:["堂食","外卖","自取","预约"],
 		orderList:[],//订单列表数据
 		subscribeList:[],
 		orderStatus: 0,//订单状态
@@ -273,8 +277,12 @@ export default class OrderList extends wepy.page{
 				that.orderStatus = 1;
 				that.getOrderMsg(1,0,9);
 			} else if (cur == 2){
+				console.log("自取订单");
+				that.orderStatus = 2
+				that.getOrderMsg(2,0,9)
+			}else if (cur == 3){
 				console.log("预订订单");
-				that.orderStatus = 2;
+				that.orderStatus = 3;
 				that.getSubscribeList();
 			}
 			that.$apply();

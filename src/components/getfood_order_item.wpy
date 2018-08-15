@@ -94,8 +94,6 @@
 						<text class="type" wx:if="{{item.ftype==2}}">{{item.fOrderNo}}：自取</text>
 						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
 						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
-						<text class="status" wx:if="{{item.fStatus==2}}">待配送</text>	
-						<text class="status" wx:if="{{item.fStatus==3}}">配送中...</text>	
 						<text class="status" wx:if="{{item.fStatus==4}}">已完成</text>
 						<text class="status" wx:if="{{item.fStatus==5}}">已取消</text>					
 					</view>
@@ -136,8 +134,8 @@
 						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}" data-item="{{item}}" data-status="5" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							拒绝订单
 						</view>						
-						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==2}}" data-item="{{item}}" data-status="3" data-index="{{index}}" @tap.stop="updateOrderStatus">
-							配送
+						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==2}}" data-item="{{item}}" data-status="4" data-index="{{index}}" @tap.stop="updateOrderStatus">
+							取餐
 						</view>							
 					</view>	
 					<view class="order_list_footer" wx:if="{{type==0}}">
@@ -160,7 +158,7 @@ import {
 	ORDER_DETAIL,
 	TOKEN
 } from '@/utils/constant'
-export default class parceOrderItem extends wepy.component{
+export default class getFoodOrderItem extends wepy.component{
 	props = {
 		orderList:{
 			default:[{

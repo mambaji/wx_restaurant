@@ -26,6 +26,7 @@
 		background:#fff;
 		width:94%;
 		height:145rpx;
+		margin-top:30rpx;
 		.icon_address{
 			width:40rpx;
 			height:40rpx;
@@ -249,49 +250,75 @@
 .wx-switch-input::after{width: 18px !important;height: 18px !important;}//中间小圆球
 .get_time{
 	width:94%;
+	height:80rpx;
+	line-height:80rpx;
 	background:#fff;
-	margin-bottom:30rpx;
 	margin-top:30rpx;
 	text{
-		width:80%;
-		margin-left:15rpx;
+		margin-left:20rpx;
 	}
 	i{
-		margin-right:10rpx;
+		margin-right:15rpx;
 		float:right;
 	}
 	picker{
 		float:right;
 		height:50rpx;
 		line-height:50rpx;	
-		margin-top:-40rpx;	
+		margin-top:-30rpx;	
+		margin-right:10rpx;
 	}
 
+}
+.get_phone{
+	width:94%;
+	height:60rpx;
+	line-height:60rpx;
+	background:#fff;
+	padding-top:10rpx;
+	padding-bottom:10rpx;
+	text{
+		float:left;
+		margin-left:20rpx;
+	}
+	i{
+		margin-right:15rpx;
+		float:right;
+	}
+	view{
+		float:right;
+		margin-right:15rpx;
+	}
 }
 </style>
 <template>
 	<view style="height:{{wheight-45}}px;">
 	<scroll-view class="scroll_content" scroll-y style="padding:3%;height:{{wheight-45}}px">
 		<!-- 当店自取 -->
-			<view class="switch_btn">
+			<view class="switch_btn" wx:if="{{this.type!=0}}">
 				<text>到店自取</text><switch bindchange="onSwitchChange"/>
 			</view>
 		<!-- 预约时间 -->
-			<view class="get_time">
-				<text>预约时间</text>
+			<view class="get_time" wx:if="{{isGetFood}}">
+				<text>取餐时间</text>
+				<i class="iconfont icon-pulldown"></i>
 				<picker mode="time" value="{{time}}" start="09:01" end="23:01" bindchange="bindTimeChange">
     				<text class="picker">
       					{{getTime}}
     				</text>
   				</picker>
-  				<i class="iconfont icon-pulldown"></i>
+			</view>
+			<view class="get_phone" wx:if="{{isGetFood}}" @tap="setAddress">
+				<text>联系电话</text>
+				<i class="iconfont icon-arrowright"></i>
+				<view>{{getphone}}</view>
 			</view>
 		<!-- 我的地址 -->
 			<view class="empty_address" wx:if="{{!isExit&&type==1&&!isGetFood}}" @tap="setAddress">
 		        <text class="title">设置收货地址</text>
         		<image class="icon_arrow_right" src="../images/icon_arrow_right.png"></image>
       		</view>
-      		<view class="address" wx:if="{{isExit&&type==1}}"  @tap="setAddress">
+      		<view class="address" wx:if="{{isExit&&type==1&&!isGetFood}}"  @tap="setAddress">
 			<image class="icon_address" src="../images/icon_address.png"></image>
 			<view class="address_detail">
 				{{addressInfo.fProvinceId}}{{addressInfo.fCityId}}{{addressInfo.fAreaId}}{{addressInfo.fAddress}}
@@ -317,11 +344,11 @@
 			</view>
 		</view>
 		<!-- 其他费用 -->
-		<view class="order_price" wx:if="{{type==1}}">
-			<text class="package_text">包装费</text>
-			<text class="package_price">￥{{shop.fPackagePrice}}</text>
-			<text class="distribution_text">配送费</text>
-			<text class="distribution_price">￥{{shopInfo.fDistributionPrice}}</text>
+		<view class="order_price" >
+			<text class="package_text" wx:if="{{type==1||type==2}}">包装费</text>
+			<text class="package_price" wx:if="{{type==1||type==2}}">￥{{shop.fPackagePrice}}</text>
+			<text class="distribution_text" wx:if="{{type==1}}">配送费</text>
+			<text class="distribution_price" wx:if="{{type==1}}">￥{{shopInfo.fDistributionPrice}}</text>
 		</view>
 		<view class="all_price">
 			小计
@@ -392,7 +419,8 @@ export default class CommitOrder extends wepy.page{
 		shopInfo:{},
 		shopCart:[],
 		isGetFood:false,
-		getTime:''
+		getTime:'',
+		getphone:'13670316633'
 	}
 
 	onLoad(option){
@@ -428,7 +456,6 @@ export default class CommitOrder extends wepy.page{
 		console.log("addressId===",addressId);
 		this.onGetAddress(addressId);
 	}
-
 
 	onHide(){
 		console.log("onHide");
@@ -477,10 +504,11 @@ export default class CommitOrder extends wepy.page{
 				if (this.addressInfo==null) {
 					this.isExit = false;
 				}
-
+				this.getphone = this.addressInfo.fPhone;
 			}else{
 				tip.error(json.data.msg);
 			}
+			console.log("取餐电话:",this.getphone)
 			console.log("is_exit_address",this.isExit);
 			console.log("当前默认地址",this.addressInfo);
 			that.showLoading = false;
@@ -523,7 +551,16 @@ export default class CommitOrder extends wepy.page{
 		}
 
 		onSwitchChange(e){
-			console.log("onSwitchChange===",e.detail.value)
+			this.isGetFood = e.detail.value
+			if(e.detail.value){
+				this.type = 2
+			}else{
+				this.type = 1
+			}
+		}
+
+		bindTimeChange(e){
+			this.getTime = e.detail.value
 		}
 	
 	methods = {
@@ -542,10 +579,14 @@ export default class CommitOrder extends wepy.page{
 			let orderNo;
 			if(this.type==0){
 				orderNo = 'TC'+util.getTimeStamp();
-			}else{
+				this.shopInfo.fDistributionPrice = 0
+				this.shopInfo.fPackPrice = 0
+			}else if(this.type==1){
 				orderNo = 'WM'+util.getTimeStamp();
+			}else if(this.type==2){
+				orderNo = 'ZQ'+util.getTimeStamp();
+				this.shopInfo.fDistributionPrice = 0
 			}
-
 			for(let i = 0 ;i<this.shopCart.length;i++){
 				this.shopCart[i].fEntryId = i+1;
 			}
