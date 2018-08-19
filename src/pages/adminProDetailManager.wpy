@@ -205,7 +205,7 @@
 			<view wx:if="{{!isImage}}" @tap = "onUploadImage">
 				<i class="iconfont icon-add"></i>
 			</view>
-			<image class="goodsPic" wx:if="{{isImage}}" src="{{imageURL}}"></image>
+			<image class="goodsPic" @tap = "onUploadImage" wx:if="{{isImage}}" src="{{imageURL}}"></image>
 		</view>
 		<view class="goodsAttr" @tap="goAttr" wx:if="{{isGoodsSave}}">
 			<text>商品规格</text>
@@ -248,15 +248,31 @@ export default class AdminProDetailManager extends wepy.page{
 		isGoodsSave:false,
 		token:'',
 		uptoken:'',
+		imagekey:'',
+		imagekey1:'',//用来没有保存的情况下替换图片时用的，删除之前的图片
 
 
 		goodsName:'',
 		goodsDesc:'',
 		goodsPrice:'',
 		oldPrice:'',
+		goodsId:'',
 	}
 
 	onLoad(option){
+		console.log(wepy.getStorageSync("goodMsg"))
+		if(option.type==1 && wepy.getStorageSync("goodMsg")!=undefined && wepy.getStorageSync("goodMsg")!=null){
+			let goodMsg = wepy.getStorageSync("goodMsg")
+			this.goodsName = goodMsg.fName
+			this.goodsDesc = goodMsg.fGoodsNote
+			this.goodsPrice = goodMsg.fBaseAmount
+			this.oldPrice = goodMsg.fOldPrice
+			this.imageURL = goodMsg.fGoodsImg
+			this.goodsId = goodMsg.fGoodsId
+			if(this.imageURL!=''){
+				this.isImage = true
+			}
+		}
 		this.token = wepy.getStorageSync(TOKEN)||{};
 		this.shopId = wepy.getStorageSync(SHOPID)||{};
 		console.log("type=======",option.type)
@@ -268,9 +284,15 @@ export default class AdminProDetailManager extends wepy.page{
 		this.getCategoryList();
 	}
 
+	//页面卸载
+	onUnload(){
+		//没有保存并且有图片上传
+		if(this.type==0 && !this.isGoodsSave && this.imageURL!=''){
+			this.onDelImage()
+		}
+	}
+
 	async onSaveGoods(e){
-		this.onDelImage();
-		return;
 		let that = this;
 		console.log("form===",e.detail.value);
 		let goodsName = e.detail.value.goodsName;
@@ -281,15 +303,35 @@ export default class AdminProDetailManager extends wepy.page{
 		let type_id = this.type_id;
 		let pic = this.imageURL;
 
-		if(categoryId==''||goodsName == '' || goodsPrice == ''||pic == 'url'){
+		if(categoryId==''||goodsName == '' || goodsPrice == ''||pic == ''){
 			tip.toast("信息填写不完整！");
 			return;
 		}
 
-		const json = await api.addGoods({
+		if(this.type == 0){
+			//商品添加
+			const json = await api.addGoods({
+				query:{
+					token:that.token,
+					fShopId:that.shopId,
+					fGoodsListId:categoryId,
+					fName:goodsName,
+					fGoodsImg:pic,
+					fGoodsNote:goodsDesc,
+					fBaseAmount:goodsPrice,
+					fOldPrice:oldPrice,
+					fLable:type_id,
+					fStatus:1,
+				},
+				method:'POST'
+			});
+		}else{
+			//商品编辑
+		const json = await api.updateGoods({
 			query:{
 				token:that.token,
 				fShopId:that.shopId,
+				fGoodsId:that.goodsId,
 				fGoodsListId:categoryId,
 				fName:goodsName,
 				fGoodsImg:pic,
@@ -301,6 +343,8 @@ export default class AdminProDetailManager extends wepy.page{
 			},
 			method:'POST'
 		});
+		}
+
 		console.log("saveGoods==",json);
 		if(json.data.code==0){
 			tip.toast("保存信息成功,请设置商品规格");
@@ -313,6 +357,7 @@ export default class AdminProDetailManager extends wepy.page{
 		}else{
 			tip.toast("网络连接失败!");
 		}
+		this.$apply();
 
 	}
 
@@ -341,7 +386,7 @@ export default class AdminProDetailManager extends wepy.page{
 		const json = await api.delImage({
 			query:{
 				token:this.token,
-				fImageName:'testqiniuImage1.png'
+				fImageName:this.imagekey1
 			},
 			method:'POST'
 		})
@@ -371,11 +416,19 @@ export default class AdminProDetailManager extends wepy.page{
 			wx.chooseImage({
 				count:1,
 				success:function(res){
+				console.log(res)
+ 				var timestamp = (new Date()).getTime()
+      			that.imagekey = that.shopId.toString() + '/image/' + timestamp + res.name					
 					var tempFilePath = res.tempFilePaths[0];
 					upload.upload(that.token,tempFilePath,(res)=>{
+						if(that.imageURL!=''){
+							//执行删除图片接口
+							that.onDelImage()
+						}
 						that.imageURL = res.imageURL
 						if(that.imageURL!=''){
 							that.isImage = true;
+							that.imagekey1 = that.imagekey
 						}
 						that.$apply()
 					},(error)=>{
@@ -383,7 +436,7 @@ export default class AdminProDetailManager extends wepy.page{
 					},{
 						region:'SCN',
 						domain:'http://opmzmyurr.bkt.clouddn.com',
-						key:'testqiniuImage1.png',
+						key:that.imagekey,
 						uptokenURL:'https://www.passingjoy.com/test/wechat/auth/uptoken/'
 						// uptoken:that.uptoken
 					},(res)=>{

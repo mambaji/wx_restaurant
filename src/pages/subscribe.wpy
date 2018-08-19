@@ -178,7 +178,8 @@ export default class Subscribe extends wepy.page{
 				fCustName:name,
 				fPeopleNum:num,
 				fTableNum:'',
-				fCustId:custId
+				fCustId:custId,
+				fStatus:0
 			},
 			method:'POST'
 		});

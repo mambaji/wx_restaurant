@@ -295,7 +295,7 @@
 	<view style="height:{{wheight-45}}px;">
 	<scroll-view class="scroll_content" scroll-y style="padding:3%;height:{{wheight-45}}px">
 		<!-- 当店自取 -->
-			<view class="switch_btn" wx:if="{{this.type!=0}}">
+			<view class="switch_btn" wx:if="{{type!=0}}">
 				<text>到店自取</text><switch bindchange="onSwitchChange"/>
 			</view>
 		<!-- 预约时间 -->
@@ -420,11 +420,11 @@ export default class CommitOrder extends wepy.page{
 		shopCart:[],
 		isGetFood:false,
 		getTime:'',
-		getphone:'13670316633'
+		getphone:''
 	}
 
 	onLoad(option){
-		console.log("onLoad");
+			console.log("onLoad");
 			this.shopId = wepy.getStorageSync(SHOPID)||{};
 			this.custId = wepy.getStorageSync(CUSTID)||{};
 			this.token = wepy.getStorageSync(TOKEN)||{};
@@ -437,6 +437,7 @@ export default class CommitOrder extends wepy.page{
 			this.wheight = systemInfo.windowHeight;
 			
 			this.type = option.type;
+			console.log("type",this.type)
 			this.payType = option.payType;
 			this.tableNo = option.tableNo;
 			if(this.tableNo==undefined){
@@ -445,8 +446,6 @@ export default class CommitOrder extends wepy.page{
 			this.shopCart = wepy.getStorageSync(SHOP_CART)||{};
 			console.log("tableNo===",this.tableNo);
 
-		var datetime = util.getCurrentTime().split(" ");
-		this.getTime = datetime[1];			
 	}
 
 	onShow(){
@@ -523,7 +522,7 @@ export default class CommitOrder extends wepy.page{
 			});
 			console.log("getShopMsg===",json);
 			if(json.data.code == 0){
-				this.shopInfo = json.data.data;
+				this.shopInfo = json.data.data[0];
 			}else{
 				tip.error("网络连接失败!");
 			}
@@ -551,6 +550,8 @@ export default class CommitOrder extends wepy.page{
 		}
 
 		onSwitchChange(e){
+			var datetime = util.getCurrentTime().split(" ");
+			this.getTime = datetime[1];	
 			this.isGetFood = e.detail.value
 			if(e.detail.value){
 				this.type = 2
@@ -620,7 +621,8 @@ export default class CommitOrder extends wepy.page{
 					fCouponPrice:0,
 					fOrderNo:orderNo,
 					fTable:0,
-					fDate:currentDate
+					fDate:currentDate,
+					fGetTime:this.getTime
 				},
 				method:'POST'
 			});

@@ -118,7 +118,7 @@
 	</view>
 	<view class="middle_container" > 
 		<repeat for="{{goodsData}}" key="index" index="index" item="item">
-			<view class="pro_list" @tap="goProDetail">
+			<view class="pro_list" @tap="goProDetail" data-item="{{item}}">
 				<view class="list_top">
 					<image class="goodsPic" src="{{item.fGoodsImg}}"></image>
 					<view class="goodsName">{{item.fName}}</view>
@@ -209,7 +209,7 @@ export default class AdminProManager extends wepy.page{
 		if(index == 0){
 			index = ''
 		}else{
-			index = this.categoryList[index].fListId;
+			index = this.categoryList[index-1].fListId;
 		}
 		this.categoryId = index;
 		this.getFoodListMsg();
@@ -256,6 +256,7 @@ export default class AdminProManager extends wepy.page{
 			
 		},
 		goProDetail(e){
+			wepy.setStorageSync('goodMsg',e.currentTarget.dataset.item)
 			wx.navigateTo({
 				url:'adminProDetailManager?type=1'
 			})
@@ -319,19 +320,6 @@ export default class AdminProManager extends wepy.page{
 				tip.error(json.data.msg);
 				return;
 			}
-			this.$apply();
-		}
-
-		bindPickerChange(e){
-			this.index = e.detail.value;
-			if(this.index == 0){
-				//分类选择‘全部’
-				this.categoryId = '';
-			}else{
-				this.categoryId = this.categoryList[this.index-1].fListId;	
-			}
-			//获取商品列表
-			this.getFoodListMsg(this.categoryId);
 			this.$apply();
 		}
 }

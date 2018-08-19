@@ -9,7 +9,7 @@
   	 	color: transparent;
 	}
 	.top_box{
-		height:230rpx;
+		height:80rpx;
 	}
 	.top_container{
 		background:#413d3c;
@@ -126,7 +126,18 @@
 			left:40rpx;
 			top:15rpx;
 		}
-		.btn_balance{
+		.btn_balance_wx{
+			float:right;
+			background:#62b900;
+			font-size:30rpx;
+			height:90rpx;
+			line-height:90rpx;
+			width:170rpx;
+			text-align:center;
+			font-weight:600;
+			color:#333;
+		}
+		.btn_balance_cash{
 			float:right;
 			background:#ffc400;
 			font-size:30rpx;
@@ -136,7 +147,7 @@
 			text-align:center;
 			font-weight:600;
 			color:#333;
-		}
+		}		
 
 		.shopcart_num_redpoint{
 			float:left;
@@ -426,25 +437,25 @@
 <template>
 	<!-- 顶部 -->
 	<view class="top_box">
-		<view class="top_container">
+<!-- 		<view class="top_container">
 			<image class="shopImg" src="{{shopInfo.fLogo}}"></image>
 			<view class="shopName">{{shopInfo.fName}}</view>
 			<view class="shopTime">营业时间：{{shopInfo.openTime}}</view>
 			<view class="shopPackPrice">包装费：￥{{shopInfo.fPackPrice}}元</view>
 			<view class="shopStartPrice">起送价：￥{{shopInfo.fStartPrice}}元</view>
-		</view>
+		</view> -->
 		<view class="top_tab textcolor1"><text>菜单</text></view>
 	</view>
 	<!-- 中间 -->
-	<view class="content_box" style="height:{{windowHeight-170}}px">
+	<view class="content_box" style="height:{{windowHeight-95}}px">
 		<!-- 左侧菜单 -->
-		<scroll-view class="category_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-170}}px">
+		<scroll-view class="category_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-95}}px">
 			<view class="name text_overflow {{item.active?'active':''}}" wx:for="{{categoryList}}" wx:key="item" @tap="onChangeCategory" data-id="{{item.fListId}}" data-index="{{index}}">
 				<text>{{item.fListName}}</text>
 			</view>
 		</scroll-view>
 		<!-- 右侧菜单 -->
-		<scroll-view class="food_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-170}}px">
+		<scroll-view class="food_box" scroll-y scroll-with-animation="true" style="height:{{windowHeight-95}}px">
 			<view class="category_name">{{categoryName}}</view>
 			<view class="food_list">
 				<view class="food_item" wx:for="{{foodMsgList}}" wx:for-item="item" wx:key="index" data-index="{{index}}" @tap="showM">
@@ -476,13 +487,14 @@
 		<view class="{{allPrice==0||allPrice==undefined?'pic_shopcart_bg_null':'pic_shopcart_bg'}}"><image class="pic_shopcart" src="../images/icon_shop_cart.png"></image></view>
 		<view class="shopcart_num_redpoint" wx:if="{{allPrice==0||allPrice==undefined?false:true}}">{{allProNum}}</view>
 		<text class="all_price">{{allPrice==0||allPrice==undefined?'':'￥'+allPrice}}</text>
-		<text class="distributionPrice">另需配送费{{shopInfo.fDistributionPrice}}元</text>
-		<text class="btn_balance" @tap="onBalance">结算</text>
+<!-- 		<text class="distributionPrice">另需配送费{{shopInfo.fDistributionPrice}}元</text> -->
+		<text class="btn_balance_cash" @tap="onBalance" data-paytype="0">现金支付</text>
+		<text class="btn_balance_wx" @tap="onBalance" data-paytype="1">微信支付</text>
 	</view>
 	<!-- 商品信息弹窗 -->
 	<foodMsgModal :modal.sync="modalItem" @msgModal.user="onMsgModal" wx:if="{{showMsgModal}}"></foodMsgModal>
 	<!-- 商品属性弹窗 -->
-	<foodAttrModal :attrMsgList.sync="attrMsgList" :shopCart.sync="shopCart" :goodsMsg.sync="goodsMsg" @attrModal.user="onAttrModal" @addShopCart.user="onAttrAddShopCart" @attrAddProNum.user="attrAddProNum" @attrReduceProNum.user="attrReduceProNum" wx:if="{{showAttrModal}}"></foodAttrModal>
+	<foodAttrModal @attrModal.user="onAttrModal" @addShopCart.user="onAttrAddShopCart" @attrAddProNum.user="attrAddProNum" @attrReduceProNum.user="attrReduceProNum" wx:if="{{showAttrModal}}"></foodAttrModal>
 </template>
 
 <script>
@@ -502,7 +514,7 @@ import FoodAttrModal from '../components/food_attr_modal'
 import tip from '@/utils/tip'
 export default class foodMsgModal extends wepy.page{
 	config = {
-		navigationBarTitleText:'外卖',
+		navigationBarTitleText:'点餐',
 		navigationBarBackgroundColor: '#413d3c',
 		navigationBarTextStyle: 'white'
 	}
@@ -525,6 +537,7 @@ export default class foodMsgModal extends wepy.page{
 
 		allPrice:'',
 		allProNum:'',
+		tableNo:'',
 
 		showMsgModal:false,
 		showAttrModal:false,
@@ -538,7 +551,8 @@ export default class foodMsgModal extends wepy.page{
 		isGoodsNum:false,//判断购物车中是否有该商品的数量
 	}
 
-	onLoad(){
+	onLoad(opts){
+		this.tableNo = opts.tableNo;//获取桌号
 		this.shopId = wepy.getStorageSync(SHOPID)||{};
 		this.getCategoryList();
 		console.log(this.showMsgModal);
@@ -596,7 +610,8 @@ export default class foodMsgModal extends wepy.page{
 			query:{
 				fShopId:this.shopId,
 				fGoodsListId:2,
-				fGoodsName:''
+				fGoodsName:'',
+				fGoodsId:''
 			}
 		})
 		console.log("getFoodMsgList===",json);
@@ -712,6 +727,7 @@ export default class foodMsgModal extends wepy.page{
 		if(isattr){
 			this.$invoke("foodAttrModal","setAttrItem",this.showAttrModal,scItem);
 		}
+		this.$invoke("foodAttrModal","refreshShopCartList",this.shopCart);
 		console.log("onAddShopCart===");
 		this.countShopCart();
 	}
@@ -832,6 +848,7 @@ export default class foodMsgModal extends wepy.page{
 		}
 
 			this.showAttrModal = true;
+			this.$invoke("foodAttrModal","refreshAttrList",this.attrMsgList)
 			this.$invoke("foodAttrModal","setAttrItem",this.showAttrModal,attrListItem);
 		console.log("setAttrItemActive==");
 		this.$apply();
@@ -952,6 +969,9 @@ export default class foodMsgModal extends wepy.page{
 				this.attrMsgList = this.categoryList[this.curCategoryActiveIndex].fGoodsList[this.curGoodsListIndex].fAttrList;
 				this.setAttrItemActive(goodsId,basePrice,goodsName);
 			}
+			this.$invoke("foodAttrModal","refreshGoodsMsgList",this.goodsMsg);
+			this.$invoke("foodAttrModal","refreshShopCartList",this.shopCart);
+
 		},
 		onAttrAddShopCart(attrListItem,isGoodsAdd,isAdd){
 			this.onAddShopCart(attrListItem,isGoodsAdd,isAdd,true);
@@ -966,6 +986,7 @@ export default class foodMsgModal extends wepy.page{
 			
 		},
 		onBalance(e){
+			let payType = e.currentTarget.dataset.paytype;
 			if(this.shopCart.length == 0){
 				tip.toast("购物车不能为空！");
 				return;
@@ -974,7 +995,7 @@ export default class foodMsgModal extends wepy.page{
 			wepy.setStorageSync(ADDRESS_ID,'');//初始化 addressId,为下个页面所用
 			console.log("结算 购物车中的商品:",this.shopCart);
 			wx.navigateTo({
-				url: 'commitOrder?type=1'
+				url: 'commitOrder?type=0&payType='+payType+'&tableNo='+this.tableNo
 			})
 		}
 	}

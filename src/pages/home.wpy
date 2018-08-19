@@ -13,7 +13,7 @@
 	    	<text class="notice">{{notice}}</text>
     	</view>
 			<i class="iconfont icon-home-notice" @tap="onNoticecover"></i>			
-			<image class="logo" src="../images/lamian_logo.jpg"></image>
+			<image class="logo" src="{{shop_logo}}"></image>
 			<view class="shopName textsize1">{{shop_name}}</view>
 		</view>
 
@@ -180,9 +180,11 @@
 	.shopName{
 		position:absolute;
 		color:#fff;
+		width:30vw;
 		font-weight:500;
-		top:26vw;
-		left:40vw;
+		top:27vw;
+		left:50%;
+		margin-left:-15vw;
 	}
 
 	.middle_box{
@@ -379,8 +381,8 @@ export default class Home extends wepy.page{
 		console.log(json);
 		if(json.data.code == 0){
 			//请求成功
-			let data = json.data.data;
-			that.open_time = data.fOpenTime;
+			let data = json.data.data[0];
+			that.open_time = data.fOpenTime+'-'+data.fCloseTime;
 			that.phone = data.fPhone;
 			wepy.setStorageSync(SHOPPHONE,that.phone);//保存商家手机号码，用于其它页面可直接获取
 			that.address = data.fAddress;
@@ -388,6 +390,7 @@ export default class Home extends wepy.page{
 			that.latitude = data.fAddressX;
 			that.longitude = data.fAddressY;
 			this.notice = data.fNotice;
+			this.shop_logo = data.fLogo;
 
 			if(this.notice==null||this.notice==''){
 				this.notice = that.shop_name+"没啥可说的..."
@@ -414,17 +417,19 @@ export default class Home extends wepy.page{
 		//店内点单
 		onOrder(e){
 			let tableNum = 1
-    				wx.navigateTo({
-    					url: 'foodMenuOrder?tableNum='+tableNum
-    				})
-    				return			
+    				// wx.navigateTo({
+    				// 	url: 'foodMenuOrder?tableNum='+tableNum
+    				// })
+    				// return			
 			wx.scanCode({
   				onlyFromCamera: true,
   				scanType:'qCode',
   				success:(res)=>{
     				console.log("扫描桌面二维码success：",res);
     				let tableNum = res.result;
-
+      				wx.navigateTo({
+    					url: 'foodMenuOrder?tableNo='+tableNum
+    				})
   				},
   				fail:(res)=>{
   					console.log("扫描桌面二维码fail:",res);

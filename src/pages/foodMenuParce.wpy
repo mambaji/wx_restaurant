@@ -451,7 +451,7 @@
 					<image class="food_image" src="{{item.fGoodsImg}}"></image>
 					<view class="food_name">{{item.fName}}</view>
 					<view class="food_desc">{{item.fGoodsNote}}</view>
-					<view class="food_msg">月售{{item.fSellNum}}</view>
+					<view class="food_msg">月售 {{item.fSellNum==null?0:item.fSellNum}}</view>
 					<view class="food_minprice">￥{{item.fBaseAmount}}<text class="food_originalPrice">{{item.fOldPrice==0||item.fOldPrice==undefined?"":'￥'+item.fOldPrice}}</text></view>
 					<!-- 商品有属性规格 -->
 					<view class="chose_attr type_theme_color" data-index="{{index}}" data-id="{{item.fGoodsId}}" data-price="{{item.fBaseAmount}}" data-name="{{item.fName}}" wx:if="{{item.fAttrNum>0}}" @tap.stop="onShowAttrModal">选规格</view>
@@ -500,7 +500,7 @@ import{
 import FoodMsgModal from '../components/food_msg_modal'
 import FoodAttrModal from '../components/food_attr_modal'
 import tip from '@/utils/tip'
-export default class foodMsgModal extends wepy.page{
+export default class foodMenuParce extends wepy.page{
 	config = {
 		navigationBarTitleText:'外卖',
 		navigationBarBackgroundColor: '#413d3c',
@@ -641,7 +641,7 @@ export default class foodMsgModal extends wepy.page{
 		});
 		console.log("getShopMsg===",json);
 		if(json.data.code == 0){
-			this.shopInfo = json.data.data;
+			this.shopInfo = json.data.data[0];
 		}else{
 			tip.error("网络连接失败!");
 		}
