@@ -590,6 +590,7 @@ export default class CommitOrder extends wepy.page{
 			}
 			for(let i = 0 ;i<this.shopCart.length;i++){
 				this.shopCart[i].fEntryId = i+1;
+				this.shopCart[i].fOrderNo = orderNo
 			}
 			let status = 1;//0:待支付；1:已支付,待确认；2:待配送；3：配送中；4：已完成；5：已取消；6：已确认，待上菜
 			if(this.remark==''){
