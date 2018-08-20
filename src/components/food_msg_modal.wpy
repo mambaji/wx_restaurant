@@ -86,13 +86,13 @@
 <template>
 	<view class="mask" catchtouchmove="preventTouchMove" @tap="touchMask" wx:if="{{showMsgModal}}" ></view>
 	<view class="modalDlg" wx:if="{{showMsgModal}}">
-	<image class="modal_img" src="{{modal.fGoodsImg}}" />
+	<image class="modal_img" src="{{modal.fGoodsImg}}" mode="aspectFill" />
 	<text class="modal_name">{{modal.fName}}</text>
-	<text class="modal_num">月售 <text class="numorder">{{modal.fSellNum}}</text></text>
+	<text class="modal_num">月售 <text class="numorder">{{modal.fSellNum==null?'0':modal.fSellNum}}</text></text>
 	<view class = "modal_bottom">
 		<text class="modal_minPrice">￥{{modal.fBaseAmount}}</text>
 		<text class="modal_originPrice">{{modal.fOldPrice==0||modal.fOldPrice==undefined?"":'￥'+modal.fOldPrice}}</text>
-		<view class="modal_chose_attr type_theme_color" data-id="{{modal.fGoodsId}}" @tap="getAttrMsgList">选规格</view>
+		<!-- <view class="modal_chose_attr type_theme_color" data-id="{{modal.fGoodsId}}" @tap="getAttrMsgList">选规格</view> -->
 	</view>
 	</view>
 </template>

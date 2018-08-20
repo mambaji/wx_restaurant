@@ -205,7 +205,7 @@
 			<view wx:if="{{!isImage}}" @tap = "onUploadImage">
 				<i class="iconfont icon-add"></i>
 			</view>
-			<image class="goodsPic" @tap = "onUploadImage" wx:if="{{isImage}}" src="{{imageURL}}"></image>
+			<image class="goodsPic" mode="aspectFill" @tap = "onUploadImage" wx:if="{{isImage}}" src="{{imageURL}}"></image>
 		</view>
 		<view class="goodsAttr" @tap="goAttr" wx:if="{{isGoodsSave}}">
 			<text>商品规格</text>
@@ -269,6 +269,7 @@ export default class AdminProDetailManager extends wepy.page{
 			this.oldPrice = goodMsg.fOldPrice
 			this.imageURL = goodMsg.fGoodsImg
 			this.goodsId = goodMsg.fGoodsId
+			this.categoryId = goodMsg.fGoodsListId
 			if(this.imageURL!=''){
 				this.isImage = true
 			}
@@ -308,9 +309,11 @@ export default class AdminProDetailManager extends wepy.page{
 			return;
 		}
 
-		if(this.type == 0){
+		let json={};
+
+		if(this.type == '商品添加'){
 			//商品添加
-			const json = await api.addGoods({
+			json = await api.addGoods({
 				query:{
 					token:that.token,
 					fShopId:that.shopId,
@@ -320,26 +323,29 @@ export default class AdminProDetailManager extends wepy.page{
 					fGoodsNote:goodsDesc,
 					fBaseAmount:goodsPrice,
 					fOldPrice:oldPrice,
-					fLable:type_id,
+					fLabel:type_id,
 					fStatus:1,
 				},
 				method:'POST'
 			});
 		}else{
 			//商品编辑
-		const json = await api.updateGoods({
+		
+		json = await api.updateGoods({
 			query:{
 				token:that.token,
-				fShopId:that.shopId,
-				fGoodsId:that.goodsId,
-				fGoodsListId:categoryId,
-				fName:goodsName,
-				fGoodsImg:pic,
-				fGoodsNote:goodsDesc,
-				fBaseAmount:goodsPrice,
-				fOldPrice:oldPrice,
-				fLable:type_id,
-				fStatus:1,
+				data:{
+					fShopId:that.shopId,
+					fGoodsId:that.goodsId,
+					fGoodsListId:categoryId,
+					fName:goodsName,
+					fGoodsImg:pic,
+					fGoodsNote:goodsDesc,
+					fBaseAmount:goodsPrice,
+					fOldPrice:oldPrice,
+					fLabel:type_id,
+					fStatus:1,
+				}
 			},
 			method:'POST'
 		});
@@ -377,8 +383,11 @@ export default class AdminProDetailManager extends wepy.page{
 			}
 			for(let i =0;i<that.categoryList.length;i++){
 				that.category.push(that.categoryList[i].fListName);
+				if(this.type=='商品编辑' && that.categoryList[i].fListId == that.categoryId){
+					this.index = i
+				}
 			}
-			console.log("category===",that.category);
+			console.log("category===",that.category,this.index);
 			this.$apply();
 		}
 

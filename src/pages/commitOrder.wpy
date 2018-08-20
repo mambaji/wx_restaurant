@@ -598,6 +598,9 @@ export default class CommitOrder extends wepy.page{
 
 			let currentDate = util.getCurrentTime();
 			console.log("当前下单时间:",currentDate);
+			if(this.getTime==''){
+				this.getTime = null
+			}
 
 			const json = await api.submitOrder({
 				query:{

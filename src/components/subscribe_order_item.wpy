@@ -81,7 +81,8 @@
 				<view class="num">人数：{{item.fPeopleNum}}</view>
 				<!-- <text class="option">取消预约</text> -->
 				<view class="order_list_footer" wx:if="{{item.fStatus==0}}">
-					<view class="option_btn" id="btn_pay" data-id="{{item.fId}}" data-index="{{index}}" @tap.stop="onCancelSub">取消预约</view>
+					<view class="option_btn" id="btn_pay" data-id="{{item.fId}}" data-status="-1" data-index="{{index}}" @tap.stop="onUpdateStatus">取消预约</view>
+					<view class="option_btn" wx:if="{{type==0}}" id="btn_pay" data-id="{{item.fId}}" data-status="1" data-index="{{index}}" @tap.stop="onUpdateStatus">已到店</view>
 				</view>	
 			</view>
 		</repeat>
@@ -129,6 +130,25 @@ export default class subscribeOrderItem extends wepy.component{
 			}else{
 				tip.toast("取消预约失败!")
 			}
+		},
+		async onUpdateStatus(e){
+			let status = e.currentTarget.dataset.status
+			let index = e.currentTarget.dataset.index
+			let id = e.currentTarget.dataset.id
+			let token = wepy.getStorageSync(TOKEN)||{}	
+			const json = await api.updateStatusRecord({
+				query:{
+					token:token,
+					fId:id,
+					fStatus:status
+				},
+				method:'POST'
+			})
+			console.log("onUpdateStatus",json)
+			if(json.data.code==0){
+				this.subscribeList[index].fStatus = status
+			}
+			this.$apply()
 		}
 
 	}

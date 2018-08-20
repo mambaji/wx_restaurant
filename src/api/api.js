@@ -62,6 +62,9 @@ const getRecord = (params) => wxRequest(params,apiTHost+'/record/get/');
 //取消预约记录
 const cancelRecord = (params) =>wxRequest(params,apiTHost+'/record/cancel/');
 
+//更新预约状态
+const updateStatusRecord = (params) =>wxRequest(params,apiTHost+'/record/revise/');
+
 //删除用户收货地址
 // const deleteAddress = (params) => wxRequest(params,apiHost+'/user/shipping-address/delete');
 const deleteAddress = (params) => wxRequest(params,apiTHost+'/address/del/');
@@ -123,7 +126,7 @@ const updateGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/attribute/re
 const delGoodsAttribute = (params) =>wxRequest(params,apiTHost+'/attribute/del/');
 
 //获取后台商品信息
-const getShopGoods = (params) => wxRequest(params,apiTHost+'/goods/list/');
+const getShopGoods = (params) => wxRequest(params,apiTHost+'/goods/wx/');
 
 
 
@@ -161,5 +164,6 @@ export default {
   getShopGoods,
   delImage,
   adminLogin,
-  cancelRecord
+  cancelRecord,
+  updateStatusRecord
 }

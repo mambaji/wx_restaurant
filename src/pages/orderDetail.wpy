@@ -213,6 +213,7 @@
 		<view class="order_msg">
 			<view class="title_value">订单号码<text>{{orderListItem.fOrderNo}}</text></view>
 			<view class="title_value">订单时间<text>{{orderListItem.fDate}}</text></view>
+			<view class="title_value" wx:if="{{orderListItem.ftype==2}}">取餐时间<text>{{orderListItem.fGetTime}}</text></view>
 			<view class="title_value">支付方式<text>{{orderListItem.fPayType==0?'现金支付':'微信支付'}}</text></view>
 			<view class="title_value">订单备注<text>{{orderListItem.fNote}}</text></view>			
 		</view>

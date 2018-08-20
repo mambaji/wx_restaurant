@@ -97,11 +97,11 @@
 		background:#ffc400;
 		border-radius:360rpx;
 		text-align:center;
-		font-size:24rpx;
+		font-size:40rpx;
 		z-index:9999;
 		bottom:40rpx;
 		right:40rpx;
-		color:#000;
+		color:#fff;
 		font-weight:600;
 	}
 </style>
@@ -120,7 +120,7 @@
 		<repeat for="{{goodsData}}" key="index" index="index" item="item">
 			<view class="pro_list" @tap="goProDetail" data-item="{{item}}">
 				<view class="list_top">
-					<image class="goodsPic" src="{{item.fGoodsImg}}"></image>
+					<image class="goodsPic" mode="aspectFill" src="{{item.fGoodsImg}}"></image>
 					<view class="goodsName">{{item.fName}}</view>
 				</view>
 				<view class="list_footer">
@@ -132,7 +132,7 @@
 			</view>
 		</repeat>
 	</view>
-	<view class="addPro" @tap="addPro">添加</view>
+	<view class="addPro" @tap="addPro">+</view>
 
 
 </template>

@@ -35,7 +35,7 @@
 			color:#ccc;
 			font-size:26rpx;
 			top:60rpx;
-			left:-120rpx;
+			left:-140rpx;
 		}
 		.shopPackPrice{
 			color:#ccc;
@@ -44,7 +44,7 @@
 			color:#ccc;
 			font-size:26rpx;
 			top:70rpx;
-			left:-120rpx;
+			left:-140rpx;
 
 		}
 		.shopStartPrice{
@@ -448,7 +448,7 @@
 			<view class="category_name">{{categoryName}}</view>
 			<view class="food_list">
 				<view class="food_item" wx:for="{{foodMsgList}}" wx:for-item="item" wx:key="index" data-index="{{index}}" @tap="showM">
-					<image class="food_image" src="{{item.fGoodsImg}}"></image>
+					<image class="food_image" mode="aspectFill" src="{{item.fGoodsImg}}"></image>
 					<view class="food_name">{{item.fName}}</view>
 					<view class="food_desc">{{item.fGoodsNote}}</view>
 					<view class="food_msg">月售 {{item.fSellNum==null?0:item.fSellNum}}</view>

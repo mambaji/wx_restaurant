@@ -230,7 +230,8 @@ export default class List extends wepy.page{
 			query:{
 				fShopId:1,
 				fEntryId:that.listNum,
-				fStatus:-1
+				fStatus:-1,
+				fTableNo:null
 			},
 			method:'POST'
 		});
