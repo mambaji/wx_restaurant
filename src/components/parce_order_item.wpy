@@ -118,13 +118,13 @@
 					</view>
 					<!-- 用户端 type==1 -->
 					<view class="order_list_footer" wx:if="{{type==1}}">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}" @tap.stop="payMoney">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}" data-index="{{index}}" data-item="{{item}}" @tap.stop="payMoney">
 							立即支付
 						</view>
-						<view class="option_btn" id="btn_cancel" data-status="5" data-index="{{index}}" @tap.stop="updateOrderStatus" wx:if="{{item.fStatus==0||item.fStatus==1||item.fStatus==2}}">
+						<view class="option_btn" id="btn_cancel" data-status="5" data-index="{{index}}" data-item="{{item}}" @tap.stop="updateOrderStatus" wx:if="{{item.fStatus==0||item.fStatus==1||item.fStatus==2}}">
 							取消订单
 						</view>						
-						<view class="option_btn" id="btn_comfirm" data-status="4" data-index="{{index}}" @tap.stop="updateOrderStatus" wx:if="{{item.fStatus==3}}">
+						<view class="option_btn" id="btn_comfirm" data-status="4" data-index="{{index}}" data-item="{{item}}" @tap.stop="updateOrderStatus" wx:if="{{item.fStatus==3}}">
 							确认收货
 						</view>						
 					</view>
@@ -215,6 +215,7 @@ export default class parceOrderItem extends wepy.component{
 		async updateOrderStatus(e){
 			let that = this;
 			let item = e.currentTarget.dataset.item;
+			console.log("orderitem===",item)
 			let optstatus = e.currentTarget.dataset.status;
 			let index = e.currentTarget.dataset.index;
 			const json = await api.updateOrderStatus({

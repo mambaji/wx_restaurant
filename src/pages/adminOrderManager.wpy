@@ -147,7 +147,11 @@ export default class AdminOrderManager extends wepy.page{
 				this.is_empty = false;
 			}
 			for(let i = 0; i<this.orderList.length;i++){
-				this.orderList[i].fDate = this.orderList[i].fDate.replace("T"," ");
+				if(this.orderList[i].fDate != null){
+					this.orderList[i].fDate = this.orderList[i].fDate.replace("T"," ");
+				}else{
+					this.orderList[i].fDate == ''
+				}
 				this.orderList[i].goodsData = [];
 				if(this.orderList[i].fUnionName == null){
 					continue;

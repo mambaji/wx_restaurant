@@ -359,6 +359,7 @@ export default class Home extends wepy.page{
 	async onLoad(){
 		wx.getSystemInfo({
 			success:function(res){
+				
 				var version = res.SDKVersion;
 				version = version.replace(/\./g,"")
 				console.log("version===",version)

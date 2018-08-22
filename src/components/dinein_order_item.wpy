@@ -114,7 +114,7 @@
 					</view>
 					<!-- 用户端 type==1-->
 					<view class="order_list_footer" wx:if="{{type==1}}">
-						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0}}" data-optstatus="1" data-item="{{item}}" data-index="{{index}}" @tap.stop="payMoney">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0&&item.fPayType==1}}" data-optstatus="1" data-item="{{item}}" data-index="{{index}}" @tap.stop="payMoney">
 							立即支付
 						</view>
 						<view class="option_btn" id="btn_cancel" wx:if="{{item.fStatus==0}}" data-optstatus="5" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
@@ -123,6 +123,9 @@
 					</view>
 					<!-- 商户端 type==0-->
 					<view class="order_list_footer" wx:if="{{type==0}}">
+						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==0&&item.fPayType==0}}" data-optstatus="6" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
+							已支付
+						</view>						
 						<view class="option_btn" id="btn_pay" wx:if="{{item.fStatus==1}}" data-optstatus="6" data-item="{{item}}" data-index="{{index}}" @tap.stop="updateOrderStatus">
 							确认订单
 						</view>

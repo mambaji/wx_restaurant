@@ -593,6 +593,9 @@ export default class CommitOrder extends wepy.page{
 				this.shopCart[i].fOrderNo = orderNo
 			}
 			let status = 1;//0:待支付；1:已支付,待确认；2:待配送；3：配送中；4：已完成；5：已取消；6：已确认，待上菜
+			if(this.payType == 0){
+				status = 0
+			}
 			if(this.remark==''){
 				this.remark = null;
 			}
@@ -619,9 +622,9 @@ export default class CommitOrder extends wepy.page{
 					fReductionPrice:0,
 					fCouponId:null,
 					fAllAmount:this.allPrice,
-					fPayType:0,
+					fPayType:this.payType,
 					fGoodsData:this.shopCart,
-					fAddressId:this.addressInfo.fId,
+					fAddressId:this.addressInfo==null?null:this.addressInfo.fId,
 					fCouponPrice:0,
 					fOrderNo:orderNo,
 					fTable:0,

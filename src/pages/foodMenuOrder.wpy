@@ -493,6 +493,7 @@ export default class foodMenuParce extends wepy.page{
 	data = {
 		windowHeight:0,
 		shopId:'',
+		tableNo:null,
 
 		categoryList:[],
 		foodMsgList:[],
@@ -516,8 +517,9 @@ export default class foodMenuParce extends wepy.page{
 		isGoodsNum:false,//判断购物车中是否有该商品的数量
 	}
 
-	onLoad(){
+	onLoad(opts){
 		this.shopId = wepy.getStorageSync(SHOPID)||{};
+		this.tableNo = opts.tableNo
 		this.getCategoryList();
 		console.log(this.showMsgModal);
 
@@ -951,6 +953,7 @@ export default class foodMenuParce extends wepy.page{
 		},
 		onBalance(e){
 			let payType = e.currentTarget.dataset.paytype;
+			console.log("支付类型",payType)
 			if(this.shopCart.length == 0){
 				tip.toast("购物车不能为空！");
 				return;

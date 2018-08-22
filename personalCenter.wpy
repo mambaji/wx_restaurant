@@ -1,9 +1,0 @@
-<template>
-	<view class="container">
-		<text>personalCenter</text>
-	</view>
-</template>
-
-<script></script>
-
-<style lang="less"></style>

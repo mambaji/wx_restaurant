@@ -236,22 +236,10 @@ export default class OrderList extends wepy.page{
 		this.shopId = wepy.getStorageSync(SHOPID)||{};
 		this.custId = wepy.getStorageSync(CUSTID)||{};
 		this.token = wepy.getStorageSync(TOKEN)||{};
-		this.getOrderMsg(0,0,9);
-		// this.getSubscribeList();
-		// for(let i = 0;i<10;i++){
-		// 	let item = {}
-		// 	item.fCustName = '小姐'
-		// 	item.fDate = '2018-07-27'
-		// 	item.fDateTime = '2018-07-27 14:04:00'
-		// 	item.fId = 5
-		// 	item.fPeopleNum = 2
-		// 	item.fPhone = 15918881632
-		// 	item.fTableNum = null
-		// 	this.subscribeList.push(item)
-		// }
 	}
 
 	onShow(){
+		this.getOrderMsg(0,0,9);
 	}
 
 	computed = {
