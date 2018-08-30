@@ -13,7 +13,7 @@
 			</getFoodOrderItem>
 			<subscribeOrderItem :subscribeList.sync="subscribeList" :type.sync="type" wx:if="{{currentTab==3}}"></subscribeOrderItem>
 			<!-- 暂无数据显示 -->
-			<placeholder :show.sync="is_empty" message="暂无发现数据"></placeholder>
+			<placeholder wx:if="{{is_empty}}" :show.sync="is_empty" message="暂无发现数据"></placeholder>
 		</scroll-view>	
 		</view>
 </template>
@@ -130,6 +130,9 @@ export default class OrderList extends wepy.page{
 		});
 		console.log("getOrderMsg===",json)
 		if(json.data.code == 0){
+			if(json.data.data.length==1&&json.data.data[0].fOrderNo==null){
+				json.data.data = []
+			}
 			if(that.currentPage == 1){
 				//刷新
 				that.orderList = json.data.data;
@@ -236,10 +239,11 @@ export default class OrderList extends wepy.page{
 		this.shopId = wepy.getStorageSync(SHOPID)||{};
 		this.custId = wepy.getStorageSync(CUSTID)||{};
 		this.token = wepy.getStorageSync(TOKEN)||{};
+		this.getOrderMsg(0,0,9)
 	}
 
 	onShow(){
-		this.getOrderMsg(0,0,9);
+		// this.getOrderMsg(0,0,9);
 	}
 
 	computed = {

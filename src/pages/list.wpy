@@ -166,10 +166,27 @@ export default class List extends wepy.page{
 
 	onHide(){
 		clearTimeout(this.timer);
+		this.onCancelList()
 	}
 
 	onUnload(){
 		clearTimeout(this.timer);
+		this.onCancelList()
+      	// wx.showModal({
+       //  	title: title,
+       //  	content: text,
+       //  	showCancel: true,
+       //  	success: res => {
+       //    		if (res.confirm) {
+       //    			clearTimeout(this.timer);
+       //    		} else if (res.cancel) {
+
+       //    		}
+       //  	},
+       //  	fail: res => {
+    	  //   }
+      	// });
+		
 	}
 
 	//获取排队号码
@@ -191,9 +208,7 @@ export default class List extends wepy.page{
 		}else{
 			tip.toast("开始排队失败");
 		}
-
 		// this.listNum = Math.ceil(Math.random()*1000);  
-		
 	}
 
 	//获取当前排队人数，轮询监控

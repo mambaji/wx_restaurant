@@ -12,8 +12,6 @@
 			<getFoodOrderItem :orderList.sync="orderList" :type.sync="type" wx:if="{{currentTab==2}}">
 			</getFoodOrderItem>			
 			<subscribeOrderItem :subscribeList.sync="subscribeList" :type.sync="type" wx:if="{{currentTab==3}}"></subscribeOrderItem>
-			<!-- 加载更多 -->
-			<bottomLoadMore :show.sync="showLoading" message="正在加载"></bottomLoadMore>
 			<!-- 暂无数据显示 -->
 			<placeholder :show.sync="is_empty" message="暂无发现数据"></placeholder>
 		</scroll-view>	
@@ -35,7 +33,6 @@ import ParceOrderItem from '@/components/parce_order_item'
 import SubscribeOrderItem from '@/components/subscribe_order_item'
 import GetFoodOrderItem from '@/components/getfood_order_item'
 // import OrderItem from '@/components/order_item' //订单列表组件
-import BottomLoadMore from '../components/common/bottomLoadMore' //底部加载更多组件
 import PlaceHolder from '../components/common/placeholder' //空列表显示组件
 export default class AdminOrderManager extends wepy.page{
 	config = {
@@ -44,7 +41,6 @@ export default class AdminOrderManager extends wepy.page{
 	components = {
 		tab: Tab, 
 		// orderItem: OrderItem,s
-		bottomLoadMore: BottomLoadMore,
 		placeholder: PlaceHolder,
 		dineinOrderItem:DineinOrderItem,
 		parceOrderItem:ParceOrderItem,

@@ -145,12 +145,12 @@ export default class PersonalCenter extends wepy.page{
 		},
 		goAdmin(){
 			wepy.navigateTo({
-				url:'/pages/adminHome'
+				url:'/packageA/pages/adminHome'
 			})			
 		},
 		goAdminLogin(){
 			wepy.navigateTo({
-				url:'/pages/adminLogin'
+				url:'/packageA/pages/adminLogin'
 			})		
 		},
 		goOutLogin(){

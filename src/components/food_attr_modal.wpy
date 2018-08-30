@@ -72,6 +72,7 @@ export default class foodAttrModal extends wepy.component{
 			this.$apply()
 		},
 		refreshGoodsMsgList(val){
+			console.log("refreshGoodsMsgList===",val)
 			if(val==undefined){return}
 			this.goodsMsg = val
 			this.$apply()
@@ -141,33 +142,14 @@ export default class foodAttrModal extends wepy.component{
 			//3.再修改当前的attrListItem内容
 			//4.最后要把attrListItem跟shopCart对比，看购物车中是否有该属性内容
 			this.attrListItem.fBasePrice = this.goodsMsg.fBasePrice;
-			// for(let i = 0;i<this.attrMsgList[pindex].fUnionName.length;i++ ){
-			// 	this.attrMsgList[pindex].fUnionName[i].active = false;
-			// 	if(this.attrMsgList[pindex].fUnionName[i].fItemId==id){
-			// 		this.attrMsgList[pindex].fUnionName[i].active = true;
-			// 		//先计算总价格
-			// 		// this.attrListItem.fBaseAmount+=this.attrMsgList[pindex].fUnionName[i].fAddPrice;
-			// 		console.log("计算总价格:",this.attrMsgList[pindex].fUnionName[i].fAddPrice,this.attrListItem.fBaseAmount);
-			// 		if(pindex==0){
-			// 			this.attrListItem.fAttrType1 = id;
-			// 			this.attrListItem.fAttrPrice1 = this.attrMsgList[pindex].fUnionName[i].fAddPrice;
-			// 		}else if(pindex==1){
-			// 			this.attrListItem.fAttrType2 = id;
-			// 			this.attrListItem.fAttrPrice2 = this.attrMsgList[pindex].fUnionName[i].fAddPrice;
-			// 		}else if(pindex==2){
-			// 			this.attrListItem.fAttrType3 = id;
-			// 		}else if(pindex==3){
-			// 			this.attrListItem.fAttrType4 = id;
-			// 			this.attrListItem.fAttrPrice4 = this.attrMsgList[pindex].fUnionName[i].fAddPrice;
-			// 		}
-			// 	}
-			// }
+
 			//计算改变属性规格后的总价格
 			this.attrListItem.fBaseAmount = this.attrListItem.fBasePrice+(this.attrListItem.fAttrPrice1==undefined?0:this.attrListItem.fAttrPrice1)+(this.attrListItem.fAttrPrice2==undefined?0:this.attrListItem.fAttrPrice2)+(this.attrListItem.fAttrPrice3==undefined?0:this.attrListItem.fAttrPrice3)+(this.attrListItem.fAttrPrice4==undefined?0:this.attrListItem.fAttrPrice4)
 			this.attrListItem.fAllAmount = this.attrListItem.fBaseAmount;
-			this.attrListItem.fNum = 0;
-			this.attrListItem.fGoodsId = this.goodsMsg.fGoodsId;
-			this.attrListItem.fGoodsName = this.goodsMsg.fGoodsName;
+			this.attrListItem.fNum = 0
+			this.attrListItem.fGoodsId = this.goodsMsg.fGoodsId
+			this.attrListItem.fGoodsName = this.goodsMsg.fGoodsName
+			this.attrListItem.fGoodsImg = this.goodsMsg.fGoodsImg
 			//查询购物车中是否有该商品规格属性存在，如果有，则数量和总价跟购物车的一致。
 			for(let i=0;i<this.shopCart.length;i++){
 			//有商品存在并且属性相同
@@ -198,10 +180,12 @@ export default class foodAttrModal extends wepy.component{
 			//调用父级的addShopCart方法
 			this.$emit('addShopCart',this.attrListItem,isGoodsAdd,true);
 		},
-		addProNum(e){
+		addProNum(e){ 
+			console.log("测试attr变动===",this.attrListItem)
 			this.$emit('attrAddProNum',this.attrListItem,true);
 		},
 		reduceProNum(e){
+			console.log("测试attr变动===",this.attrListItem)
 			this.$emit('attrReduceProNum',this.attrListItem,false);
 		}
 	}

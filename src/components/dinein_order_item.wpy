@@ -87,7 +87,7 @@
 			<view class="list">
 				<view class="item_content" @tap="navigatorOrderDetail" data-index="{{index}}" data-item="{{item}}">
 					<view class="order_list_top">
-						<text class="type">{{item.ftype==0?'堂食：'+item.fOrderNo:'外卖：'+item.fOrderNo}}</text>
+						<text class="type">{{item.fType==0?'堂食：'+item.fOrderNo:'外卖：'+item.fOrderNo}}</text>
 						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
 						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
 						<text class="status" wx:if="{{item.fStatus==6}}">已确认，待上菜</text>
@@ -218,7 +218,7 @@ export default class dineinOrderItem extends wepy.component{
     			});	
 			}else{
     			wx.navigateTo({
-    				url: '/pages/adminOrderDetail?orderListItem='+ that.orderList[index]
+    				url: '/packageA/pages/adminOrderDetail?orderListItem='+ that.orderList[index]
     			});	
 			}			
 		}

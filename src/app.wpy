@@ -14,7 +14,6 @@ export default class extends wepy.app {
       'pages/authorize',
       'pages/home',
       'pages/orderList',
-      'pages/adminHome',
       'pages/personalCenter',
       'pages/address',
       'pages/subscribe',
@@ -23,13 +22,28 @@ export default class extends wepy.app {
       'pages/foodMenuOrder',
       'pages/commitOrder',
       'pages/orderDetail',
-      'pages/adminProManager',
-      'pages/adminProDetailManager',
-      'pages/adminProDetailAttrManager',       
-      'pages/adminOrderManager',
-      'pages/adminOrderDetail',
-      'pages/adminLogin'
     ],
+    subPackages:[
+      {
+        root:'packageA',
+        name:'packA',
+        pages:[
+          'pages/adminHome',
+          'pages/adminProManager',
+          'pages/adminProDetailManager',
+          'pages/adminProDetailAttrManager',       
+          'pages/adminOrderManager',
+          'pages/adminOrderDetail',
+          'pages/adminLogin'
+        ]
+      }
+    ],
+    // preloadRule:[
+    //   pages/personalCenter:{
+    //     network:'all',
+    //     packages:["packageA"]
+    //   }
+    // ],
    window: {
       backgroundTextStyle: 'dark',
       navigationBarBackgroundColor: '#FFFFFF',

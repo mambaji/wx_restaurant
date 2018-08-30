@@ -617,7 +617,7 @@ export default class foodMenuParce extends wepy.page{
 		console.log("获取分类下面的商品信息：",this.foodMsgList,this.categoryList);
 	}
 
-	async getAttributeList(goodsId,basePrice,goodsName){
+	async getAttributeList(goodsId,basePrice,goodsName,goodsImg){
 		const json = await api.getAttrMsgList({
 			query:{
 				fGoodsId:goodsId
@@ -627,7 +627,7 @@ export default class foodMenuParce extends wepy.page{
 		if(json.data.code == 0){
 			this.attrMsgList = json.data.data;
 			this.categoryList[this.curCategoryActiveIndex].fGoodsList[this.curGoodsListIndex].fAttrList=this.attrMsgList;
-			this.setAttrItemActive(goodsId,basePrice,goodsName);
+			this.setAttrItemActive(goodsId,basePrice,goodsName,goodsImg);
 		}
 		this.$apply();
 
@@ -642,6 +642,7 @@ export default class foodMenuParce extends wepy.page{
 		console.log("getShopMsg===",json);
 		if(json.data.code == 0){
 			this.shopInfo = json.data.data[0];
+			this.shopInfo.openTime = this.shopInfo.fOpenTime+"-"+this.shopInfo.fCloseTime
 		}else{
 			tip.error("网络连接失败!");
 		}
@@ -762,13 +763,14 @@ export default class foodMenuParce extends wepy.page{
 	/**
 	 * 设置属性的选中值
 	 */
-	setAttrItemActive(goodsId,basePrice,goodsName){
+	setAttrItemActive(goodsId,basePrice,goodsName,goodsImg){
 		let attrListItem = {};
 		attrListItem.fBasePrice = basePrice;
 		attrListItem.fBaseAmount = basePrice;
 		attrListItem.fNum = 0;
 		attrListItem.fGoodsId = goodsId;
 		attrListItem.fGoodsName = goodsName;
+		attrListItem.fGoodsImg = goodsImg
 		console.log("计算前===",basePrice,attrListItem.fBaseAmount);
 		if(!this.isGoodsNum){
 			//购物车没有该商品存在，取该商品各属性类别下面的第一个属性作为默认选中。
@@ -865,7 +867,8 @@ export default class foodMenuParce extends wepy.page{
 
 			let scItem = {};
 			scItem.fGoodsName = goodsItem.fName
-			scItem.fGoodsId = goodsItem.fGoodsId;
+			scItem.fGoodsId = goodsItem.fGoodsId
+			scItem.fGoodsImg = goodsItem.fGoodsImg
 			scItem.fAttrType1 = null;
 			scItem.fAttrType2 = null;
 			scItem.fAttrType3 = null;
@@ -893,6 +896,7 @@ export default class foodMenuParce extends wepy.page{
 			let scItem = {};
 			scItem.fGoodsName = goodsItem.fName;
 			scItem.fGoodsId = goodsItem.fGoodsId;
+			scItem.fGoodsImg = goodsItem.fGoodsImg
 			scItem.fAttrType1 = null;
 			scItem.fAttrType2 = null;
 			scItem.fAttrType3 = null;
@@ -937,9 +941,10 @@ export default class foodMenuParce extends wepy.page{
 			let goodsName = e.currentTarget.dataset.name;
 			console.log("basePrice===",basePrice)
 			this.curGoodsListIndex = index;
-			this.goodsMsg.fGoodsId = this.foodMsgList[this.curGoodsListIndex].fGoodsId;
-			this.goodsMsg.fGoodsName = this.foodMsgList[this.curGoodsListIndex].fName;
-			this.goodsMsg.fBasePrice = this.foodMsgList[this.curGoodsListIndex].fBaseAmount;
+			this.goodsMsg.fGoodsId = this.foodMsgList[this.curGoodsListIndex].fGoodsId
+			this.goodsMsg.fGoodsName = this.foodMsgList[this.curGoodsListIndex].fName
+			this.goodsMsg.fBasePrice = this.foodMsgList[this.curGoodsListIndex].fBaseAmount
+			this.goodsMsg.fGoodsImg = this.foodMsgList[this.curGoodsListIndex].fGoodsImg
 			//判断该商品在购物车中是否有数量
 			if(this.categoryList[this.curCategoryActiveIndex].
 				fGoodsList[this.curGoodsListIndex].num==0){
@@ -949,11 +954,11 @@ export default class foodMenuParce extends wepy.page{
 			}
 			if(this.categoryList[this.curCategoryActiveIndex].fGoodsList[this.curGoodsListIndex].fAttrList==undefined){
 				//没有缓存，调用接口获取属性
-				this.getAttributeList(goodsId,basePrice,goodsName);
+				this.getAttributeList(goodsId,basePrice,goodsName,this.goodsMsg.fGoodsImg);
 			}else{
 				//有缓存，直接取缓存内容
 				this.attrMsgList = this.categoryList[this.curCategoryActiveIndex].fGoodsList[this.curGoodsListIndex].fAttrList;
-				this.setAttrItemActive(goodsId,basePrice,goodsName);
+				this.setAttrItemActive(goodsId,basePrice,goodsName,this.goodsMsg.fGoodsImg);
 			}
 			this.$invoke("foodAttrModal","refreshGoodsMsgList",this.goodsMsg);
 			this.$invoke("foodAttrModal","refreshShopCartList",this.shopCart);

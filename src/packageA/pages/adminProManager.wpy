@@ -125,9 +125,8 @@
 				</view>
 				<view class="list_footer">
 					<view class="btn_delete" data-id="{{item.fGoodsId}}" @tap.stop="optionDelGoods" data-index="{{index}}">删除</view>
-					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="1" wx:if="{{item.fStatus==0}}" data-index="{{index}}">上架</view>
-					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="0" wx:if="{{item.fStatus==1}}" data-index="{{index}}">下架</view>
-					<view class="btn_attr" @tap.stop="goAttr" data-id="{{item.fGoodsId}}">规格管理</view>		
+					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="1" wx:if="{{item.fStatusCode==0}}" data-index="{{index}}">上架</view>
+					<view class="btn_status" @tap.stop="optionStatus" data-id="{{item.fGoodsId}}" data-status="0" wx:if="{{item.fStatusCode==1}}" data-index="{{index}}">下架</view>
 				</view>
 			</view>
 		</repeat>
@@ -184,7 +183,6 @@ export default class AdminProManager extends wepy.page{
 		}
 		this.$apply();
 	}
-
 
 	async onDelGoods(goodsId,index){
 		const json = await api.delGoods({

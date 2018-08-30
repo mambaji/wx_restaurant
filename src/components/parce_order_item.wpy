@@ -89,9 +89,9 @@
 			<view class="list">
 				<view class="item_content" @tap="navigatorOrderDetail" data-index="{{index}}">
 					<view class="order_list_top">
-						<text class="type" wx:if="{{item.ftype==0}}">{{item.fOrderNo}}：堂吃</text>
-						<text class="type" wx:if="{{item.ftype==1}}">{{item.fOrderNo}}：外卖</text>
-						<text class="type" wx:if="{{item.ftype==2}}">{{item.fOrderNo}}：自取</text>
+						<text class="type" wx:if="{{item.fType==0}}">堂吃：{{item.fOrderNo}}</text>
+						<text class="type" wx:if="{{item.fType==1}}">外卖：{{item.fOrderNo}}</text>
+						<text class="type" wx:if="{{item.fType==2}}">自取：{{item.fOrderNo}}</text>
 						<text class="status" wx:if="{{item.fStatus==0}}">待支付</text>
 						<text class="status" wx:if="{{item.fStatus==1}}">已付款，待确认</text>
 						<text class="status" wx:if="{{item.fStatus==2}}">待配送</text>	
@@ -207,7 +207,7 @@ export default class parceOrderItem extends wepy.component{
     			});	
 			}else{
     			wx.navigateTo({
-    				url: '/pages/adminOrderDetail'
+    				url: '/packageA/pages/adminOrderDetail'
     			});	
 			}			
 		},

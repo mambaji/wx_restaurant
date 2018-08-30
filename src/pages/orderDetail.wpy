@@ -171,27 +171,27 @@
 			<view class="list">
 				<image src="{{item.fGoodsImg}}"></image>
 				<view class="name">{{item.fGoodsName}}</view>
-				<view class="amount">￥{{item.fPrice}}</view>
+				<view class="amount">￥{{item.fAllAmount}}</view>
 				<view class="attr">{{item.fAttrType1==null?"":item.fAttrType1}}
 				{{item.fAttrType2==null?"":item.fAttrType2}}{{item.fAttrType3==null?"":item.fAttrType3}}{{item.fAttrType4==null?"":item.fAttrType4}}</view>
 				<view class="num">x{{item.fNum}}</view>
 			</view>
 		</repeat>
 		<view class="order_price_content" >
-			<view class="pack_price" wx:if="{{orderListItem.ftype==1||orderListItem.ftype==2}}">
+			<view class="pack_price" wx:if="{{orderListItem.fType==1||orderListItem.fType==2}}">
 				<view class="text1">餐盒费</view>
 				<view class="text2">￥{{orderListItem.fPackPrice}}</view>
 			</view>
-			<view class="distribute_price" wx:if="{{orderListItem.ftype==1}}">
+			<view class="distribute_price" wx:if="{{orderListItem.fType==1}}">
 				<view class="text1">配送费</view>
 				<view class="text2">￥{{orderListItem.fDistributionPrice}}</view>
 			</view>
 		</view>
 		<view class="discount_content">
-			<view class="discount_price">
+<!-- 			<view class="discount_price">
 				<view class="text1">折扣</view>
 				<view class="text2">￥{{orderListItem.fDiscountPrice}}</view>
-			</view>
+			</view> -->
 			<view class="counpon_price">
 				<view class="text1">优惠</view>
 				<view class="text2">￥{{orderListItem.fReductionPrice}}</view>
@@ -215,7 +215,7 @@
 			<view class="title_value">订单时间<text>{{orderListItem.fDate}}</text></view>
 			<view class="title_value" wx:if="{{orderListItem.ftype==2}}">取餐时间<text>{{orderListItem.fGetTime}}</text></view>
 			<view class="title_value">支付方式<text>{{orderListItem.fPayType==0?'现金支付':'微信支付'}}</text></view>
-			<view class="title_value">订单备注<text>{{orderListItem.fNote}}</text></view>			
+			<view class="title_value">订单备注<text>{{orderListItem.fNote==null?'':orderListItem.fNote}}</text></view>			
 		</view>
 	</view>
 </template>

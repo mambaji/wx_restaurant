@@ -334,7 +334,7 @@
 			<view class="pro_list_top">选购商品</view>
 			<view class="pro_list_content">
 				<view class="pro_list_item" wx:for="{{shopCart}}" wx:for-item="item" wx:key="index">
-					<image class="image" src="{{item.image}}"></image>
+					<image class="image" src="{{item.fGoodsImg}}"></image>
 					<text class="name">{{item.fGoodsName}}</text>
 					<text class="price">￥{{item.fBaseAmount}}</text>
 					<text class="attr">{{item.fAttrName1}}{{item.fAttrName2}}{{item.fAttrName3}}{{item.fAttrName4}}</text>
@@ -346,7 +346,7 @@
 		<!-- 其他费用 -->
 		<view class="order_price" >
 			<text class="package_text" wx:if="{{type==1||type==2}}">包装费</text>
-			<text class="package_price" wx:if="{{type==1||type==2}}">￥{{shop.fPackagePrice}}</text>
+			<text class="package_price" wx:if="{{type==1||type==2}}">￥{{shopInfo.fPackPrice}}</text>
 			<text class="distribution_text" wx:if="{{type==1}}">配送费</text>
 			<text class="distribution_price" wx:if="{{type==1}}">￥{{shopInfo.fDistributionPrice}}</text>
 		</view>
