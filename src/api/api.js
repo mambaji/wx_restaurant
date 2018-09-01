@@ -16,7 +16,7 @@ const hostUrl = 'https://www.passingjoy.com';
 
 const apiHost = 'https://api.it120.cc/manbasji/';
 const apisuHost = 'https://api.it120.cc/suya/';
-const apiTHost= 'https://www.passingjoy.com/test/wechat';
+const apiTHost= 'https://www.leadnexus.net/wechat';
 
 //管理员登录接口
 const adminLogin = (params) => wxRequest(params,apiTHost+'/auth/login/');

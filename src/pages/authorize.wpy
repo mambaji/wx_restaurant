@@ -12,6 +12,7 @@
 <script>
 import wepy from 'wepy';
 import api from '@/api/api';
+import tip from '@/utils/tip';
 import {
 	SYSTEM_INFO,
 	USER_SPECICAL_INFO,
@@ -31,13 +32,15 @@ export default class Authrorize extends wepy.page{
 	}
 
 	async onLoad(){
+		wx.clearStorage()
+		// wx.removeStorageSync(TOKEN)
 		let that = this;
 		//判断用户是否配置设置
 		let resSetting = await wepy.getSetting();
 		console.log(resSetting)
 		if((resSetting.authSetting)['scope.userInfo']){
 			console.log("执行isToken");
-			that.isToken();
+			// that.isToken();
 		}
 	}
 
@@ -45,7 +48,9 @@ export default class Authrorize extends wepy.page{
 		let reslogin = await wepy.login();
 		console.log("wxcode:");
 		console.log(reslogin.code);
+		// tip.toast("进入了wxlogin")
 		if(reslogin.errMsg == "login:ok"){
+			// tip.toast("开始调用wxlogin")
 			const json = await api.sendWxCode({
 				query:{
 					code:reslogin.code,
@@ -55,6 +60,7 @@ export default class Authrorize extends wepy.page{
 			})
 			console.log("发送wxcode请求......");
 			console.log(json);
+			// tip.toast("wxlogin结果"+JSON.stringify(json))
 			if(json.data.code == 0){
 					//保存token到本地
 					wepy.setStorageSync(TOKEN,json.data.token);//
@@ -84,10 +90,12 @@ export default class Authrorize extends wepy.page{
 	async isToken(){
 		let that = this;
 		var token = wepy.getStorageSync(TOKEN);
+		// tip.toast(token)
 		if(token==undefined || token==''){
 			//token为空，重新调用获取token接口
 			that.wxlogin();
 		}else{
+			// tip.toast("token有值存在")
 			//token有值存在
 			let json = await api.checkToken({
 				query:{
@@ -95,12 +103,15 @@ export default class Authrorize extends wepy.page{
 				},
 			})
 			console.log("执行token接口");
-			console.log(json);			
+			console.log(json);	
+			// tip.toast(JSON.stringify(json))		
 			if(json.data.code == 0){
+				// tip.toast("token验证成功")	
 				wepy.switchTab({
 					url:'/pages/home'
 				})
 			}else{
+				// tip.toast("token验证失败")	
 				//token过期，重新请求token
 				that.wxlogin();
 			}
@@ -115,6 +126,7 @@ export default class Authrorize extends wepy.page{
 			let res = await wepy.login();
 			console.log("用户登录信息:");
 			console.log(res);
+			// tip.toast("用户登录信息")
 			if(res.code){
 				console.log(e.detail);
 				// 存储用户信息到本地
@@ -125,6 +137,7 @@ export default class Authrorize extends wepy.page{
 				// wepy.switchTab({
 				// 	url:'/pages/home'
 				// })
+				// tip.toast("即将进入isToken")
 				that.isToken();
 			}
 		}
